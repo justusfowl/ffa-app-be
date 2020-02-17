@@ -65,4 +65,42 @@ function updateUser(req, res){
 
 }
 
-module.exports = { updateUser }
+async function asyncGetUserProfile(userId){
+    return new Promise ((resolve, reject) => {
+        try{
+
+            MongoClient.connect(MongoUrl, function(err, db) {
+      
+                if (err) throw err;
+                
+                let dbo = db.db(config.mongodb.database);
+     
+                const collection = dbo.collection('users');
+     
+                collection.findOne(
+                    {
+                        "_id" : ObjectID(userId)
+                    },
+                    function(err, user){
+                        if (user){
+
+                            if (user.passPhrase){
+                                delete user.passPhrase;
+                            }
+                            
+                            resolve(user);
+                        }else{
+                            reject("No user found with id: " + userId);
+                        }
+                    }
+                );
+                    
+              });
+     
+        }catch(error){
+            reject(error);
+        }
+    });
+}
+
+module.exports = { updateUser, asyncGetUserProfile }

@@ -5,6 +5,7 @@ var router = express.Router();
 var authRoutes = require('./auth.route');
 var profileRoutes = require('./profile.route');
 var teamRoutes = require('./team.route');
+var coachRoutes = require('./coach.route');
 
 const tokenValidator = require('../controllers/tokenvalidate.controller');
 
@@ -16,6 +17,8 @@ router.use('/hb', function (req, res){
 router.use('/auth', authRoutes);
 
 router.use('/profile', [tokenValidator.verifyToken], profileRoutes);
+
+router.use('/coach', [tokenValidator.verifyToken], coachRoutes);
 
 // static content:
 

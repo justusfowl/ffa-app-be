@@ -41,10 +41,9 @@ function login(req, res){
 
                 if(bcrypt.compareSync(password, data.passPhrase)) {
     
-                    let resp = {
-                        "userName" : data.userName, 
-                        "_id" : data._id
-                    }
+                    let resp = data; 
+
+                    delete resp.passPhrase;
         
                     var token = jwt.sign(resp, config.auth.jwtsec, {
                         expiresIn: config.auth.expiresIn // expires in 90 secs
