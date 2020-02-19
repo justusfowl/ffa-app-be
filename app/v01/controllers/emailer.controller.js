@@ -14,11 +14,13 @@ var hbs = require('nodemailer-express-handlebars');
 
 var transporter = nodeMailer.createTransport({
     host:  config.email.smtpServer,
-    secure: true, 
+    secure: false, 
     auth: {
       user: config.email.smtpEmail,
       pass: config.email.smtpPass
-    }
+    },
+    tls: {rejectUnauthorized: false},
+    debug:true
   });
 
 const handlebarOptions = {
