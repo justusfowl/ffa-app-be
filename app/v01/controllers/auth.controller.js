@@ -234,7 +234,15 @@ function _sendAccountValidationEmail (_id, userName){
     
         console.log(token);
 
-        let tokenUrl = encodeURI("http://localhost:8000/web/validateAccount?token=" + token); 
+        let urlBase;
+
+        if (config.env == "development"){
+            urlBase = config.hostProto + "://" + config.hostBase + ":" + config.hostExposedPort  + "/web/validateAccount?token=";
+        }else{
+            urlBase = config.hostProto + "://" + config.hostBase + "/web/validateAccount?token=";
+        }
+
+        let tokenUrl = encodeURI(urlBase + token); 
     
         emailerCtrl.sendValidateAccountEmail(userName, tokenUrl).then(result => {
             resolve(true)

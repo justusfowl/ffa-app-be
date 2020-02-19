@@ -17,7 +17,12 @@ else if (env == 'production'){
 const config = {
     env: env,
     port: port,
-    APIVersion: '01',
+
+    hostExposedPort : process.env.HOST_EXPOSED_PORT,
+    hostBase :  process.env.HOST_BASE,
+    hostProto : process.env.HOST_PROTO,
+
+    APIVersion: process.env.API_V,
 
     mongodb: {
       username: process.env.MONGO_USER,
