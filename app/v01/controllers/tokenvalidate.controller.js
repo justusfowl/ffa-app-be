@@ -19,8 +19,14 @@ function verifyToken(req, res, next) {
         }
         // verifies secret
         jwt.verify(token, config.auth.jwtsec, function(err, decoded) {   
-        if (err) 
-            return res.send(401, { auth: false, message: 'Failed to authenticate token.' });    
+        if (err){
+            if (err.name == "TokenExpiredError"){
+                return res.send(440, { auth: false, message: 'Token expired.' });    
+              }else{
+                return res.send(401, { auth: false, message: 'Failed to authenticate token.' });    
+              }
+        }
+            
 
         // if everything is good, save to request for use in other routes
         req.userId = decoded._id;

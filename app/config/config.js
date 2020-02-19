@@ -1,22 +1,11 @@
 require('dotenv').config();
 
-var versiony = require('versiony');
-
 let env = (process.env.NODE_ENV).toLowerCase() || 'development'; 
 
 var port;
 
 if (env == 'development'){
   port = process.env.PORT || 8000;
-
-  versiony
-    .patch()                // will cause the minor version to be bumped by 1
-    .from('version.json')   // read the version from version.json
-    .to()                   // write the version to the source file (package.json)
-                            // with the minor part bumped by 1
-    .to('bower.json')       // apply the same version
-    .to('package.json')     // apply the same version
-    .end()                  // display info on the stdout about modified files
 
 }
 else if (env == 'production'){
@@ -40,12 +29,18 @@ const config = {
 
     auth: {
       jwtsec : process.env.JWT_TOKEN_SEC, 
-      expiresIn: 100000000
+      expiresIn:  process.env.JWT_EXPIRY_MILLISEC
     },
     procBackend : {
       host: process.env.PROC_BACKEND_HOST,
       port : process.env.PROC_BACKEND_PORT,
     },
+
+    email : {
+      smtpServer : process.env.SMTP_SERVER,
+      smtpPass : process.env.SMTP_PASS,
+      smtpEmail : process.env.SMTP_EMAIL
+    }
 
   };
 

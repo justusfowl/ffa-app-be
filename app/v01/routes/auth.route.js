@@ -10,4 +10,7 @@ router.route('/login')
 router.route('/register')
     .post(authCtrl.registerUser)
 
+router.route('/getValidateEmail')
+    .get([tokenValidator.verifyToken], authCtrl.userIssueAccountValidationEmail)
+
 module.exports = router;

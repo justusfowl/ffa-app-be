@@ -24,6 +24,11 @@ function updateUser(req, res){
         delete targetUser.token;
     }
 
+    // remove validated if passed, so that it is not overwritten
+    if (typeof(targetUser.validated) != "undefined"){
+        delete targetUser.validated;
+    }
+
    // remove username, prevent changing of the email address
    if (targetUser.userName){
         delete targetUser.userName;

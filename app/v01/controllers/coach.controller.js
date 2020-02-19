@@ -2054,7 +2054,8 @@ async function getWellbeingEvaluation(userId, sessionObj){
           let response = {
             "score" : body["GZmehm01_score"], 
             "evalDate" : body["evalDate"], 
-            "evalDetails" : body["evalDetails"]
+            "evalDetails" : body["evalDetails"], 
+            "suggestions" : body["suggestions"]
           };
 
           resolve(response);
@@ -2067,36 +2068,63 @@ async function getWellbeingEvaluation(userId, sessionObj){
 
 }
 
-function storeSession(userId, sessionObj){
+async function storeSession(userId, inSessionObj){
+  // make a deep copy which can be stored, so that ID is not modified
+  let sessionObj = JSON.parse(JSON.stringify(inSessionObj));
 
- sessionObj.userId = userId;
+  sessionObj.userId = userId;
+  let sessId;
 
+  if (sessionObj._id){
+    sessId = sessionObj._id;
+    delete sessionObj._id
+  }
+
+ return new Promise ((resolve, reject) => {
   try{
 
-     MongoClient.connect(MongoUrl, function(err, db) {
+    MongoClient.connect(MongoUrl, function(err, db) {
 
-         if (err) throw err;
-         
-         let dbo = db.db(config.mongodb.database);
+        if (err) throw err;
 
-         const collection = dbo.collection('coach');
+        
+        
+        let dbo = db.db(config.mongodb.database);
 
-         collection.insertOne(sessionObj,
-             function(err, docs){
-               if (err){
-                console.error(err)
-               }else{
-                console.log("Session stored for userId | " + userId)
-               }
-                 
-             }
-         );
-             
-       });
+        const collection = dbo.collection('coach');
 
- }catch(error){
-     console.error("Something went wrong storing the session for userId | " + userId)
- }
+        var cb = function(err, docs){
+          if (err){
+           console.error(err);
+           reject(err);
+          }else{
+            resolve(docs);
+           console.log("Session stored for userId | " + userId)
+          }
+            
+        };
+
+        if (sessId){
+          collection.replaceOne(
+            {"_id" : ObjectID(sessId)},
+            sessionObj,
+              cb
+          );
+        }else{
+          collection.insertOne(
+            sessionObj,
+              cb
+          );
+        }
+            
+      });
+
+}catch(error){
+    console.error("Something went wrong storing the session for userId | " + userId)
+}
+ })
+
+  
 
 }
 

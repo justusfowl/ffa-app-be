@@ -17,7 +17,12 @@ sockets.init = function (server) {
     
         jwt.verify(token, config.auth.jwtsec, function(err, decoded) {
           if (err){
-            return callback({ message: 'UNAUTHORIZED' });
+            if (err.name == "TokenExpiredError"){
+              return callback({ message: 'EXPIRED' , status : 440});
+            }else{
+              return callback({ message: 'UNAUTHORIZED' });
+            }
+            
           }else{
             socket["userId"] = decoded._id;
             return callback(null, true);
@@ -42,6 +47,8 @@ sockets.init = function (server) {
 
           if (sessionObj.complete){
 
+            socket.emit('loading', {isLoading: true});
+
             let flagValidEval = true;
             let error;
 
@@ -51,26 +58,29 @@ sockets.init = function (server) {
             });
             
             if (flagValidEval){
+
               sessionObj.evaluation = evaluation;
 
-              coachCtrl.storeSession(socket.userId, sessionObj);
+              let s = await coachCtrl.storeSession(socket.userId, sessionObj).catch(err => {
+                socket.emit('coach:badcomplete', sessionObj);
+              });
+
+              if (typeof(sessionObj._id) == "undefined"){
+                sessionObj["_id"] = (s.insertedId).toString()
+              }      
   
               socket.emit('coach:complete', sessionObj);
+
             }else{
               
-              sessionObj.evaluation = {
-                error :  error
-              };
-
-              coachCtrl.storeSession(socket.userId, sessionObj);
-  
               socket.emit('coach:badcomplete', sessionObj);
+              
             }
            
 
           }else{
-            socket.emit('coach:question', inputSessionObj)
-            socket.emit('coach:progress', {perc: inputSessionObj.progress})
+            socket.emit('coach:question', inputSessionObj);
+            socket.emit('coach:progress', {perc: inputSessionObj.progress});
           }
             
         })
