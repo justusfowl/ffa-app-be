@@ -9,6 +9,17 @@ function getNews(req, res){
 
     try{
 
+        let newsId = req.params.newsId;
+        let filterObj;
+
+        if (newsId){
+            filterObj = {
+                "_id" : ObjectID(newsId)
+            }
+        }else{
+            filterObj = {}
+        }
+
         MongoClient.connect(MongoUrl, function(err, db) {
   
             if (err) throw err;
@@ -17,13 +28,20 @@ function getNews(req, res){
  
             const collection = dbo.collection('news');
  
-            collection.find({}).sort( { date: -1 } ).toArray(function(error, result){
+            collection.find(filterObj).sort( { date: -1 } ).toArray(function(error, result){
                 if (error){
                     throw err;
                 }
 
-                res.json(result)
-
+                if (newsId){
+                    if (result.length > 0){
+                        res.json(result[0]);
+                    }else{
+                        res.json({});
+                    }
+                }else{
+                    res.json(result)
+                }
             });
                 
           });

@@ -7,5 +7,6 @@ router.route('/sessions')
 
 router.route('/session/:sessionId')
     .get(coachCtrl.loadSession)
+    .delete(coachCtrl.deleteSession)
 
 module.exports = router;

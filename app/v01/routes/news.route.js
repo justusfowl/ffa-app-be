@@ -5,4 +5,7 @@ var newsCtrl = require('../controllers/news.controller')
 router.route('/')
     .get(newsCtrl.getNews)
 
+router.route('/:newsId')
+    .get(newsCtrl.getNews)
+
 module.exports = router;
