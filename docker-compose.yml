@@ -1,0 +1,22 @@
+version: "3"
+services:
+  app:
+    container_name: ffa-web
+    restart: always
+    build: ./
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    links:
+      - mongo
+  mongo:
+    container_name: mongo
+    image: mongo
+    environment:
+      - MONGO_INITDB_DATABASE=${MONGO_DB}
+    volumes:
+      - ./init_mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+      - ./mongodb:/data/db
+    ports:
+      - "27017:27017"

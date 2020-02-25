@@ -1,12 +1,14 @@
 pipeline {
     
     agent {
-        dockerfile true
+        dockerfile {
+            args '-t ffa_web'
+        }
     }
     stages {
-        stage('Example') {
+        stage('Finish') {
             steps {
-                echo "FFA"
+                echo "FFA complete"
             }
         }
     }
