@@ -1,0 +1,25 @@
+.news{
+    img{
+        max-width: 100%;
+    }
+
+    .card-title{
+        margin-top: 1rem;
+    }
+
+    .date{
+        font-size: 12px;
+        color: gray;
+        margin-bottom: 1rem;
+    }
+}
+
+
+app-newsdetail{
+    max-height: 100vh;
+    overflow: scroll;
+}
+
+.full-height-dialog{
+    max-height : 100vh !important;
+}

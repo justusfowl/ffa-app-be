@@ -1,0 +1,571 @@
+
+    <!-- end of navbar -->
+  
+  
+    <!-- Header -->
+    <header id="header" class="header">
+        <div class="header-content">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="text-container">
+                            <h1>{{WELCOME_TITLE}}</h1>
+                            <p class="sub p-heading p-large">{{WELCOME_SUBHEADER}}</p>
+                            <div class="opening-statement">
+                                <div class="announcement open" *ngIf="getIsNowOpen()">
+                                    Wir haben aktuell geöffnet, klicken Sie <a href="#times">hier</a>, um die Öffnungszeiten anzusehen.
+                                </div>
+                                <div class="announcement closed" *ngIf="!getIsNowOpen()">
+                                    Wir haben aktuell geschlossen, klicken Sie <a href="#times">hier</a>, um die Öffnungs- & Vertretungszeiten anzusehen.
+                                    <p *ngIf="getIsVacationClosed()">{{getIsVacationClosed()}}</p>
+                                </div>
+                            </div>
+                            <a class="btn-solid-lg page-scroll" (click)="goToTag('contact')">Anfrage</a>
+                           
+                        </div>
+                    </div> <!-- end of col -->
+                </div> <!-- end of row -->
+            </div> <!-- end of container -->
+        </div> <!-- end of header-content -->
+    </header> <!-- end of header -->
+    <!-- end of header -->
+  
+   
+    <!-- Description -->
+    <div class="cards-1">
+        <div class="container"> 
+            <div class="row">
+                <div class="col-lg-12">
+                    
+                    <!-- Card -->
+                    <div class="card">
+                        <span class="fa-stack">
+                            <span class="hexagon"></span>
+                            <i class="fas fa-clock fa-stack-1x"></i>
+                        </span>
+                        <div class="card-body">
+                            <h4 class="card-title">Organisation</h4>
+                            <p>Informieren Sie sich über unsere Sprech- und Urlaubszeiten, sowie relevante Vertreter oder nehmen Sie direkt Kontakt zu uns auf.</p>
+                        </div>
+                    </div>
+                    <!-- end of card -->
+  
+                    <!-- Card -->
+                    <div class="card">
+                        <span class="fa-stack">
+                            <span class="hexagon"></span>
+                            <i class="fas fa-users fa-stack-1x"></i>
+                        </span>
+                        <div class="card-body">
+                            <h4 class="card-title">Team</h4>
+                            <p>Hier können Sie sich über das Team sowie medizinischen Leistungen ausführlich informieren oder einen Termin vereinbaren.</p>
+                        </div>
+                    </div>
+                    <!-- end of card -->
+  
+                    <!-- Card -->
+                    <div class="card">
+                        <span class="fa-stack">
+                            <span class="hexagon"></span>
+                            <i class="fas fa-arrows-alt-h fa-stack-1x"></i>
+                        </span>
+                        <div class="card-body">
+                            <h4 class="card-title">Leistungen</h4>
+                            <p>Erfahren Sie mehr über unser weitreichendes Leistungsangebot.</p>
+                        </div>
+                    </div>
+                    <!-- end of card -->
+
+                    <!-- Card -->
+                    <div class="card">
+                        <span class="fa-stack">
+                            <span class="hexagon"></span>
+                            <i class="fas fa-newspaper fa-stack-1x"></i>
+                        </span>
+                        <div class="card-body">
+                            <h4 class="card-title">Aktuelles</h4>
+                            <p>Auch finden Sie hier Informationen über aktuelle Vorkommnisse im Praxisbrief, sowie wichtige Ankündigungen.</p>
+                        </div>
+                    </div>
+                    <!-- end of card -->
+  
+                </div> <!-- end of col -->
+            </div> <!-- end of row -->
+        </div> <!-- end of container -->
+    </div> <!-- end of cards-1 -->
+    <!-- end of description --> 
+  
+   
+    <!-- Details 1 -->
+  <div id="services" class="accordion">
+    <div class="area-1">
+    </div><!-- end of area-1 on same line and no space between comments to eliminate margin white space --><div class="area-2">
+            
+            <!-- Accordion -->
+            <div class="accordion-container" id="accordionOne">
+                <h2>Versorgungs-Leitlinien</h2>
+                <div class="item">
+                    <div id="headingOne">
+                        <span data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne" role="button">
+                            <span class="circle-numbering">1</span><span class="accordion-title">Mensch-Zuerst</span>
+                        </span>
+                    </div>
+                    <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordionOne">
+                        <div class="accordion-body">
+                            Wir fühlen uns primär der medizinischen Versorgung unserer Patienten verpflichtet. 
+                        </div>
+                    </div>
+                </div> <!-- end of item -->
+            
+                <div class="item">
+                    <div id="headingTwo">
+                        <span class="collapsed" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo" role="button">
+                            <span class="circle-numbering">2</span><span class="accordion-title">Offene Kommunikation</span>
+                        </span>
+                    </div>
+                    <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionOne">
+                        <div class="accordion-body">
+                                Bei auftretenden Problemen ist es für uns alle leichter, wenn wir offen darüber sprechen - wir möchten Ihnen, soweit es geht, Ihre Situation als Patient erleichtern. Im Falle von Kritik oder Verbesserungsvorschlägen zur Organisation, der Betreuung, der Praxiseinrichtung etc., bitten wir um offene oder anonyme (Briefkasten) Mitteilung. Nur so können wir Ihren Bedürfnissen noch gerechter werden.
+                        </div>
+                    </div>
+                </div> <!-- end of item -->
+            
+                <div class="item">
+                    <div id="headingThree">
+                        <span class="collapsed" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree" role="button">
+                            <span class="circle-numbering">3</span><span class="accordion-title">Planbarkeit</span>
+                        </span>
+                    </div>
+                    <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#accordionOne">
+                        <div class="accordion-body">
+                                Für besondere Untersuchungen und planbare langwierige Behandlungen und Gespräche ist eine Terminvereinbarung vorteilhaft.
+                        </div>
+                    </div>
+                </div> <!-- end of item -->
+            </div> <!-- end of accordion-container -->
+            <!-- end of accordion -->
+  
+    </div> <!-- end of area-2 -->
+    </div> <!-- end of accordion -->
+    <!-- end of details 1 -->
+  
+    <!-- Details 2 -->
+    <div class="tabs">
+            <div class="area-1">
+                <div class="tabs-container">
+                    
+                    <!-- Tabs Links -->
+                    <ul class="nav nav-tabs" id="ariaTabs" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" id="nav-tab-2" data-toggle="tab" href="#tab-2" role="tab" aria-controls="tab-2" aria-selected="true"><i class="fas fa-th"></i> Leistungen</a>
+                        </li>
+                        <!--
+                        <li class="nav-item">
+                            <a class="nav-link" id="nav-tab-1" data-toggle="tab" href="#tab-1" role="tab" aria-controls="tab-1" aria-selected="false"><i class="fas fa-th"></i> Werte</a>
+                        </li>
+                        -->
+                       
+                    </ul>
+                    <!-- end of tabs links -->
+                    
+                    <!-- Tabs Content -->
+                    <div class="tab-content" id="ariaTabsContent">
+      
+                        <!-- Tab 
+                        <div class="tab-pane fade" id="tab-1" role="tabpanel" aria-labelledby="tab-1">
+                            <h4>Planbarkeit</h4>
+                            <p>Für besondere Untersuchungen und planbare langwierige Behandlungen und Gespräche ist eine Terminvereinbarung vorteilhaft.</p>     
+                            
+                            <h4>Offenheit der Kommunikation</h4>
+                            <p>Bei auftretenden Problemen ist es für uns alle leichter, wenn wir offen darüber sprechen - wir möchten Ihnen, soweit es geht, Ihre Situation als Patient erleichtern. Im Falle von Kritik oder Verbesserungsvorschlägen zur Organisation, der Betreuung, der Praxiseinrichtung etc., bitten wir um offene oder anonyme (Briefkasten) Mitteilung. Nur so können wir Ihren Bedürfnissen noch gerechter werden.</p>    
+                        </div> 
+                         end of tab -->
+      
+                        <!-- Tab -->
+                        <div class="tab-pane fade  show active" id="tab-2" role="tabpanel" aria-labelledby="tab-2">
+                            <ul class="service-list list-unstyled li-space-lg first">
+                                <li class="media" *ngFor="let s of serviceBullets; let i=index;">
+                                    <div class="media-bullet"> <mat-icon>{{s.icon}}</mat-icon></div>
+                                    <div class="media-body"><strong>{{s.service}}</strong><span *ngIf="s.sub"><br/>{{s.sub}}</span></div>
+                                </li>
+                            </ul>
+                        </div> <!-- end of tab-pane -->
+                    </div> <!-- end of tab-content -->
+                    <!-- end of tabs content -->
+      
+                </div> <!-- end of tabs-container -->
+            </div><!-- end of area-1 on same line and no space between comments to eliminate margin white space --><div class="area-2"></div> <!-- end of area-2 -->
+        </div> <!-- end of tabs -->
+        <!-- end of details 2 -->
+     
+    
+    <!-- Services -->
+    <div id="times">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <h2>Sprechzeiten</h2>
+
+                    <p>
+                            Bitte beachten Sie: Unsere Öffnungszeiten beinhalten Kurzzeitsprechstunden. Diese sind unten entsprechend durch das  Symbol erkennbar und sind zur Konsultation bei akuten Erkrankungen wie Erkältung, Grippe, Magen-Darm-Infekten, Harnwegsinfekten o.ä. und / oder Ausstellung von Arbeitsunfähigkeitsbescheinigungen (AU).
+                            Bitte bringen Sie daher hierfür Wartezeit mit.
+                    </p>
+
+                    <br/>
+                    <p>
+                            Für planbare Anliegen wie Befundbesprechungen, Vorsorgeuntersuchungen o.ä. bitten wir Sie, wie gewohnt, einen Termin unter 06123 / 902910 zu vereinbaren.
+                    </p>
+
+
+                </div> <!-- end of col -->
+            </div> <!-- end of row -->
+            <div class="row">
+                <div class="col-lg-12 days">
+                    
+                    <!-- Card -->
+                    <div class="day" *ngFor="let d of times; let i=index;">
+
+                        <div class="tag open" *ngIf="getIsDayOpen(d) && getDayIsToday(d)">geöffnet</div>
+                        <div class="tag closed" *ngIf="!getIsDayOpen(d) && getDayIsToday(d)">aktuell geschlossen</div>
+                       
+                        <div class="card-body">
+                            <h3 class="card-title">{{d.day}}</h3> 
+                            <p>{{d.vomiStart}} - {{d.vomiEnd}}</p>
+                            <p *ngIf="d.namiStart">{{d.namiStart}} - {{d.namiEnd}}</p>
+                        </div>
+                    </div>
+                    <!-- end of card -->
+    
+                </div> <!-- end of col -->
+            </div> <!-- end of row -->
+
+            <div class="row">
+                <p class="sub-detail">
+                        Unsere Praxis ist durch einen Aufzug barrierefrei erreichbar.
+                </p>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-12">
+                    <h2>Urlaubszeiten</h2>
+
+                </div> <!-- end of col -->
+            </div> <!-- end of row -->
+            <div class="row vacationtimes">
+                <div class="col-lg-12 days">
+                    
+                    <!-- Card -->
+                    <div class="day vacation" *ngFor="let v of vacation; let i=index;">
+                        
+                        <div class="card-body">
+                            <h3 class="card-title">{{v.title}}</h3> 
+                            <p>{{getVacationDisplay(v)}}</p>
+                        </div>
+                    </div>
+
+                    <div class="vacation-no-data" *ngIf="vacation.length == 0">
+                        Wir werden weitere Urlaubszeiten hier rechtzeitig bekanntgeben.
+                    </div>
+                    <!-- end of card -->
+    
+                </div> <!-- end of col -->
+            </div> <!-- end of row -->
+
+            
+        </div> <!-- end of container -->
+    </div> <!-- end of cards-2 -->
+    <!-- end of services -->
+
+    <!-- Services -->
+    <div id="news" class="cards-2">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="section-title">Neuigkeiten</div>
+                    <h2>Praxisnews</h2>
+                </div> <!-- end of col -->
+            </div> <!-- end of row -->
+            <div class="row">
+                <div class="col-lg-12 ">
+                    
+                    <!-- Card -->
+                    <div class="card" *ngFor="let n of news; let i=index;" >
+                        <div class="card-image">
+                            <img class="img-fluid" [src]="getImageUrl(n)" alt="alternative">
+                        </div>
+                        <div class="card-body">
+                            <h3 class="card-title">{{n.header}}</h3>
+                            <p>{{n.text  | trimLongStr:50}}</p>
+                            <p class="price">{{n.date | date:'MMM d, y'}}</p>
+                        </div>
+                        <div class="button-container">
+                            <button class="more-news" (click)="openNews(n)" color="accent" mat-raised-button >MEHR</button>
+                        </div> <!-- end of button-container -->
+                    </div>
+                    <!-- end of card -->
+    
+                </div> <!-- end of col -->
+            </div> <!-- end of row -->
+        </div> <!-- end of container -->
+    </div> <!-- end of cards-2 -->
+    <!-- end of services --> 
+
+    
+    <!-- Team -->
+    <div class="basic-2" id="team">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <h2>Unser Team</h2>
+                    <h4 class="p-heading">Ärzte</h4>
+                </div> <!-- end of col -->
+            </div> <!-- end of row -->
+            <div class="row">
+                <div class="col-lg-12">
+    
+                    <!-- Team Member --> 
+                    <div class="team-member" *ngFor="let doc of teamDocs; let i=index;">
+                        <div class="image-wrapper">
+                            <img class="img-fluid" [src]="getAvatar(doc)" alt="alternative">
+                        </div> <!-- end of image-wrapper -->
+                        <p class="p-large">{{doc.name}}</p>
+                        <p class="job-title">{{doc.role}}</p>
+                        <p class="member-description">
+                            {{doc.description}}
+                        </p>
+                    </div> <!-- end of team-member -->
+                    <!-- end of team member -->
+
+                </div> <!-- end of col -->
+            </div> <!-- end of row -->
+
+            <div class="row">
+                <div class="col-lg-12">
+                    <h4 class="p-heading">MFA</h4>
+                </div> <!-- end of col -->
+            </div> <!-- end of row -->
+            <div class="row">
+                <div class="col-lg-12">
+    
+                    <!-- Team Member --> 
+                    <div class="team-member" *ngFor="let mfa of teamMfa; let i=index;">
+                        <div class="image-wrapper">
+                            <img class="img-fluid" [src]="getAvatar(mfa)" alt="alternative">
+                        </div> <!-- end of image-wrapper -->
+                        <p class="p-large">{{mfa.name}}</p>
+                        <p class="job-title">{{mfa.role}}</p>
+                    </div> <!-- end of team-member -->
+                    <!-- end of team member -->
+
+                </div> <!-- end of col -->
+            </div> <!-- end of row -->
+
+        </div> <!-- end of container -->
+    </div> <!-- end of basic-2 -->
+    <!-- end of team -->
+    
+    <!-- Call Me -->
+    <div id="contact" class="form-1">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="text-container">
+                        <div class="section-title">ANFRAGE</div>
+                        <h2 class="white">Kontaktieren Sie uns</h2>
+                        <p class="white">Sie haben die Möglichkeit, über unsere digitalen Services Rezepte vorzubestellen oder Termine zu vereinbaren:</p>
+                        <ul class="list-unstyled li-space-lg white">
+                            <li class="media">
+                                <i class="fas fa-square"></i>
+                                <div class="media-body">Generelle Anfragen und Kommentare</div>
+                            </li>
+                            <li class="media">
+                                <i class="fas fa-square"></i>
+                                <div class="media-body">Rezeptbestellungen</div>
+                            </li>
+                            <!--
+                            <li class="media">
+                                <i class="fas fa-square"></i>
+                                <div class="media-body">Terminanfragen</div>
+                            </li>
+                            -->
+                            <li class="media">
+                                <i class="fas fa-square"></i>
+                                <div class="media-body">Gesundheitsinformationen</div>
+                            </li>
+                        </ul>
+                    </div>
+                </div> <!-- end of col -->
+                <div class="col-lg-6">
+
+                    <!-- Contact Form -->
+                    <form id="requestForm"  FormGroupDirective  [formGroup]="requestForm"  class="form-dark" data-toggle="validator" data-focus="false">
+
+
+                        <div class="form-group">
+                            <mat-form-field class="login-forms">
+                                <input formControlName="name" required matInput type="text" placeholder="Name" class="form-control" required>
+                                <mat-error  *ngIf="requestForm.get('name').hasError('required')" >Bitte Namen eintragen.</mat-error>
+                            </mat-form-field>
+                        </div>
+
+                        
+                        <div class="form-group">
+                            <mat-form-field class="login-forms">
+                                <input  formControlName="email"  matInput type="text" placeholder="eMail" class="form-control" required>
+                                <mat-error  *ngIf="requestForm.get('email').hasError('required')" >Bitte Email eintragen.</mat-error>
+                            </mat-form-field>
+                        </div>
+
+                            
+                        <div class="form-group">
+                            <mat-form-field>
+                                <mat-label>Anfrageart</mat-label>
+                                <mat-select  formControlName="type" required>
+                                    <mat-option *ngFor="let req of requestTypes" [value]="req">
+                                    {{req.name}}
+                                    </mat-option>
+                                </mat-select>
+                                <mat-error *ngIf="requestForm.get('type').hasError('required')"  >Bitte wählen Sie eine Anfrageart</mat-error>
+                            </mat-form-field>
+                        </div>
+
+                        <div class="form-group" *ngIf="requestForm.value.type.type == 'general'">
+                            <mat-form-field>
+                                <mat-label>Nachricht</mat-label>
+                                <textarea formControlName="message" required type="text" matInput #messageObj maxlength="256" placeholder="Ihre generelle Anfrage"></textarea>
+                                <mat-hint class="hint" align="end">{{requestForm.value.message.length}} / 256</mat-hint>
+                            </mat-form-field>
+                        </div>
+
+                        <div class="med-requests" *ngFor="let med of medicationsRequest; let i = index;">
+
+                            <h4>Medikamente: 
+                                 <button  class="editBtn" mat-button (click)="editMediRequests()">
+                                    <mat-icon>edit</mat-icon>
+                                </button>
+                            </h4>
+
+                           
+
+                            <div class="med">
+                                    {{ med.name }} ...
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                                <mat-checkbox  formControlName="acceptTerms"  >Ich akzeptiere die <a  target="_blank"  routerLink="/privacy" routerLinkActive="active" >Nutzungsbedingungen</a></mat-checkbox>
+                        </div>
+
+                        <div class="form-group">
+                            <button mat-button [disabled]="!requestForm.valid"  class="form-control-submit-button" (click)="sendMessage()">Abschicken</button>
+                        </div>
+                        
+                    </form>
+                                       
+                </div> <!-- end of col -->
+            </div> <!-- end of row -->
+        </div> <!-- end of container -->
+    </div> <!-- end of form-1 -->
+    <!-- end of call me -->
+  
+  
+    <!-- Projects -->
+  <div id="projects" class="filter">
+    <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="section-title">EINDRÜCKE</div>
+                    <h2>Praxis</h2>
+                </div> <!-- end of col -->
+            </div> <!-- end of row -->
+            <div class="row">
+                <div class="col-lg-12">
+
+                    <div class="grid">
+                        <div class="element-item ">
+                            <a class="popup-with-move-anim"><div class="element-item-overlay"><span>Sprechzimmer</span></div><img src="assets/images/project-1.jpg" alt="alternative"></a>
+                        </div>
+                        <div class="element-item ">
+                            <a class="popup-with-move-anim" ><div class="element-item-overlay"><span>Praxisräume</span></div><img src="assets/images/project-2.jpg" alt="alternative"></a>
+                        </div>
+                        <div class="element-item ">
+                            <a class="popup-with-move-anim" ><div class="element-item-overlay"><span>Labor</span></div><img src="assets/images/project-3.jpg" alt="alternative"></a>
+                        </div>
+                        <div class="element-item ">
+                            <a class="popup-with-move-anim" ><div class="element-item-overlay"><span>Sportmedizin</span></div><img src="assets/images/project-4.jpg" alt="alternative"></a>
+                        </div>
+
+                    </div> <!-- end of grid -->
+                    <!-- end of filter -->
+                    
+                </div> <!-- end of col -->
+            </div> <!-- end of row -->
+    </div> <!-- end of container -->
+    </div> <!-- end of filter -->
+    <!-- end of projects -->
+  
+    <div id="mapid" style="width: 100%; height: 400px;"></div>
+  
+    <!-- Contact -->
+    <div id="times" class="form-2">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="text-container">
+                        <div class="section-title">PRAXIS</div>
+                        <h2>KONTAKT</h2>
+                        <p>Sie erreichen uns zu unseren Sprechzeiten an folgender Adresse oder für generelle Anfragen über das <strong class="link" (click)="goToTag('contact')">Formular</strong></p>
+                        <ul class="list-unstyled li-space-lg">
+                            <li class="address"><i class="fas fa-map-marker-alt"></i>Ringstrasse 33, 65346 Eltville-Erbach</li>
+                            <li class="address"><i class="fas fa-phone"></i><a href="tel:00496123902910">+49 6123 90 29 10</a></li>
+                            <li class="address"><i class="fas fa-fax"></i><a href="tel:00496123902911">+49 6123 90 29 11</a></li>
+                        </ul>
+                        
+                    </div> <!-- end of text-container -->
+                </div> <!-- end of col -->
+                <div class="col-lg-6" *ngIf="false">
+                    
+                    <!-- Contact Form --> 
+                    <form id="contactForm"  [formGroup]="contactForm" data-toggle="validator" data-focus="false">
+
+                        <div class="form-group">
+                            <mat-form-field class="login-forms">
+                                <input formControlName="name" matInput type="text" placeholder="Name" class="form-control" required>
+                                <mat-error *ngIf="contactForm.get('name').hasError('required')">Bitte Namen eintragen.</mat-error>
+                            </mat-form-field>
+                        </div>
+                        
+                        <div class="form-group">
+                            <mat-form-field class="login-forms">
+                                <input  formControlName="email"  required matInput type="text" placeholder="eMail" class="form-control">
+                                <mat-error *ngIf="contactForm.get('email').invalid">Bitte Email eintragen.</mat-error>
+                            </mat-form-field>
+                        </div>
+                            
+                        <div class="form-group">
+                            <mat-form-field class="example-full-width">
+                                <mat-label>Nachricht</mat-label>
+                                <textarea formControlName="message" required type="text" matInput #messageObj maxlength="256" placeholder="Ihre generelle Anfrage"></textarea>
+                                <mat-hint align="start"><strong>Bitte senden Sie hierüber keine sensiblen Informationen</strong> </mat-hint>
+                                <mat-hint align="end">{{contactForm.value.message.length}} / 256</mat-hint>
+                                <mat-error *ngIf="contactForm.get('message').hasError('required')">Bitte verfassen Sie eine Nachricht.</mat-error>
+                            </mat-form-field>
+                        </div>
+
+                        <div class="form-group">
+                                <mat-checkbox formControlName="acceptTerms"  >Ich akzeptiere die <a  target="_blank"  routerLink="/privacy" routerLinkActive="active" >Nutzungsbedingungen</a></mat-checkbox>
+                        </div>
+
+                        <div class="form-group">
+                            <button mat-button [disabled]="!contactForm.valid" class="form-control-submit-button" (click)="setMessage()">Abschicken</button>
+                        </div>
+                      
+                    </form>
+                    <!-- end of contact form -->
+  
+                </div> <!-- end of col -->
+            </div> <!-- end of row -->
+        </div> <!-- end of container -->
+    </div> <!-- end of form-2 -->
+    <!-- end of contact -->
+  

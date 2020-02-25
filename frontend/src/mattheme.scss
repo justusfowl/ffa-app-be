@@ -1,0 +1,93 @@
+@import '~@angular/material/theming';
+@import 'variables.scss';
+// Plus imports for other components in your app.
+
+// Include the common styles for Angular Material. We include this here so that you only
+// have to load a single css file for Angular Material in your app.
+// Be sure that you only ever include this mixin once!
+@include mat-core();
+
+// Define the palettes for your theme using the Material Design palettes available in palette.scss
+// (imported above). For each palette, you can optionally specify a default, lighter, and darker
+// hue. Available color palettes: https://material.io/design/color/
+
+$md-ffa: (
+    50 : #f3e6e6,
+    100 : #e0c0c1,
+    200 : #cb9698,
+    300 : #b66b6e,
+    400 : #a74c4f,
+    500 : #972c30,
+    600 : #8f272b,
+    700 : #842124,
+    800 : #7a1b1e,
+    900 : #691013,
+    A100 : #ff9ea0,
+    A200 : #ff6b6f,
+    A400 : #ff383d,
+    A700 : #ff1f24,
+    contrast: (
+        50 : #000000,
+        100 : #000000,
+        200 : #000000,
+        300 : #000000,
+        400 : #ffffff,
+        500 : #ffffff,
+        600 : #ffffff,
+        700 : #ffffff,
+        800 : #ffffff,
+        900 : #ffffff,
+        A100 : #000000,
+        A200 : #000000,
+        A400 : #ffffff,
+        A700 : #ffffff,
+    )
+);
+
+$md-accent: (
+    50 : #fefbf0,
+    100 : #fdf5da,
+    200 : #fcefc2,
+    300 : #fbe9aa,
+    400 : #fae497,
+    500 : #f9df85,
+    600 : #f8db7d,
+    700 : #f7d772,
+    800 : #f6d268,
+    900 : #f5ca55,
+    A100 : #ffffff,
+    A200 : #ffffff,
+    A400 : #fffbf0,
+    A700 : #fff4d6,
+    contrast: (
+        50 : #000000,
+        100 : #000000,
+        200 : #000000,
+        300 : #000000,
+        400 : #000000,
+        500 : #000000,
+        600 : #000000,
+        700 : #000000,
+        800 : #000000,
+        900 : #000000,
+        A100 : #000000,
+        A200 : #000000,
+        A400 : #000000,
+        A700 : #000000,
+    )
+);
+
+$ffa-app-primary: mat-palette($md-ffa);
+$ffa-app-accent:  mat-palette($md-ffa, 500, A100, A400);
+
+// The warn palette is optional (defaults to red).
+$ffa-app-warn:    mat-palette($mat-red);
+
+// Create the theme object (a Sass map containing all of the palettes).
+$ffa-app-theme: mat-light-theme($ffa-app-primary, $ffa-app-accent, $ffa-app-warn);
+
+// Include theme styles for core and each component used in your app.
+// Alternatively, you can import and @include the theme mixins for each component
+// that you are using.
+@include angular-material-theme($ffa-app-theme);
+

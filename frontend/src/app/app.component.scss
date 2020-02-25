@@ -1,0 +1,21 @@
+@import "../variables.scss";
+
+.full-height-dialog{
+    max-height : 100vh !important;
+}
+
+#globalLoader{
+    z-index: 99999; 
+    position: fixed; 
+    width: 100vw;
+    top: 0;
+    left : 0;
+}
+
+.my:hover{
+    cursor: pointer;
+}
+
+.nav-item{
+    padding: 5px;
+}

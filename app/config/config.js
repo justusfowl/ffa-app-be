@@ -21,6 +21,7 @@ const config = {
     hostExposedPort : process.env.HOST_EXPOSED_PORT,
     hostBase :  process.env.HOST_BASE,
     hostProto : process.env.HOST_PROTO,
+    hostPubDir : process.env.HOST_EXPOSED_PUB_DIR,
 
     APIVersion: process.env.API_V,
 
@@ -44,7 +45,9 @@ const config = {
     email : {
       smtpServer : process.env.SMTP_SERVER,
       smtpPass : process.env.SMTP_PASS,
-      smtpEmail : process.env.SMTP_EMAIL
+      smtpEmail : process.env.SMTP_EMAIL,
+      smtpEmailSenderName : process.env.SMTP_EMAIL_SENDER_NAME, 
+      backofficeEmailReceiver : process.env.BACKOFFICE_EMAIL_RECEIVE
     }
 
   };
@@ -62,8 +65,23 @@ const config = {
 
   }
 
+  function getPubExposedDirUrl(){
 
-  config["getMongoUrl"] = getMongoUrl
+    var url = config.hostProto + "://" + config.hostBase;
+
+    if (config.hostExposedPort != 443){
+      url += ":" + config.hostExposedPort;
+    }
+
+    url += "/" ;
+
+    return url;
+      
+  }
+
+
+  config["getMongoUrl"] = getMongoUrl;
+  config["getPubExposedDirUrl"] = getPubExposedDirUrl
 
 
   

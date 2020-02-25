@@ -221,6 +221,21 @@ async function executeAccountValidation(_id){
     });
 } 
 
+async function validateUserScope(userId, scope){
+    let user = await getUserById(userId);
+
+    if (typeof(user.scopes) == "undefined"){
+        return false;
+    }else{
+        if (user.scopes.indexOf(scope) != -1){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+}
+
 function _sendAccountValidationEmail (_id, userName){
     return new Promise((resolve, reject) => {
 
@@ -270,4 +285,4 @@ async function userIssueAccountValidationEmail (req, res){
 
 }
 
-module.exports = { login, registerUser, executeAccountValidation, userIssueAccountValidationEmail}
+module.exports = { login, registerUser, executeAccountValidation, userIssueAccountValidationEmail, validateUserScope}

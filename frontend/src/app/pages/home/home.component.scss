@@ -1,0 +1,284 @@
+@import "../../../variables.scss";
+
+#header{
+    h1{
+        font: 300 2.5rem/4rem "Roboto", sans-serif;
+    }
+
+    .sub{
+        letter-spacing: 10px;
+    }
+}
+
+.card-title{
+    font-weight: 400;
+    letter-spacing: 6px;
+}
+ 
+#news{
+    .card-image{
+        .img-fluid{
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            object-position: center;
+        }
+    }
+}
+
+.more-news{
+    background-color: $secondary;
+}
+
+.more-news:focus{
+    border: unset;
+    outline: unset !important;
+}
+
+.media-body{
+    font-size: 12px;
+}
+
+#times{
+    margin-top: 40px;
+    margin-bottom: 40px;
+
+    h2{
+        text-align: center;
+    }
+}
+
+.days{
+    display: flex; 
+    align-items : center;
+    justify-content: center;
+    margin-bottom:20px;
+}
+
+@media (max-width: 1100px) {
+    .days{
+        flex-direction: column;
+
+    }
+
+    .day{
+        width: 100% !important;
+    }
+}
+
+.vacation-no-data{
+    text-align: center;
+}
+
+.day{
+    position: relative;
+    height: 150px;
+    margin: 10px;
+    width: 220px;
+    border-radius: 4px;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+
+    .card-title{
+        border-bottom: 1px solid #e4e4e4;
+        padding-bottom: 10px;
+    }
+
+    .tag{
+        position: absolute; 
+        top: -5px;
+        right: 5px;
+        font-size: 10px;
+        padding: 2px;
+        border-radius: 4px;
+    }
+
+    .tag.open{
+        background-color: green;
+        color: white;
+    }
+
+    .tag.closed{
+        background-color: $background_nav;
+        color: white;
+    }
+}
+
+.day:hover{
+    background-color: #edededa9;
+}
+
+.sub-detail{
+    text-align: center;
+    width: 100%;
+    margin-bottom: 30px;
+}
+
+
+
+@media (min-width: 1100px) {
+
+    .vacationtimes{
+
+        .days{
+            flex-wrap: wrap;
+        }
+        .day{
+            flex: 2 0 25%;
+        }
+    
+        .day.vacation{
+    
+            width: 100%; 
+    
+        }
+    }
+    
+}
+
+.vacationtimes{
+    .card-title{
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+}
+
+.team-member{
+    padding: 20px;
+    border-radius : 2px;
+    .member-description{
+        max-height: 0px; 
+        overflow: hidden;
+        transition: 0.2s;
+    }
+}
+
+
+.team-member:hover{
+    border: 1px solid #eeeeee;
+    background-color: white;
+    .member-description{
+        max-height: 100vh;
+    }
+}
+
+
+#mapid{
+    overflow: hidden;
+    z-index: -1;
+}
+
+#contactForm, 
+#requestForm{
+    mat-form-field{
+        width: 100%;
+    }
+
+    textarea{
+        height: 100px;
+        color: white;
+    }
+
+    .hint{
+        color: white;
+    }
+}
+
+.form-dark{
+
+    .mat-checkbox-frame {
+        border-color: $background_light;
+    }
+
+    .mat-select-value, 
+    .mat-select-arrow{
+        color: $background_light;
+    }
+
+    .mat-input-element {
+        caret-color: $background_dark;
+        color: $background_light;
+    }
+
+    .mat-form-field-appearance-legacy .mat-form-field-label{
+        color: $background_light;
+    }
+
+    .mat-form-field-underline {
+        background-color: $background_light;
+      }
+
+      .mat-form-field.mat-focused {
+          .mat-form-field-label{
+            color: $secondary;
+          }
+
+          .mat-input-element {
+            color: $background_dark;
+        }
+
+          .mat-form-field-ripple{
+            background-color: $secondary;
+          }
+      }
+    
+}
+
+.link:hover{
+    cursor: pointer;
+    color: $background_nav;
+}
+
+
+@media (min-width: 1100px) {
+    .prescription-dialog{
+        max-width: 90vw !important;
+    }
+}
+
+.prescription-dialog{
+    max-height: 100vh !important;
+}
+
+.med-requests{
+    margin-bottom: 20px;
+    color: white;
+}
+
+.service-list{
+    width: 100% !important;
+    display: flex !important;
+    flex: 1 0 45%;
+    flex-wrap: wrap;
+
+    .media{
+        width: 45%;
+    }
+
+    .media-body{
+        text-transform: uppercase;
+    }
+}
+
+.opening-statement{
+
+    .announcement{
+        margin: 0px 80px 20px 80px;
+    }
+
+    .announcement.closed,
+    .announcement.closed p,
+    .announcement.closed a{
+        background-color: #691f21;
+        color: white;
+    }
+
+    .announcement.open,
+        .announcement.open p,
+        .announcement.open a{
+        background-color: #2b691f;
+        color: white;
+    }
+
+
+}

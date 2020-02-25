@@ -1,0 +1,80 @@
+
+
+<div class="prescription-request">
+
+    <h1>Rezeptanfrage</h1>
+    <p>
+        Bitte tragen Sie hier die Medikamente ein, für die Sie ein Rezept vorbestellen möchten.
+    </p>
+    <p>
+        <button  class="saveBtn" mat-button (click)="addMedi()">
+            Neues Medikament zufügen
+        </button>
+    </p>
+
+    <div *ngFor="let m of medications.controls; let i=index;">
+
+        <form [formGroup]="m" class="med-itm">
+
+            
+
+
+            <mat-form-field >
+                <input  formControlName="name"  matInput type="text" placeholder="Name" class="form-control" required>
+                <mat-error  *ngIf="m.get('name').hasError('required')" >Bitte Name eintragen.</mat-error>
+            </mat-form-field>
+
+            <mat-form-field >
+                <input  formControlName="dose"  matInput type="text" placeholder="Dosis" class="form-control" required>
+                <mat-error  *ngIf="m.get('dose').hasError('required')" >Bitte Dosis eintragen.</mat-error>
+            </mat-form-field>
+
+            <mat-form-field>
+                <input  formControlName="substance"  matInput type="text" placeholder="Wirkstoff" class="form-control" required>
+                <mat-error  *ngIf="m.get('substance').hasError('required')" >Bitte Wirkstoff eintragen.</mat-error>
+            </mat-form-field>
+
+            <mat-form-field >
+                <input  formControlName="amount"  matInput type="number" placeholder="Anzahl" class="form-control" required>
+                <mat-error  *ngIf="m.get('amount').hasError('required')" >Bitte Anzahl eintragen.</mat-error>
+            </mat-form-field>
+
+            <mat-form-field >
+                <input  formControlName="pzn"  matInput type="text" placeholder="PZN" class="form-control" >
+                <mat-error  *ngIf="m.get('name').hasError('required')" >Bitte PZN eintragen.</mat-error>
+            </mat-form-field>
+
+            <mat-form-field class="doseageform">
+                <mat-label>Darreichungsart</mat-label>
+                <mat-select  formControlName="dosageform" required>
+                    <mat-option *ngFor="let f of doseformOptions" [value]="f.form">
+                    {{f.form}}
+                    </mat-option>
+                </mat-select>
+                <mat-error *ngIf="m.get('dosageform').hasError('required')"  >Bitte wählen Sie eine Darreichungsform</mat-error>
+            </mat-form-field>
+            
+            <button  class="saveBtn" mat-button (click)="removeMedi(i)">
+                <mat-icon>delete</mat-icon>
+            </button>
+            <span class="invalid-row" *ngIf="m.invalid">*</span>
+
+        </form>
+
+
+    </div>
+
+    <div class="menu-row">
+
+            <button  class="saveBtn" mat-button (click)="abort()">
+               Abbruch
+            </button>
+
+            <button  class="saveBtn" mat-button (click)="confirm()" [disabled]="medications.status == 'INVALID'">
+               OK
+            </button>
+
+
+    </div>
+</div>
+

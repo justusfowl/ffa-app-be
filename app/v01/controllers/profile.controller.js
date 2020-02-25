@@ -34,6 +34,12 @@ function updateUser(req, res){
         delete targetUser.userName;
    }
 
+   
+   // remove scopes, prevent user changing of the scopes 
+   if (targetUser.scopes){
+        delete targetUser.scopes;
+    }
+
     if (Object.keys(targetUser).length == 0){
         res.json({"message" : "ok"});
         return;

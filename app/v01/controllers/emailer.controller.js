@@ -65,6 +65,92 @@ function sendValidateAccountEmail (userName, tokenUrl) {
    
 };
 
+function sendGeneralAutoReply (userName, email, messageText) {
+
+    return new Promise((resolve, reject) => {
+
+        let options = {
+            from : '"' + config.email.smtpEmailSenderName + '" ' + config.email.smtpEmail, 
+            to : email, 
+            subject : "Eingang | Wir haben Ihre Nachricht erhalten" , 
+            template: 'generalAutoReply',
+            context: {
+                "userName": userName, 
+                "messageText" : messageText
+            }
+        }
+
+        transporter.sendMail(options, function (err, info){
+            if (err){
+                reject(err); 
+
+            }else{
+                resolve(info);
+            }
+        })
+
+    });
+   
+};
+
+function sendVacationAutoReply (userName, email, messageText, vacationObject) {
+
+    return new Promise((resolve, reject) => {
+
+        let options = {
+            from : '"' + config.email.smtpEmailSenderName + '" ' + config.email.smtpEmail, 
+            to : email, 
+            subject : "Eingang und Urlaubsnotiz | Wir haben Ihre Nachricht erhalten" , 
+            template: 'vacationAutoReply',
+            context: {
+                "userName": userName, 
+                "messageText" : messageText, 
+                "substitutes" : vacationObject.subs,
+                "vacationEndDate" : new Date(vacationObject.vacationEnd).toDateString()
+            }
+        }
+
+        transporter.sendMail(options, function (err, info){
+            if (err){
+                reject(err); 
+
+            }else{
+                resolve(info);
+            }
+        })
+
+    });
+   
+};
+
+function sendMessageToBackOffice (contextObj) {
+
+    return new Promise((resolve, reject) => {
+
+        let options = {
+            from : '"' + config.email.smtpEmailSenderName + '" ' + config.email.smtpEmail, 
+            to : config.email.backofficeEmailReceiver, 
+            subject : "myFFA | Eingang einer Nachricht über die Website" , 
+            template: 'backofficeGeneral',
+            context: contextObj
+        }
+
+        transporter.sendMail(options, function (err, info){
+            if (err){
+                reject(err); 
+
+            }else{
+                resolve(info);
+            }
+        })
+
+    });
+   
+};
+
 module.exports = {
-    sendValidateAccountEmail
+    sendValidateAccountEmail, 
+    sendGeneralAutoReply,
+    sendVacationAutoReply, 
+    sendMessageToBackOffice
 }

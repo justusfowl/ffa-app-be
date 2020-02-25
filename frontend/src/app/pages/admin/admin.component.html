@@ -1,0 +1,341 @@
+<header  class="header">
+    <div class="header-content">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="text-container">
+                    </div>
+                </div> 
+            </div> 
+        </div> 
+    </div> 
+</header> 
+
+<div class="content">
+    <h1>
+        Wartung der Website
+    </h1>
+    <mat-tab-group>
+
+        <mat-tab label="Leistungen"> 
+            <div class="service">
+                <div class="srv-itm" *ngFor="let s of services; let i=index;">
+                    <div class="media-bullet"> <i [class]="s.icon"></i></div>
+                    <div class="media-body"><strong>{{s.name}}</strong></div>
+                </div>
+            </div>
+        </mat-tab>
+        
+        <mat-tab label="Team" > 
+
+            <div class="teamList">
+
+                <div class="member" *ngFor="let m of teamMembers;">
+                    
+                    <div class="avatar">
+                        <img [src]="m.picture">
+
+                        <p>
+                            <mat-checkbox [(ngModel)]="m.flagActive" (ngModelChange)="updateTeamMember(m)" >Aktiv?</mat-checkbox>
+                        </p>
+                        <p>
+                            <button (click)="deleteMember(m)" mat-icon-button color="accent" aria-label="Example icon-button with a heart icon">
+                                <mat-icon>delete</mat-icon>
+                            </button>
+                        </p>
+                        
+                    </div>
+                    <div class="text">
+                        <mat-form-field >
+                            <input [(ngModel)]="m.name"  (ngModelChange)="handleUpdateTeamMember(m, $event)" matInput type="text" placeholder="Name"  required>
+                        </mat-form-field>
+
+                        <mat-form-field>
+                            <mat-label>Gattung</mat-label>
+                            <mat-select [(ngModel)]="m.type"  required (ngModelChange)="handleUpdateTeamMember(m, $event)">
+                                <mat-option value="doc">
+                                    doc
+                                </mat-option>
+                                <mat-option value="mfa">
+                                    mfa
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+
+                        <mat-form-field >
+                            <input [(ngModel)]="m.role" (ngModelChange)="handleUpdateTeamMember(m, $event)"  matInput type="text" placeholder="Rolle"  required>
+                        </mat-form-field>
+
+                        <mat-form-field >
+                            <textarea [(ngModel)]="m.description" (ngModelChange)="handleUpdateTeamMember(m, $event)"  matInput type="text" placeholder="Beschreibung"  required></textarea>
+                        </mat-form-field>
+                    </div>
+                </div>
+                <div class="headline">
+                    <h2>
+                        Neues Team-Mitglied
+                    </h2>
+                </div>
+                <div class="new member">
+
+                    <div  class="avatar">
+                        <img [src]="newTeamMemberFileStr" *ngIf="newTeamMemberFileStr">
+                        
+                    </div>
+                    <div class="text">
+                        <mat-form-field >
+                            <input [(ngModel)]="newTeamMember.name"   matInput type="text" placeholder="Name"  required>
+                        </mat-form-field>
+
+                        <mat-form-field>
+                            <mat-label>Gattung</mat-label>
+                            <mat-select [(ngModel)]="newTeamMember.type" required >
+                                <mat-option value="doc">
+                                    doc
+                                </mat-option>
+                                <mat-option value="mfa">
+                                    mfa
+                                </mat-option>
+                            </mat-select>    
+                        </mat-form-field>
+
+                        <mat-form-field >
+                            <input [(ngModel)]="newTeamMember.role"  matInput type="text" placeholder="Rolle"  required>
+                        </mat-form-field>
+
+                        <mat-form-field >
+                            <textarea [(ngModel)]="newTeamMember.description" matInput type="text" placeholder="Beschreibung"  required></textarea>
+                        </mat-form-field>
+                        
+                        <input class="teammember-pic-upload" type="file" placeholder="Bild hochladen" (change)="handleFileInput($event.target.files)">
+                        
+                        <button (click)="addMember()" mat-button color="secondary">
+                            <mat-icon>add</mat-icon>
+                        </button>
+                       
+                    </div>
+
+                </div>
+            </div>
+            
+        </mat-tab>
+        <mat-tab label="Sprechzeiten"> 
+                <div class="timesList">
+                    <div class="day" *ngFor="let d of times; let i=index;" [class.edit]="timesDayEditIdx == i">                      
+                        <div class="card-body" >
+                            <h3 class="card-title">
+                                <button class="editBtn" mat-button  matSuffix mat-icon-button aria-label="Clear" (click)="editOpenHrs(d,i)">
+                                    <mat-icon>edit</mat-icon>
+                                </button>
+                                
+                                {{d.day}}
+                                
+                            </h3> 
+                            <div class="slot">
+                                <mat-form-field  class="time">
+                                    <input  [readonly]="timesDayEditIdx != i" [(ngModel)]="d.vomiStart"  matInput type="time" placeholder="Start" >
+                                    <button  mat-button *ngIf="d.vomiStart && timesDayEditIdx == i" matSuffix mat-icon-button aria-label="Clear" (click)="d.vomiStart=null">
+                                        <mat-icon>close</mat-icon>
+                                    </button>
+                                </mat-form-field>
+                                - 
+                                <mat-form-field  class="time">
+                                    <input   [readonly]="timesDayEditIdx != i" [(ngModel)]="d.vomiEnd"  matInput type="time" placeholder="Ende" >
+                                    <button mat-button *ngIf="d.vomiEnd && timesDayEditIdx == i" matSuffix mat-icon-button aria-label="Clear" (click)="d.vomiEnd=null">
+                                        <mat-icon>close</mat-icon>
+                                    </button>
+                                </mat-form-field>
+
+                                <button *ngIf="timesDayEditIdx == i" mat-button  matSuffix mat-icon-button aria-label="Clear" (click)="removeHrs(d, true)">
+                                    <mat-icon>delete</mat-icon>
+                                </button>
+                               
+                            </div>
+                           
+                            <div class="slot">
+                                <mat-form-field  class="time">
+                                    <input   [readonly]="timesDayEditIdx != i" [(ngModel)]="d.namiStart"  matInput type="time" placeholder="Start" >
+                                    <button mat-button *ngIf="d.namiStart  && timesDayEditIdx == i" matSuffix mat-icon-button aria-label="Clear" (click)="d.namiStart=null">
+                                        <mat-icon>close</mat-icon>
+                                    </button>
+                                </mat-form-field>
+
+                                - 
+                                <mat-form-field  class="time">
+                                    <input [readonly]="timesDayEditIdx != i" [(ngModel)]="d.namiEnd"  matInput type="time" placeholder="Ende" >
+                                    <button  mat-button *ngIf="d.namiEnd && timesDayEditIdx == i" matSuffix mat-icon-button aria-label="Clear" (click)="d.namiEnd=null">
+                                            <mat-icon>close</mat-icon>
+                                        </button>
+                                </mat-form-field>
+                               
+                                <button *ngIf="timesDayEditIdx == i" mat-button  matSuffix mat-icon-button aria-label="Clear" (click)="removeHrs(d, false)">
+                                    <mat-icon>delete</mat-icon>
+                                </button>
+                            </div>
+
+                            <div *ngIf="timesDayEditIdx == i">
+                                <button  class="saveBtn" mat-button mat-stroked-button (click)="updateOpenHrs(d)">
+                                    <mat-icon>save</mat-icon>
+                                </button>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>    
+        </mat-tab>
+
+        <mat-tab label="Urlaubszeiten" >
+            <mat-accordion  class="vacation">
+                <mat-expansion-panel *ngFor="let vac of vacation; let i=index;">
+                    <mat-expansion-panel-header>
+                    <mat-panel-title>
+                        {{vac.title}} <span *ngIf="!vac.title">Neuer Eintrag</span>
+                    </mat-panel-title>
+                    <mat-panel-description>
+                       ab {{vac.vacationStart| date:'MMM d, y'}}
+                    </mat-panel-description>
+                    </mat-expansion-panel-header>
+                    
+                    <div class="vacation-container">
+
+                        <mat-form-field>
+                            <mat-label>Start</mat-label>
+                            <input  disabled  [max]="vac.vacationEnd"  [(ngModel)]="vac.vacationStart" matInput [matDatepicker]="pickerStart">
+                            <mat-datepicker-toggle matSuffix [for]="pickerStart"></mat-datepicker-toggle>
+                            <mat-datepicker disabled="false" #pickerStart></mat-datepicker>
+                        </mat-form-field>
+                        
+                        <mat-form-field>
+                            <mat-label>Ende</mat-label>
+                            <input disabled [min]="vac.vacationStart"  [(ngModel)]="vac.vacationEnd" matInput [matDatepicker]="pickerEnd">
+                            <mat-datepicker-toggle matSuffix [for]="pickerEnd"></mat-datepicker-toggle>
+                            <mat-datepicker disabled="false" #pickerEnd></mat-datepicker>
+                        </mat-form-field>
+                        
+                        <mat-form-field >
+                            <input [(ngModel)]="vac.title"  matInput type="text" placeholder="Titel" >
+                        </mat-form-field>
+
+
+                    </div>
+
+                    <div class="substitutes">
+
+                        <h4>vertretende Kollegen*innen</h4>
+
+                        <div class="new">
+                            <mat-form-field class="field">
+                                <mat-label>Name</mat-label>
+                                <input [(ngModel)]="newSub.name" matInput type="text">
+                            </mat-form-field>
+
+                            <mat-form-field class="field">
+                                <mat-label>Adresse</mat-label>
+                                <input [(ngModel)]="newSub.address" matInput type="text">
+                            </mat-form-field>
+
+                            <mat-form-field class="field">
+                                <mat-label>Tel</mat-label>
+                                <input [(ngModel)]="newSub.phone" matInput type="tel">
+                            </mat-form-field>
+
+                            <button (click)="addSubstitute(vac)"   mat-button mat-icon-only matSuffix >
+                                <mat-icon>add</mat-icon>
+                            </button>
+
+                        </div>
+
+                        <div class="subs" *ngFor="let s of vac.subs; let i=index;">
+
+                            <p>{{s.name}} (<mat-icon class="detail-icon">location_on</mat-icon> {{s.address}} /  <mat-icon class="detail-icon">call</mat-icon> {{s.phone}})
+                                <button (click)="removeSub(vac, s)"  mat-button mat-icon-only matSuffix >
+                                    <mat-icon>delete</mat-icon>
+                                </button> 
+                            </p>
+
+                        </div>
+
+
+                    </div>
+                    <div>
+                        <button  class="saveBtn" mat-button matSuffix mat-stroked-button (click)="saveVacation(vac)">
+                            <mat-icon>save</mat-icon>
+                        </button>
+
+                        <button  class="saveBtn" mat-button matSuffix mat-stroked-button (click)="copyVacation(vac)">
+                            <mat-icon>file_copy</mat-icon>
+                        </button>
+
+                        
+                        <button (click)="deleteVacation(vac)"  mat-button matSuffix mat-stroked-button >
+                            <mat-icon>delete</mat-icon>
+                        </button>
+                    </div>
+
+                </mat-expansion-panel>
+
+
+                
+            </mat-accordion>  
+
+            <div class="addBtn-row">
+                <button  class="addBtn" mat-button mat-stroked-button (click)="addNewVacation()">
+                    <mat-icon>add</mat-icon>
+                </button>
+            </div>
+
+        </mat-tab>
+
+        <mat-tab label="Praxisnews"> 
+            <mat-accordion>
+                <mat-expansion-panel *ngFor="let n of news; let i=index;">
+                    <mat-expansion-panel-header>
+                    <mat-panel-title>
+                        {{n.header}}
+                    </mat-panel-title>
+                    <mat-panel-description>
+                        {{n.date | date:'MMM d, y'}}
+                    </mat-panel-description>
+                    </mat-expansion-panel-header>
+                    
+                    <div class="news-container">
+
+                        <img *ngIf="n.image" [src]="n.image">
+
+                        <input class="newsimage-pic-upload" type="file" placeholder="Bild hochladen" (change)="handleNewsFileUpload(n, $event.target.files)">
+                        
+
+                        <mat-form-field >
+                            <input [(ngModel)]="n.header"  matInput type="text" placeholder="Header" >
+                        </mat-form-field>
+
+                        <mat-form-field >
+                            <input [(ngModel)]="n.title"  matInput type="text" placeholder="Titel" >
+                        </mat-form-field>
+
+                        <mat-checkbox [(ngModel)]="n.published">öffentlich?</mat-checkbox>
+
+                        <mat-form-field >
+                            <textarea [(ngModel)]="n.text"  matInput  placeholder="Inhalt" ></textarea>
+                        </mat-form-field>
+                    </div>
+                    <div>
+                        <button  class="saveBtn" mat-button matSuffix mat-stroked-button (click)="saveNews(n)">
+                            <mat-icon>save</mat-icon>
+                        </button>
+                    </div>
+
+                </mat-expansion-panel>
+
+
+                
+            </mat-accordion>   
+            
+            <div class="addBtn-row">
+                <button  class="addBtn" mat-button mat-stroked-button (click)="addNewNews()">
+                    <mat-icon>add</mat-icon>
+                </button>
+            </div>
+        </mat-tab>
+    </mat-tab-group>               
+</div>

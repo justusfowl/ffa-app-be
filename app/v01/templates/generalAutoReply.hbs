@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Nachricht | {{tenant}}</title>
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <style>
+	
+	body{
+		background-color: #ebebf0;
+		height: 100vh;
+		font-family: Helvetica;
+		position: relative;
+	}
+	
+	h1{
+		color: black;
+		
+	}
+	
+	.container{
+		min-width: 300px;
+		min-height: 300px;
+		max-width: 350px;
+		background-color: white;
+		box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+		padding: 20px;
+		z-index: 999;
+		left: 50%;
+		position: absolute;
+		top: 2vh;
+		transform: translate(-50%, -0%);
+	}
+	
+	.footer{
+		margin-top: 50px;
+		text-align: center;
+		
+	}
+	
+	a{
+		color: #972c30;
+	}
+	
+	.success{
+		color: #76b812;
+		font-weight: 600;
+	}
+
+	.banner{
+		width: 100vw; 
+		height: 20vh; 
+		position: absolute;
+		top: 0; 
+		left: 0;
+		background-color: #972c30;
+		z-index: -1;
+	}
+
+	.activate{
+		background-color: #972c30;
+		border-radius: 4px;
+		text-decoration: unset;
+		color: white;
+		padding: 10px;
+	}
+
+	p{
+		margin:40px;
+	}
+
+	.small{
+		font-size: 10px; 
+		color: grey;
+	}
+	
+  
+  </style>
+</head>
+
+<body>
+
+	<div class="banner"></div>
+
+  <div class="container">
+	<h4><a href="https://facharztpraxis-fuer-allgemeinmedizin.de">Facharztpraxis für Allgemeinmedizin</a></h4>
+	<h1>Nachricht</h1>
+	  Hallo {{userName}}, vielen Dank für Ihre Nachricht über unsere Website:
+	
+		<p>
+ 			{{messageText}}
+		</p>
+	 
+		Wir werden uns zeitnah bei Ihnen diesbezüglich zurückmelden.
+
+	  <br/><br/>
+
+	  Ihr Praxis-Team
+	  
+	  <div class="footer">
+		<p><a href="https://facharztpraxis-fuer-allgemeinmedizin.de/impressum.html">Impressum</a> | <a href="https://facharztpraxis-fuer-allgemeinmedizin.de/privacy.html">Datenschutz</a></p>
+		<p class="small">Facharztpraxis-fuer-Allgemeinmedizin.de | Eltville-Erbach 65346</p>
+	  </div>
+  </div>
+
+</body>
+
+</html>

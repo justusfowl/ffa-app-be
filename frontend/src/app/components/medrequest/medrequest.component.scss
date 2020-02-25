@@ -1,0 +1,34 @@
+@import "../../../variables.scss";
+
+
+.prescription-request{
+
+    .med-itm{
+        background-color: #f0f0f0;
+        padding: 10px;
+        border-radius: 4px;
+        margin-bottom: 10px;
+    }
+
+    .menu-row{
+        margin-top: 20px;
+    }
+
+    .doseageform .mat-form-field-wrapper{
+        padding-bottom: 30px;
+    }
+
+    .invalid-row{
+        font-size: 30px;
+        color: red;
+        padding-left: 20px;
+    }
+
+    h1{
+        width: 100%;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+}

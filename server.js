@@ -42,9 +42,22 @@ app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
 app.use('/api/v' + config.APIVersion, apiRoutes);
 app.use('/web', wbRoutes);
 
+app.use('/pub', express.static('pub'));
+
+app.use('/', express.static('frontend/dist/ffa-web'));
+
+const buildLocation = 'frontend/dist/ffa-web';
+app.use((req, res, next) => {
+  if (!req.originalUrl.includes(buildLocation)) {
+    res.sendFile(`${__dirname}/${buildLocation}/index.html`);
+  } else {
+    next();
+  }
+});
+
 sockets.init(server);
 
 server.listen(config.port, () => {
-  console.log('Server started!');
+  console.log('Server started at port !' + config.port);
 });
 

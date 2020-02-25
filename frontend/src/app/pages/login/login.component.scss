@@ -1,0 +1,91 @@
+@import "../../../variables.scss";
+
+#login{
+    // background-color: $background_nav;
+}
+
+.log-container{
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    mat-form-field{
+        width: 100%;
+    }
+
+    form{
+        width: 100%;
+    }
+
+    .log{
+        background-color: $background_nav;
+        padding: 40px;
+        box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+        justify-content: center;
+        
+    }
+
+}
+
+@media (min-width: 1101px){
+    .log{
+        min-width: 400px;
+    }
+}
+
+@media (max-width: 1100px) {
+    .log{
+        width: 100vw;
+        padding: 5px;
+    }
+}
+
+.submit-btn{
+    width: 100%;
+    color: white;
+}
+
+.login-form{
+
+    .mat-checkbox-frame {
+        border-color: $background_light;
+    }
+
+    .mat-select-value, 
+    .mat-select-arrow{
+        color: $background_light;
+    }
+
+    .mat-input-element {
+        caret-color: $background_dark;
+        color: $background_light;
+    }
+
+    .mat-form-field-appearance-legacy .mat-form-field-label{
+        color: $background_light;
+    }
+
+    .mat-form-field-underline {
+        background-color: $background_light;
+      }
+
+      .mat-form-field.mat-focused {
+          .mat-form-field-label{
+            color: $secondary;
+          }
+
+          .mat-input-element {
+            color: $background_dark;
+        }
+
+          .mat-form-field-ripple{
+            background-color: $secondary;
+          }
+      }
+    
+}

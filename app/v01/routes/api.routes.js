@@ -8,6 +8,7 @@ var teamRoutes = require('./team.route');
 var coachRoutes = require('./coach.route');
 var newsRoutes = require('./news.route');
 var timesRoutes = require('./times.route');
+var messageRoutes= require('./message.routes');
 
 const tokenValidator = require('../controllers/tokenvalidate.controller');
 
@@ -23,10 +24,13 @@ router.use('/coach', [tokenValidator.verifyToken], coachRoutes);
 
 // static content:
 
+router.use('/message', messageRoutes);
+
 router.use('/team', teamRoutes);
 
 router.use('/news', newsRoutes);
 
 router.use('/times', timesRoutes);
+
 
 module.exports = router; 
