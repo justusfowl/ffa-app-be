@@ -4,3 +4,5 @@ node_modules/
 pub/*
 uploads/*
 report*
+app/.env
+init/*.js

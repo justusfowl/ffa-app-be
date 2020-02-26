@@ -1,3 +1,11 @@
-node_modules
+src/node_modules
 npm-debug.log
-frontend/node_modules
+src/frontend/node_modules
+Dockerfile*
+docker-compose*
+.dockerignore
+.git
+.gitignore
+README.md
+LICENSE
+.vscode
