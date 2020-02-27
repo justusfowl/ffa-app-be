@@ -1,0 +1,43 @@
+db.createUser(
+        {
+            user: "MONGO_USER",
+            pwd: "MONGO_PASS",
+            roles: [
+                {
+                    role: "readWrite",
+                    db: "MONGO_DB"
+                }
+            ]
+        }
+);
+
+
+db.createCollection('openinghrs');
+db.getCollection('openinghrs').insert({
+    "dayId" : 1,
+    "day" : "Montag"
+});
+db.getCollection('openinghrs').insert({
+    "dayId" : 2,
+    "day" : "Dienstag"
+});
+db.getCollection('openinghrs').insert({
+    "dayId" : 3,
+    "day" : "Mittwoch"
+});
+db.getCollection('openinghrs').insert({
+    "dayId" : 4,
+    "day" : "Donnerstag"
+});
+db.getCollection('openinghrs').insert({
+    "dayId" : 5,
+    "day" : "Freitag"
+});
+
+db.createCollection('users');
+
+db.getCollection("users").insert({
+  userName : 'admin',
+  passPhrase : '$2a$10$TNwl/md/daEJIcb3GbJ0Y.TcEzE.luEif8jHDk5ajZ9H/XcZPkkfC',  // default root pw: admin#1
+  scopes : ["admin"]
+})

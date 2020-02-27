@@ -7,6 +7,8 @@ const config = require('./app/config/config');
 
 var hbs = require( 'express-handlebars');
 
+console.log("Launching...")
+
 app.set('view engine', 'hbs');
 app.set('views', path.resolve(__dirname, './app/v01/views/'));
 
@@ -18,6 +20,8 @@ const handlebarOptions = {
   defaultView: 'default',
   defaultLayout: 'default',
 };
+
+
 
 app.engine( 'hbs', hbs(handlebarOptions));
 
