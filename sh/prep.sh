@@ -1,6 +1,7 @@
 #!/bin/bash
 
 
+
 for ARGUMENT in "$@"
 do
 
@@ -32,7 +33,9 @@ if [ -z "$MONGO_USER" ] || [ -z "$MONGO_PASS" ] || [ -z "$MONGO_DB" ]; then
   exit 1
 fi
 
-mkdir -p init
+
+parent_path=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P )
+cd "$parent_path"
 
 sed -e "s/MONGO_USER/$MONGO_USER/g; s/MONGO_PASS/$MONGO_PASS/g; s/MONGO_DB/$MONGO_DB/g; " ../init/init_mongo.tmpl > ../init/init_mongo.js
 
