@@ -2,8 +2,9 @@
 .env_prod
 .vscode/*
 node_modules/
-pub/*
+app/pub/*
 uploads/*
 report*
 app/.env
 init/*.js
+app/frontend/dist
