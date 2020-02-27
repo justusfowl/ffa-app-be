@@ -7,7 +7,7 @@ var fs = require("fs");
 
 var storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        let dir = 'pub/n/';
+        let dir = path.join(config.baseDirectory, 'pub/n/');
         if (!fs.existsSync(dir)){
             fs.mkdirSync(dir);
         }

@@ -124,7 +124,7 @@ function addMember(req, res){
 
         var file = req.file;
         var teamMember = req.body;
-        var fqdn_file = config.getPubExposedDirUrl() + "/a/" + file.originalname;
+        var fqdn_file = config.getPubExposedDirUrl() + "a/" + file.originalname;
 
         teamMember["picture"] = fqdn_file;
 

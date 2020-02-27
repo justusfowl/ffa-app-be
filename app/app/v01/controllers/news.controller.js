@@ -88,7 +88,7 @@ function updateNews(req, res){
         var file = req.file;
 
         if (file){
-            var fqdn_file = config.getPubExposedDirUrl() + "/n/" + file.originalname;
+            var fqdn_file = config.getPubExposedDirUrl() + "n/" + file.originalname;
             newsObj["image"] = fqdn_file;
         }
   

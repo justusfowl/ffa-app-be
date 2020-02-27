@@ -2,8 +2,17 @@ const express = require('express');
 const cors = require('cors'); 
 const app = express(); 
 const http = require('http');
+const fs = require("fs");
 const path = require('path');
 const config = require('./app/config/config');
+
+config["baseDirectory"] = __dirname;
+
+const pubDirectory = path.join(__dirname, "pub");
+
+if (!fs.existsSync(pubDirectory)){
+  fs.mkdirSync(pubDirectory);
+}
 
 var hbs = require( 'express-handlebars');
 
@@ -46,7 +55,7 @@ app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
 app.use('/api/v' + config.APIVersion, apiRoutes);
 app.use('/web', wbRoutes);
 
-app.use('/pub', express.static('pub'));
+app.use('/pub', express.static(pubDirectory));
 
 app.use('/', express.static('frontend/dist/ffa-web'));
 
