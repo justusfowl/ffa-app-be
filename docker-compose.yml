@@ -11,8 +11,8 @@ services:
       MONGO_INITDB_DATABASE: ${MONGO_DB}
     volumes:
       - mongodata:/data/db
-      - ./init/init_mongo.js:/docker-entrypoint-initdb.d/init_mongo.js
-      - ./init/mongod.conf:/etc/mongod.conf
+      - ./init/init_mongo.js:/docker-entrypoint-initdb.d/init_mongo.js:ro
+      - ./init/mongod.conf:/etc/mongod.conf:ro
     ports:
       - "27017:27017"
    
