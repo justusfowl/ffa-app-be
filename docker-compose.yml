@@ -10,7 +10,7 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASS}
       MONGO_INITDB_DATABASE: ${MONGO_DB}
     volumes:
-      - ./init:/docker-entrypoint-initdb.d
+      - /var/jenkins_home/workspace/ffa-app/init:/docker-entrypoint-initdb.d:ro
       - mongodata:/data/db
       - ./init/mongod.conf:/etc/mongod.conf:ro
     ports:
