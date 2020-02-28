@@ -33,5 +33,16 @@ export class AppComponent implements AfterViewInit {
    }
   }
 
+  
+  goToTag(tagId){
+
+    try{
+      let d = document.getElementById(tagId)
+      d.scrollIntoView()
+    }catch(err){
+    }
+
+  }
+
 }
 

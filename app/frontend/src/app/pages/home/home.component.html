@@ -13,10 +13,10 @@
                             <p class="sub p-heading p-large">{{WELCOME_SUBHEADER}}</p>
                             <div class="opening-statement">
                                 <div class="announcement open" *ngIf="getIsNowOpen()">
-                                    Wir haben aktuell geöffnet, klicken Sie <a href="#times">hier</a>, um die Öffnungszeiten anzusehen.
+                                    Wir haben aktuell geöffnet, klicken Sie <strong><a (click)="goToTag('times')">[hier]</a></strong>, um die Öffnungszeiten anzusehen.
                                 </div>
                                 <div class="announcement closed" *ngIf="!getIsNowOpen()">
-                                    Wir haben aktuell geschlossen, klicken Sie <a href="#times">hier</a>, um die Öffnungs- & Vertretungszeiten anzusehen.
+                                    Wir haben aktuell geschlossen, klicken Sie <strong><a (click)="goToTag('times')">[hier]</a></strong>, um die Öffnungs- & Vertretungszeiten anzusehen.
                                     <p *ngIf="getIsVacationClosed()">{{getIsVacationClosed()}}</p>
                                 </div>
                             </div>

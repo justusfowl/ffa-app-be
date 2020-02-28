@@ -38,22 +38,22 @@
       <div class="collapse navbar-collapse" id="navbarsExampleDefault">
           <ul class="navbar-nav ml-auto">
               <li class="nav-item">
-                  <a class="nav-link page-scroll" href="#header">Home<span class="sr-only">(current)</span></a>
+                  <a class="nav-link page-scroll"  (click)="goToTag('header')" >Home<span class="sr-only">(current)</span></a>
               </li>
               <li class="nav-item">
-                  <a class="nav-link page-scroll" href="#team">Team</a>
+                  <a class="nav-link page-scroll"  (click)="goToTag('team')" >Team</a>
               </li>
               <li class="nav-item">
-                  <a class="nav-link page-scroll" href="#services">Leistungen</a>
+                  <a class="nav-link page-scroll"  (click)="goToTag('services')">Leistungen</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link page-scroll" href="#times">Sprechzeiten</a>
+                <a class="nav-link page-scroll"  (click)="goToTag('times')" >Sprechzeiten</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link page-scroll" href="#news">Praxisnews</a>
+                <a class="nav-link page-scroll"  (click)="goToTag('news')" >Praxisnews</a>
                 </li>
               <li class="nav-item">
-                  <a class="nav-link page-scroll" href="#contact">Kontakt</a>
+                  <a class="nav-link page-scroll"  (click)="goToTag('contact')" >Kontakt</a>
               </li>
               <li class="nav-item " *ngIf="auth.isAuthorized()">
                 <a class="nav-link page-scroll my"  [matMenuTriggerFor]="myMenu">myFFA</a>
