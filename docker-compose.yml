@@ -1,6 +1,20 @@
 version: "3.6"
 services:
 
+  app:
+    restart: always
+    build: ./app
+    env_file: .env
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - appdata:/app/pub
+    links:
+      - mongo
+  
+
   mongo:
     image: mongo
     container_name: mongo
@@ -10,8 +24,8 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASS}
       MONGO_INITDB_DATABASE: ${MONGO_DB}
     volumes:
-      - /var/jenkins_home/workspace/ffa-app/init:/docker-entrypoint-initdb.d:ro
       - mongodata:/data/db
+      - ./init:/docker-entrypoint-initdb.d
       - ./init/mongod.conf:/etc/mongod.conf:ro
     ports:
       - "27017:27017"
@@ -20,3 +34,6 @@ services:
 volumes:
   mongodata:
     name: ffa-mongo-data
+
+  appdata:
+    name: ffa-app-data
