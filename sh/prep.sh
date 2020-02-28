@@ -38,5 +38,12 @@ parent_path=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P )
 cd "$parent_path"
 
 sed -e "s/MONGO_USER/$MONGO_USER/g; s/MONGO_PASS/$MONGO_PASS/g; s/MONGO_DB/$MONGO_DB/g; " ../init/init_mongo.tmpl > ../init/init_mongo.js
-
+cat ../init/init_mongo.js
 echo "init/init_mongo.js"
+
+cd ..
+
+echo "Within directory:"
+pwd
+
+ls init
