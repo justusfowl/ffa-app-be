@@ -1,17 +1,6 @@
 version: "3.6"
 services:
-  app:
-    restart: always
-    build: ./app
-    env_file: .env
-    ports:
-      - "8000:8000"
-    volumes:
-      - .:/app
-      - /app/node_modules
-    links:
-      - mongo
-  
+
   mongo:
     image: mongo
     container_name: mongo
