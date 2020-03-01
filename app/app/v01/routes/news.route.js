@@ -29,5 +29,6 @@ router.route('/')
 router.route('/:newsId')
     .get(newsCtrl.getNews)
     .put([tokenValidator.detectToken, middlware_hasScopeAdmin, upload.single('file')], newsCtrl.updateNews)
+    .delete([tokenValidator.detectToken, middlware_hasScopeAdmin], newsCtrl.removeNews)
 
 module.exports = router;

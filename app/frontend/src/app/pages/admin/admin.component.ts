@@ -303,6 +303,27 @@ export class AdminComponent implements OnInit {
     })
   }
 
+  deleteNews(newsObj){
+
+    if (!newsObj._id){
+      return;
+    }
+
+    this.api.delete("/news/"+ newsObj._id).then(result => {
+      let idx = this.news.findIndex(x => x._id == newsObj._id);
+      this.news.splice(idx, 1);
+      this.snackBar.open("Gelöscht", "", {
+        duration: 1500
+      })
+    }).catch(err => {
+      console.warn(err);
+      this.snackBar.open("Etwas hat nicht geklappt", "", {
+        duration: 1500
+      })
+    })
+
+  }
+
   saveNews(newsObj){
 
     let endPoint;

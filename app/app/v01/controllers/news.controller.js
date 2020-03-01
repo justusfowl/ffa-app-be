@@ -167,6 +167,38 @@ function newNews(req, res){
 }
 
 
+function removeNews(req, res){
+    try{
+
+        var userId = req.userId;
+        var newsId = req.params.newsId;
+        
+        MongoClient.connect(MongoUrl, function(err, db) {
+    
+            if (err) throw err;
+            
+            let dbo = db.db(config.mongodb.database);
+    
+            const collection = dbo.collection('news');
+    
+            collection.deleteOne(
+              {
+                  "_id" : ObjectID(newsId)
+              },
+              function(err, result){
+                if (err) throw err;
+                res.json(result);
+              });
+          });
+
+    }catch(err){
+        console.error(error)
+        res.send(500, "An error occured adding a team member: " + JSON.stringify(req.body) );
+    }
+}
+
+
+
 function _deleteTmpFile(path){
     try {
         fs.unlinkSync(path)      
@@ -179,5 +211,6 @@ function _deleteTmpFile(path){
 module.exports = {
     getNews, 
     updateNews, 
-    newNews
+    newNews, 
+    removeNews
 }
