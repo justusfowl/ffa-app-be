@@ -10,7 +10,7 @@ services:
     volumes:
       - .:/app
       - /app/node_modules
-      - appdata:/app/pub
+      - appdata:/usr/app/pub
     links:
       - mongo
   
