@@ -17,7 +17,7 @@
     </h1>
     <mat-tab-group>
 
-        <mat-tab label="Leistungen"> 
+        <mat-tab label="Leistungen" *ngIf="false"> 
             <div class="service">
                 <div class="srv-itm" *ngFor="let s of services; let i=index;">
                     <div class="media-bullet"> <i [class]="s.icon"></i></div>

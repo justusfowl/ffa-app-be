@@ -34,11 +34,17 @@ export class AppComponent implements AfterViewInit {
   }
 
   
-  goToTag(tagId){
+  goToTag(tagId, route='home'){
 
     try{
-      let d = document.getElementById(tagId)
-      d.scrollIntoView()
+      if (this.router.url.search(route) < 0){
+        this.router.navigate(["/"+ route]);
+      }
+      let d = document.getElementById(tagId);
+
+      setTimeout(function(){
+        d.scrollIntoView();
+      }, 500);
     }catch(err){
     }
 

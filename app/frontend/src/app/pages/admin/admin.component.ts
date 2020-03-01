@@ -176,7 +176,14 @@ export class AdminComponent implements OnInit {
 
   addMember(){
 
-    const formData: FormData = new FormData()
+    if (!this.newTeamMemberFile || !this.newTeamMember.name|| !this.newTeamMember.role|| !this.newTeamMember.type){
+      this.snackBar.open("Bitte alle Felder ausfüllen", "", {
+        duration: 1500
+      });
+      return;
+    }
+
+    const formData: FormData = new FormData();
     formData.append('file', this.newTeamMemberFile, this.newTeamMemberFile.name);
 
     Object.keys(this.newTeamMember).forEach(item => {

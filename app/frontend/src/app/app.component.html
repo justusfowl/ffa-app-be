@@ -86,8 +86,11 @@
                 <div class="text-container">
                     <h4>Links</h4>
                     <ul class="list-unstyled li-space-lg">
-                        <li class="media">
+                        <li class="media" *ngIf="!auth.isAuthorized()">
                             <a class="white"  routerLink="/login" routerLinkActive="active" >Login</a>
+                        </li>
+                        <li class="media" *ngIf="auth.isAuthorized()">
+                            <a class="white"  (click)="auth.logout()">Logout</a>
                         </li>
                         <li class="media">
                             <a class="white"  routerLink="/privacy" routerLinkActive="active" >Datenschutz</a>

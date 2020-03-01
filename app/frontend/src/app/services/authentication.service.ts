@@ -59,7 +59,7 @@ export class AuthenticationService {
         this.currentUserSubject.next(null);
         this.router.navigate(["/"]);
 
-        this.snackBar.open("Erfolgreich", "OK", {
+        this.snackBar.open("Abgemeldet", "", {
             duration: 3000
         })
     }   

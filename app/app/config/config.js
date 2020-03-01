@@ -73,9 +73,7 @@ const config = {
       url += ":" + config.hostExposedPort;
     }
 
-    if (config.hostExposedPort != 443){
-      url += "/" + config.hostPubDir ;
-    }
+    url += "/" + config.hostPubDir ;
 
     url += "/" ;
 

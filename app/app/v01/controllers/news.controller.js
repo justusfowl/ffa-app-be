@@ -133,9 +133,14 @@ function newNews(req, res){
 
         var file = req.file;
         var newsObj = req.body;
-        var fqdn_file = config.getPubExposedDirUrl() + "/n/" + file.originalname;
+        try{
+            var fqdn_file = config.getPubExposedDirUrl() + "/n/" + file.originalname;
 
-        newsObj["image"] = fqdn_file;
+            newsObj["image"] = fqdn_file;
+        }catch(err){
+
+        }
+       
 
         MongoClient.connect(MongoUrl, function(err, db) {
     
