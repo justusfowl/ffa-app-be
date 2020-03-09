@@ -1,8 +1,25 @@
-import { Component, OnInit, ViewEncapsulation} from '@angular/core';
+import { Component, OnInit, ViewEncapsulation, ElementRef, ViewChild} from '@angular/core';
 import { ApiService } from 'src/app/services/api.service';
 import { Subject } from 'rxjs';
 import {debounceTime, distinctUntilChanged} from "rxjs/internal/operators";
-import { MatSnackBar } from '@angular/material';
+import { MatSnackBar, MatChipInputEvent, MatAutocomplete } from '@angular/material';
+import { FormControl, FormGroupDirective, NgForm, Validators } from '@angular/forms';
+import {Observable} from 'rxjs';
+import {map, startWith} from 'rxjs/operators';
+import {COMMA, ENTER} from '@angular/cdk/keycodes';
+
+import {ErrorStateMatcher} from '@angular/material/core';
+
+/** Error when invalid control is dirty, touched, or submitted. */
+export class MyErrorStateMatcher implements ErrorStateMatcher {
+  isErrorState(control: FormControl | null, form: FormGroupDirective | NgForm | null): boolean {
+    const isSubmitted = form && form.submitted;
+    return !!(control && control.invalid && (control.dirty || control.touched || isSubmitted));
+  }
+}
+
+
+
 @Component({
   selector: 'app-admin',
   templateUrl: './admin.component.html',
@@ -11,6 +28,24 @@ import { MatSnackBar } from '@angular/material';
 })
 export class AdminComponent implements OnInit {
 
+  @ViewChild('scopeInput', {static: false}) fruitInput: ElementRef<HTMLInputElement>;
+  @ViewChild('auto', {static: false}) matAutocomplete: MatAutocomplete;
+
+  visible = true;
+  selectable = true;
+  removable = true;
+  separatorKeysCodes: number[] = [ENTER, COMMA];
+  _filteredScopes : Observable<string[]>;
+
+  allScopes = [
+    "admin", 
+    "user", 
+    "patient"
+  ];
+  scopeCtrl = new FormControl();
+
+
+  users = [];
   news = [];
   times : any[] = [];
   vacation : any[] = [];
@@ -41,24 +76,35 @@ export class AdminComponent implements OnInit {
   newTeamMemberFile: File = null;
   newTeamMemberFileStr: any;
 
-
   timesDayEditIdx: number = null;
 
   newNewsImageFile: File = null;
 
   newSub : any = {};
 
+  emailFormControl = new FormControl('', [
+    Validators.required,
+    Validators.email,
+  ]);
+
+  matcher = new MyErrorStateMatcher();
+
 
   constructor(
     private api : ApiService, 
     private snackBar : MatSnackBar
-  ) { }
+  ) {
+    this._filteredScopes = this.scopeCtrl.valueChanges.pipe(
+      startWith(null),
+      map((scope: string | null) => scope ? this._filterScopes(scope) : this.allScopes.slice()));
+   }
 
   ngOnInit() {
 
     this.getTeam();
     this.getTimes();
     this.getNews();
+    this.getUsers();
 
     this.teamValChanged.pipe(
       debounceTime(1000), 
@@ -136,11 +182,40 @@ export class AdminComponent implements OnInit {
     })
   }
 
+
+  async handleTeamFileInput(files: FileList, teamMember){
+
+    this.api.setLoading(true);
+
+    const formData: FormData = new FormData();
+    formData.append('file', files.item(0), files.item(0).name);
+
+    Object.keys(teamMember).forEach(item => {
+      if (item != "picture"){
+        formData.append(item, teamMember[item]);
+      }
+      
+    });
+
+    const fileStr = await this.convertToBase64(files.item(0));
+
+    this.api.put("/team/" + teamMember._id, formData, true).then(res => {
+      console.log("updated.")
+      this.snackBar.open("Mitglied aktualisiert", "", {
+        duration: 1500
+      })
+      
+      teamMember.picture = fileStr;
+
+    })
+
+  }
+
+
   async handleFileInput(files: FileList){
     this.newTeamMemberFile = files.item(0);
     const fileStr = await this.convertToBase64(files.item(0));
     this.newTeamMemberFileStr = fileStr;
-
   }
 
   async handleNewsFileUpload(newsObj, files: FileList){
@@ -160,7 +235,7 @@ export class AdminComponent implements OnInit {
   }   
 
   updateTeamMember(member){
-    this.api.put("/team/" + member._id, member).then(res => {
+    this.api.put("/team/" + member._id, member, true).then(res => {
       console.log("updated.")
       this.snackBar.open("Mitglied aktualisiert", "", {
         duration: 1500
@@ -190,7 +265,7 @@ export class AdminComponent implements OnInit {
       formData.append(item, this.newTeamMember[item]);
     })
 
-    this.api.post("/team", formData).then(res => {
+    this.api.post("/team", formData, true).then(res => {
       console.log(res);
        this.snackBar.open("Hinzugefügt", "", {
         duration: 1500
@@ -290,7 +365,7 @@ export class AdminComponent implements OnInit {
     }
 
 
-    this.api.put("/times/open/", d).then(result => {
+    this.api.put("/times/open/", d, true).then(result => {
       this.snackBar.open("Aktualisiert", "", {
         duration: 1500
       });
@@ -309,7 +384,7 @@ export class AdminComponent implements OnInit {
       return;
     }
 
-    this.api.delete("/news/"+ newsObj._id).then(result => {
+    this.api.delete("/news/"+ newsObj._id, true).then(result => {
       let idx = this.news.findIndex(x => x._id == newsObj._id);
       this.news.splice(idx, 1);
       this.snackBar.open("Gelöscht", "", {
@@ -350,7 +425,7 @@ export class AdminComponent implements OnInit {
     if (newsObj._id){
       endPoint = "/news/" +  newsObj._id;
 
-      this.api.put(endPoint, formData).then(res => {
+      this.api.put(endPoint, formData, true).then(res => {
         console.log(res);
          this.snackBar.open("Aktualisiert", "", {
           duration: 1500
@@ -368,7 +443,7 @@ export class AdminComponent implements OnInit {
     }else{
       endPoint = "/news"
 
-      this.api.post(endPoint, formData).then(res => {
+      this.api.post(endPoint, formData, true).then(res => {
         console.log(res);
          this.snackBar.open("Hinzugefügt", "", {
           duration: 1500
@@ -394,7 +469,7 @@ export class AdminComponent implements OnInit {
   }
 
   saveVacation(vacationObj){
-    this.api.put("/times/vacation", vacationObj).then(res => {
+    this.api.put("/times/vacation", vacationObj, true).then(res => {
       this.snackBar.open("Aktualisiert", "", {
         duration: 1500
       });
@@ -427,7 +502,7 @@ export class AdminComponent implements OnInit {
       return;
     }
 
-    this.api.delete("/times/vacation/"+ vacationObj._id).then(result => {
+    this.api.delete("/times/vacation/"+ vacationObj._id, true).then(result => {
       let idx = this.vacation.findIndex(x => x._id == vacationObj._id);
       this.vacation.splice(idx, 1);
       this.snackBar.open("Gelöscht", "", {
@@ -454,6 +529,116 @@ export class AdminComponent implements OnInit {
   removeSub(vacationObj, sub){
     let idx = vacationObj.subs.indexOf(sub);
     vacationObj.subs.splice(idx, 1);
+  }
+
+  updateUser(userObj){
+    this.api.put("/auth/users", userObj, true).then(res => {
+      console.log("updated.")
+      this.snackBar.open("Mitglied aktualisiert", "", {
+        duration: 1500
+      });
+    })
+  }
+
+  addScope(event: MatChipInputEvent, user): void {
+
+    if (typeof(user.scopes) == "undefined"){
+      user.scopes = [];
+    }
+
+    const input = event.input;
+    const value = event.value;
+
+    if (this.allScopes.indexOf(value) < 0 ){
+      return;
+    }
+
+    if ((value || '').trim()) {
+      if (user.scopes.indexOf((value || '').trim()) == -1){
+        user.scopes.push(value.trim());
+      }else{
+        return;
+      }
+      
+    }
+
+    // Reset the input value
+    if (input.value) {
+      input.value = '';
+    }
+
+    this.scopeCtrl.setValue(null);
+
+    this.updateUser(user);
+  }
+
+  removeScope(user, scopeIdx): void {
+    
+    if (scopeIdx >= 0) {
+      user.scopes.splice(scopeIdx,1);
+      this.updateUser(user);
+    }
+    
+  }
+
+  handleScopeSelected(event, user, input){
+
+    let scope = event.option.viewValue;
+    let evt = {
+      "input" : scope, 
+      "value" : scope
+    };
+
+    this.addScope(evt, user);
+    input.nativeElement.value = '';
+
+  }
+
+
+
+  private _filterScopes(value: string): string[] {
+    const filterValue = value.toLowerCase();
+
+    return this.allScopes.filter(scope => scope.toLowerCase().indexOf(filterValue) === 0);
+  }
+
+
+  getUsers(refresher?){
+    this.api.get("/auth/users", {params : {}}, true).then((result : any) => {
+      this.users = result;
+
+      console.log(result)
+
+      if (refresher){
+        refresher.target.complete();
+      }
+    }).catch(err => {
+      console.error(err);
+    })
+
+  }
+
+  preregisterUser(){
+
+    let userName = this.emailFormControl.value;
+    console.log(userName);
+
+    this.api.post("/auth/adminRegisterUser", {userName}, true).then((result : any) => {
+      this.users = result;
+
+      this.getUsers();
+
+      this.emailFormControl.reset();
+
+      this.snackBar.open("Mitglied zugefügt. Bitte Postfach prüfen, um Kennwort zu setzen.", "", {
+        duration: 1500
+      });
+
+    }).catch(err => {
+      console.error(err);
+    })
+
+
   }
 
 }

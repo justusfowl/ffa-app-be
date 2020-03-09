@@ -36,4 +36,36 @@ router.get('/validateAccount', function(req, res, next) {
 
 });
 
+router.get('/resetPassword', function(req, res, next) {
+
+    let token = req.query.token;
+  
+    jwt.verify(token, config.auth.jwtsec, function(err, decoded) {   
+
+        if (err){
+
+            res.render('accountValidationError',{
+                layout: 'accountValidationError'
+            });
+
+        }else{
+            
+            let userId = decoded._id;
+
+            authCtrl.executeAccountValidation(userId).then(result => {
+                res.render('passwordReset',{
+                    layout: 'passwordReset'
+                });
+            }).catch(err => {
+                res.render('accountValidationError',{
+                    layout: 'accountValidationError'
+                });
+            });
+           
+        }
+
+    });
+
+});
+
 module.exports = router

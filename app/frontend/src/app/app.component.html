@@ -64,7 +64,7 @@
 
 <mat-menu #myMenu="matMenu">
     <button routerLink="/my" routerLinkActive="active"  mat-menu-item>myFFA</button>
-    <button routerLink="/admin" routerLinkActive="active"  mat-menu-item>Administration</button>
+    <button *ngIf="auth.checkUIForRole('admin')" routerLink="/admin" routerLinkActive="active"  mat-menu-item>Administration</button>
     <button (click)="auth.logout()" mat-menu-item>logout</button>
 </mat-menu>
 

@@ -7,9 +7,10 @@ import { AppComponent } from './app.component';
 import { HomeComponent } from './pages/home/home.component';
 import { PrivacyComponent } from './pages/privacy/privacy.component';
 import { LoginComponent } from './pages/login/login.component';
+import { PassresetComponent } from './pages/passreset/passreset.component';
 import { MyComponent } from './pages/my/my.component';
 import { NewsdetailComponent } from './pages/newsdetail/newsdetail.component';
-import {AdminComponent} from './pages/admin/admin.component';
+import { AdminComponent } from './pages/admin/admin.component';
 
 import { ApiService } from './services/api.service';
 import { JwtInterceptor } from './services/jwt.intercept';
@@ -27,6 +28,7 @@ import { MedrequestComponent } from './components/medrequest/medrequest.componen
     HomeComponent,
     PrivacyComponent,
     LoginComponent,
+    PassresetComponent,
     MyComponent,
     NewsdetailComponent,
     AdminComponent, 

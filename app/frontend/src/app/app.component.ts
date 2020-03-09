@@ -26,7 +26,7 @@ export class AppComponent implements AfterViewInit {
   }
  
   showNavBar(){
-    if (this.router.url.search("login") > -1){
+    if (this.router.url.search("login") > -1 || this.router.url.search("passreset") > -1){
       return false;
    }else{
      return true;

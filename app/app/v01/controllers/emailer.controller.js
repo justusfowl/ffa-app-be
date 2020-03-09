@@ -65,6 +65,34 @@ function sendValidateAccountEmail (userName, tokenUrl) {
    
 };
 
+function sendForgotPasswordEmail (userName, tokenUrl) {
+
+    return new Promise((resolve, reject) => {
+
+        let options = {
+            from : config.email.smtpEmail, 
+            to : userName, 
+            subject : "Passwort-Reset" , 
+            template: 'forgotPassword',
+            context: {
+                "userName": userName, 
+                "activateUrl" : tokenUrl
+            }
+        }
+
+        transporter.sendMail(options, function (err, info){
+            if (err){
+                reject(err); 
+
+            }else{
+                resolve(info);
+            }
+        })
+
+    });
+   
+};
+
 function sendGeneralAutoReply (userName, email, messageText) {
 
     return new Promise((resolve, reject) => {
@@ -148,9 +176,64 @@ function sendMessageToBackOffice (contextObj) {
    
 };
 
+function sendPasswordWasResetEmail(contextObj){
+    
+    return new Promise((resolve, reject) => {
+
+        let options = {
+            from : config.email.smtpEmail, 
+            to : contextObj.userName, 
+            subject : "Passwort-Reset" , 
+            template: 'forgotPasswordSuccess',
+            context: contextObj
+        }
+
+        transporter.sendMail(options, function (err, info){
+            if (err){
+                reject(err); 
+
+            }else{
+                resolve(info);
+            }
+        })
+
+    });
+}
+
+function sendPreRegistrationEmail (userName, tokenUrl) {
+
+    return new Promise((resolve, reject) => {
+
+        let options = {
+            from : config.email.smtpEmail, 
+            to : userName, 
+            subject : "Account-Aktivierung" , 
+            template: 'preregistrationWelcome',
+            context: {
+                "userName": userName, 
+                "activateUrl" : tokenUrl
+            }
+        }
+
+        transporter.sendMail(options, function (err, info){
+            if (err){
+                reject(err); 
+
+            }else{
+                resolve(info);
+            }
+        })
+
+    });
+   
+};
+
 module.exports = {
     sendValidateAccountEmail, 
     sendGeneralAutoReply,
     sendVacationAutoReply, 
-    sendMessageToBackOffice
+    sendMessageToBackOffice, 
+    sendForgotPasswordEmail,
+    sendPasswordWasResetEmail, 
+    sendPreRegistrationEmail
 }

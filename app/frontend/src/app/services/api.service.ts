@@ -34,7 +34,7 @@ export class ApiService {
   }
 
   setLoading(targetState){
-    // this.loaderSrv.setLoading(targetState);
+    this.loaderSrv.setLoading(targetState);
   }
 
   get(endPoint, paramOptions?, enableLoader=true){  

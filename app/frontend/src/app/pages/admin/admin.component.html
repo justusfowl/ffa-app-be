@@ -33,7 +33,17 @@
                 <div class="member" *ngFor="let m of teamMembers;">
                     
                     <div class="avatar">
-                        <img [src]="m.picture">
+                        <div class="pic">
+                            <img [src]="m.picture">
+                            <label>
+                                <mat-icon>edit</mat-icon>
+                                <input class="teammember-pic-upload" type="file"  (change)="handleTeamFileInput($event.target.files, m)">
+                            </label>
+                            
+                        </div> 
+
+                       
+                        
 
                         <p>
                             <mat-checkbox [(ngModel)]="m.flagActive" (ngModelChange)="updateTeamMember(m)" >Aktiv?</mat-checkbox>
@@ -339,6 +349,59 @@
                 <button  class="addBtn" mat-button mat-stroked-button (click)="addNewNews()">
                     <mat-icon>add</mat-icon>
                 </button>
+            </div>
+        </mat-tab>
+
+        <mat-tab label="Benutzer" class="user-list" style="margin:10px"> 
+
+            <div class="new-user">
+
+                <form class="add">
+                    <mat-form-field >
+                        <mat-label>Nutzername</mat-label>
+                        <input matInput [formControl]="emailFormControl" [errorStateMatcher]="matcher"
+                                placeholder="nutzer@test.de">
+                        <mat-hint>Email-Adresse</mat-hint>
+                        <mat-error *ngIf="emailFormControl.hasError('email') && !emailFormControl.hasError('required')">
+                        ungültige eMail-Adresse
+                        </mat-error>
+                        <mat-error *ngIf="emailFormControl.hasError('required')">
+                        Email wird benötigt
+                        </mat-error>
+                    </mat-form-field>
+                </form>
+
+                <button mat-button (click)="preregisterUser()">Zufügen</button>
+
+            </div>
+            
+            <div class="user" *ngFor="let user of users; let i=index;">
+
+                {{user.userName}}
+
+                <mat-chip-list #chipList aria-label="Rolle">
+                    <mat-chip
+                        *ngFor="let scope of user.scopes; let i=index;"
+                        [selectable]="selectable"
+                        [removable]="removable"
+                        (removed)="removeScope(user, i)">
+                        {{scope}}
+                        <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
+                    </mat-chip>
+                    <input
+                        placeholder="Neuer Scope..."
+                        #scopeInput
+                        [formControl]="scopeCtrl"
+                        [matAutocomplete]="auto"
+                        [matChipInputFor]="chipList"
+                        [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+                        (matChipInputTokenEnd)="addScope($event, user)">
+                </mat-chip-list>
+                <mat-autocomplete #auto="matAutocomplete" (optionSelected)="handleScopeSelected($event, user, scopeInput)">
+                    <mat-option *ngFor="let s of _filteredScopes | async" [value]="s">
+                        {{s}}
+                    </mat-option>
+                </mat-autocomplete>
             </div>
         </mat-tab>
     </mat-tab-group>               

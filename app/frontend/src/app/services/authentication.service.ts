@@ -37,13 +37,17 @@ export class AuthenticationService {
                 // store user details and jwt token in local storage to keep user logged in between page refreshes
                 let userData = resp.data; 
 
-                localStorage.setItem('userData', JSON.stringify(userData));
-                this.currentUserSubject.next(userData);
+                this.setUserData(userData);
 
                 this.loaderSrv.setLoading(false);
 
                 return userData;
             }));
+    }
+
+    setUserData(userData){
+        localStorage.setItem('userData', JSON.stringify(userData));
+        this.currentUserSubject.next(userData);
     }
 
     register(userName, password){
@@ -62,7 +66,14 @@ export class AuthenticationService {
         this.snackBar.open("Abgemeldet", "", {
             duration: 3000
         })
-    }   
+    }
+
+    changePassword(password){
+        return this.http.post<any>(`${this.api.apiURL}/auth/passwordReset`, { password })
+        .pipe(map( (resp : any) => {
+            return;
+        }));
+    }
 
     isAuthorized(){
 
@@ -73,10 +84,22 @@ export class AuthenticationService {
         }
     }
 
-    checkUIForRole(reqRole){
+    forgotPassword(userName){
+        return this.http.post<any>(`${this.api.apiURL}/auth/forgotPassword`, { userName })
+        .pipe(map( (resp : any) => {
+            return;
+        }));
+    }
+
+    checkUIForRole(reqScope){
         if (this.isAuthorized()){
-            let roles = this.currentUserSubject.value.roles;
-            if (roles.indexOf(reqRole) != -1){
+
+            if (!this.currentUserSubject.value.scopes){
+                return false; 
+            }
+
+            let scopes = this.currentUserSubject.value.scopes;
+            if (scopes.indexOf(reqScope) != -1){
                 return true;
             }else{
                 return false;
@@ -84,5 +107,11 @@ export class AuthenticationService {
         }else{
             return false;
         }
+    }
+
+    
+    validatePassphrase(pass){
+        var mediumRegex = new RegExp("^(((?=.*[a-z])(?=.*[A-Z]))|((?=.*[a-z])(?=.*[0-9]))|((?=.*[A-Z])(?=.*[0-9])))(?=.{6,})");
+        return mediumRegex.test(pass)
     }
 }

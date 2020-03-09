@@ -80,9 +80,17 @@ function _getActiveTeam(type, flagAlsoInActive=false){
 
 function updateMember(req, res){
     try{
-  
-        let memberObj = req.body;
+        
+        var memberObj = req.body;
         let memberId = memberObj._id;
+
+        var file = req.file;
+        
+
+        if (file){
+            var fqdn_file = config.getPubExposedDirUrl() + "a/" + file.originalname;
+            memberObj["picture"] = fqdn_file;
+        }
   
         if (!memberId){
           res.send(500, "Please provide memberId");
@@ -100,7 +108,7 @@ function updateMember(req, res){
   
           if (memberObj._id){
             delete memberObj._id
-        }
+          }
   
           collection.replaceOne(
             {"_id" : ObjectID(memberId)},

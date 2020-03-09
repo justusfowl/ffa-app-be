@@ -1,6 +1,6 @@
 @import "../../../variables.scss";
 
-#login{
+#passreset{
     background-color: #ebebf0;
 }
 
@@ -50,24 +50,10 @@
     color: white;
 }
 
-.submit-btn.small{
-    font-size: 10px;
-}
-
-#loginForm, 
-#forgotPassword{
-    max-height: 500px; 
-    transition: 0.5s;
-    overflow:hidden;
-}
-
-#forgotPassword.forgotPW,
-#loginForm.forgotPW{
-    max-height: 0px;
-    opacity: 0; 
-}
-
 .login-form{
+    p{
+        color: $background_light;
+    }
 
     .mat-checkbox-frame {
         border-color: $background_light;

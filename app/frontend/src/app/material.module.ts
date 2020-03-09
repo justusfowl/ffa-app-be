@@ -26,7 +26,8 @@ import {
   MatChipsModule,
   MatTabsModule,
   MatDatepickerModule,
-  MatNativeDateModule 
+  MatNativeDateModule , 
+  MatAutocompleteModule
 } from '@angular/material';
 
 
@@ -57,7 +58,8 @@ import {
     MatChipsModule,
     MatTabsModule,
     MatDatepickerModule,
-    MatNativeDateModule 
+    MatNativeDateModule,
+    MatAutocompleteModule
   ],
   exports: [
     MatButtonModule,
@@ -85,7 +87,8 @@ import {
     MatChipsModule,
     MatTabsModule,
     MatDatepickerModule,
-    MatNativeDateModule
+    MatNativeDateModule,
+    MatAutocompleteModule
   ], 
   providers : [
     MatDatepickerModule

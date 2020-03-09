@@ -1,5 +1,5 @@
 <!-- Call Me -->
-<div id="login" >
+<div id="passreset" >
     <div class="container">
         <div class="row">
             <div class="col-lg-12 log-container">
@@ -17,13 +17,9 @@
                             <path fill="#fff" d=" M 132.72 361.16 C 132.53 370.67 132.76 380.41 136.63 389.26 C 131.93 386.31 127.27 383.32 122.85 379.98 C 123.08 375.35 123.60 370.74 124.11 366.14 C 127.01 364.52 129.86 362.83 132.72 361.16 Z" />
                           </svg>
                    
-                    <form id="loginForm" class="login-form" [class.forgotPW]="forgotPasswordState" [formGroup]="loginForm" data-toggle="validator" data-focus="false">
-                        <div class="form-group">
-                            <mat-form-field class="login-forms">
-                                <input matInput type="text" placeholder="User" formControlName="username" class="form-control">
-                                <mat-error *ngIf="loginForm.get('username').invalid">Bitte User-Email eintragen.</mat-error>
-                            </mat-form-field>
-                        </div>
+                    <form id="callMeForm" class="login-form" [formGroup]="loginForm" data-toggle="validator" data-focus="false">
+
+                        <p>Setzen Sie hier Ihr Passwort zurück.</p>
 
                         <div class="form-group">
                             <mat-form-field class="login-forms">
@@ -31,38 +27,18 @@
                                 <mat-error *ngIf="loginForm.get('password').invalid">Bitte Passwort eintragen.</mat-error>
                             </mat-form-field>
                         </div>
-                        
-    
-                        <div class="form-group">
-                            <button mat-button [disabled]="!loginForm.valid" (click)="login()" class="submit-btn">LOGIN</button>
-                        </div>
-
-                        <div class="form-group">
-                            <button mat-button (click)="toggleFogotPw()" class="submit-btn small">Passwort vergessen?</button>
-                        </div>
-                        
-
-                    </form>
-
-
-                    <form id="forgotPassword" class="login-form" [class.forgotPW]="!forgotPasswordState" [formGroup]="forgotPasswordForm" data-toggle="validator" data-focus="false">
                         <div class="form-group">
                             <mat-form-field class="login-forms">
-                                <input matInput type="text" placeholder="User" formControlName="username" class="form-control">
-                                <mat-error *ngIf="forgotPasswordForm.get('username').invalid">Bitte User-Email eintragen.</mat-error>
+                                <input matInput type="password"  placeholder="Passwort bestätigen"  formControlName="password2" class="form-control" >
+                                <mat-error *ngIf="loginForm.get('password2').invalid">Bitte Passwort eintragen.</mat-error>
                             </mat-form-field>
                         </div>
+                        
     
                         <div class="form-group">
-                            <button mat-button [disabled]="!forgotPasswordForm.valid" (click)="issueForgot()" class="submit-btn">neues Passwort anfordern</button>
-                        </div>
-
-                        <div class="form-group">
-                            <button mat-button (click)="toggleFogotPw()" class="submit-btn small">zu Login</button>
+                            <button mat-button [disabled]="!loginForm.valid" (click)="changePassword()" class="submit-btn">Bestätigen</button>
                         </div>
                     </form>
-
-
                 </div>
             </div>
         </div> 

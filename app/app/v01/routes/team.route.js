@@ -30,7 +30,7 @@ router.route('/')
     
 
 router.route('/:memberId')
-    .put([tokenValidator.detectToken, middlware_hasScopeAdmin], teamCtrl.updateMember)
+    .put([tokenValidator.detectToken, middlware_hasScopeAdmin, upload.single('file')], teamCtrl.updateMember)
     .delete([tokenValidator.detectToken, middlware_hasScopeAdmin], teamCtrl.removeTeam)
 
 module.exports = router;
