@@ -73,13 +73,13 @@
                         </mat-form-field>
 
                         <mat-form-field >
-                            <input [(ngModel)]="m.role" (ngModelChange)="handleUpdateTeamMember(m, $event)"  matInput type="text" placeholder="Rolle"  required>
+                            <input [(ngModel)]="m.role" (ngModelChange)="handleUpdateTeamMember(m, $event)"  matInput type="text" placeholder="Rolle"  >
                         </mat-form-field>
 
                         <mat-form-field >
-                            <textarea [(ngModel)]="m.description" (ngModelChange)="handleUpdateTeamMember(m, $event)"  matInput type="text" placeholder="Beschreibung"  required></textarea>
+                            <textarea [(ngModel)]="m.description" (ngModelChange)="handleUpdateTeamMember(m, $event)"  matInput type="text" placeholder="Beschreibung"  ></textarea>
                         </mat-form-field>
-                    </div>
+                    </div> 
                 </div>
                 <div class="headline">
                     <h2>
@@ -110,11 +110,11 @@
                         </mat-form-field>
 
                         <mat-form-field >
-                            <input [(ngModel)]="newTeamMember.role"  matInput type="text" placeholder="Rolle"  required>
+                            <input [(ngModel)]="newTeamMember.role"  matInput type="text" placeholder="Rolle"  >
                         </mat-form-field>
 
                         <mat-form-field >
-                            <textarea [(ngModel)]="newTeamMember.description" matInput type="text" placeholder="Beschreibung"  required></textarea>
+                            <textarea [(ngModel)]="newTeamMember.description" matInput type="text" placeholder="Beschreibung"  ></textarea>
                         </mat-form-field>
                         
                         <input class="teammember-pic-upload" type="file" placeholder="Bild hochladen" (change)="handleFileInput($event.target.files)">

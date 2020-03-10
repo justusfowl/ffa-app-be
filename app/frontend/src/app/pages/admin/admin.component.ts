@@ -251,7 +251,7 @@ export class AdminComponent implements OnInit {
 
   addMember(){
 
-    if (!this.newTeamMemberFile || !this.newTeamMember.name|| !this.newTeamMember.role|| !this.newTeamMember.type){
+    if (!this.newTeamMemberFile || !this.newTeamMember.name ||  !this.newTeamMember.type){
       this.snackBar.open("Bitte alle Felder ausfüllen", "", {
         duration: 1500
       });
