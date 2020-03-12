@@ -4,6 +4,9 @@ var newsCtrl = require('../controllers/news.controller');
 var tokenValidator = require('../controllers/tokenvalidate.controller');
 var multer = require('multer');
 var fs = require("fs");
+var config = require('../../config/config');
+var path = require('path');
+
 
 var storage = multer.diskStorage({
     destination: function (req, file, cb) {

@@ -7,7 +7,9 @@
 
 
 
+
   <nav class="navbar navbar-expand-md navbar-dark navbar-custom fixed-top" *ngIf="showNavBar()">
+
       <!-- Text Logo - Use this if you don't have a graphic logo -->
       <!-- <a class="navbar-brand logo-text page-scroll" href="index.html">Aria</a> -->
 
@@ -60,6 +62,18 @@
             </li>
           </ul>
       </div>
+
+      <div class="hint-bar">
+            <div class="opening-statement">
+                <div class="announcement open" *ngIf="getIsNowOpen()">
+                    <span>Wir haben aktuell geöffnet</span>  <strong><a (click)="goToTag('times')">Öffnungszeiten</a></strong> | <strong><a (click)="goToTag('contact')">Kontakt</a></strong>
+                </div>
+                <div class="announcement closed" *ngIf="!getIsNowOpen()">
+                    Wir haben aktuell geschlossen <br/> <strong><a (click)="goToTag('times')">Öffnungszeiten</a></strong> | <strong><a (click)="goToTag('contact')">Kontakt</a></strong>
+                </div>
+            </div>
+        </div>
+
   </nav> <!-- end of navbar -->
 
 <mat-menu #myMenu="matMenu">

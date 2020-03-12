@@ -84,6 +84,7 @@ function updateNews(req, res){
 
         let newsObj = req.body;
         let newsId = newsObj._id;
+        let date = new Date();
 
         var file = req.file;
 
@@ -96,6 +97,8 @@ function updateNews(req, res){
           res.send(500, "Please provide newsId");
           return;
         }
+
+        newsObj["date"] = date;
     
         MongoClient.connect(MongoUrl, function(err, db) {
     

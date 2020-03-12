@@ -230,8 +230,8 @@
                        
                         <div class="card-body">
                             <h3 class="card-title">{{d.day}}</h3> 
-                            <p>{{d.vomiStart}} - {{d.vomiEnd}}</p>
-                            <p *ngIf="d.namiStart">{{d.namiStart}} - {{d.namiEnd}}</p>
+                            <p>{{d.vomiStart}} - {{d.vomiEnd}} Uhr</p>
+                            <p *ngIf="d.namiStart">{{d.namiStart}} - {{d.namiEnd}} Uhr</p>
                         </div>
                     </div>
                     <!-- end of card -->
@@ -248,6 +248,22 @@
             <div class="row">
                 <div class="col-lg-12">
                     <h2>Urlaubszeiten</h2>
+
+                    <div class="vacation-closed" *ngIf="currentVacation">
+                        <p>
+                            Unsere Praxis ist urlaubsbedingt geschlossen. 
+                        </p>
+                        <p>
+                            Bitte wenden Sie sich an folgende vertretenden Kollegen*innen:
+                        </p>
+
+                        <div class="subs" *ngFor="let s of currentVacation.subs; let i=index;">
+
+                            <p>{{s.name}} ( {{s.address}} / <a [href]="'tel:'+s.phone"> {{s.phone}}</a>)
+                            </p>
+
+                        </div>
+                    </div>
 
                 </div> <!-- end of col -->
             </div> <!-- end of row -->
@@ -295,7 +311,7 @@
                         </div>
                         <div class="card-body">
                             <h3 class="card-title">{{n.header}}</h3>
-                            <p>{{n.text  | trimLongStr:50}}</p>
+                            <p>{{getInnerText(n.text)  | trimLongStr:50}}</p>
                             <p class="price">{{n.date | date:'MMM d, y'}}</p>
                         </div>
                         <div class="button-container">
@@ -553,7 +569,7 @@
                         </div>
 
                         <div class="form-group">
-                                <mat-checkbox formControlName="acceptTerms"  >Ich akzeptiere die <a  target="_blank"  routerLink="/privacy" routerLinkActive="active" >Nutzungsbedingungen</a></mat-checkbox>
+                            <mat-checkbox formControlName="acceptTerms"  >Ich akzeptiere die <a  target="_blank"  routerLink="/privacy" routerLinkActive="active" >Nutzungsbedingungen</a></mat-checkbox>
                         </div>
 
                         <div class="form-group">

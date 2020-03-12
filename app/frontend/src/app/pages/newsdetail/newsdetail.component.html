@@ -3,7 +3,7 @@
 
     <h3 class="card-title">{{newsObj.header}}</h3>
     <p class="date">{{newsObj.date | date:'MMM d, y'}}</p>
-    <p>{{newsObj.text}}</p>
+    <p [innerHtml]="sanText(newsObj.text)"></p>  
    
 
     <button class="more-news" (click)="close()" color="accent" mat-raised-button >OK</button>

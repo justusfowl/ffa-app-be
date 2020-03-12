@@ -21,6 +21,7 @@ import { LeafletModule } from '@asymmetrik/ngx-leaflet'
 import { TrimLongStr } from './services/pipes';
 import { MedrequestComponent } from './components/medrequest/medrequest.component';
 
+import { RichTextEditorAllModule } from '@syncfusion/ej2-angular-richtexteditor';
 
 @NgModule({
   declarations: [
@@ -42,7 +43,8 @@ import { MedrequestComponent } from './components/medrequest/medrequest.componen
     BrowserAnimationsModule, 
     FormsModule, ReactiveFormsModule,
     MaterialModule,
-    LeafletModule.forRoot()
+    LeafletModule.forRoot(), 
+    RichTextEditorAllModule
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },

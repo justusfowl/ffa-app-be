@@ -15,6 +15,7 @@
     <h1>
         Wartung der Website
     </h1>
+
     <mat-tab-group>
 
         <mat-tab label="Leistungen" *ngIf="false"> 
@@ -210,7 +211,7 @@
 
                         <mat-form-field>
                             <mat-label>Start</mat-label>
-                            <input  disabled  [max]="vac.vacationEnd"  [(ngModel)]="vac.vacationStart" matInput [matDatepicker]="pickerStart">
+                            <input  disabled  [(ngModel)]="vac.vacationStart" matInput [matDatepicker]="pickerStart">
                             <mat-datepicker-toggle matSuffix [for]="pickerStart"></mat-datepicker-toggle>
                             <mat-datepicker disabled="false" #pickerStart></mat-datepicker>
                         </mat-form-field>
@@ -225,7 +226,6 @@
                         <mat-form-field >
                             <input [(ngModel)]="vac.title"  matInput type="text" placeholder="Titel" >
                         </mat-form-field>
-
 
                     </div>
 
@@ -264,7 +264,6 @@
                             </p>
 
                         </div>
-
 
                     </div>
                     <div>
@@ -325,9 +324,10 @@
 
                         <mat-checkbox [(ngModel)]="n.published">öffentlich?</mat-checkbox>
 
-                        <mat-form-field >
-                            <textarea [(ngModel)]="n.text"  matInput  placeholder="Inhalt" ></textarea>
-                        </mat-form-field>
+                        <ejs-richtexteditor [toolbarSettings]='tools' [(value)]="n.text"  [(ngModel)]="n.text">
+                        </ejs-richtexteditor>
+
+                       
                     </div>
                     <div>
                         <button  class="saveBtn" mat-button matSuffix mat-stroked-button (click)="saveNews(n)">
@@ -341,8 +341,6 @@
 
                 </mat-expansion-panel>
 
-
-                
             </mat-accordion>   
             
             <div class="addBtn-row">

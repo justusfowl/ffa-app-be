@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation, ElementRef, ViewChild} from '@angular/core';
+import { Component, OnInit, AfterViewInit, ViewEncapsulation, ElementRef, ViewChild} from '@angular/core';
 import { ApiService } from 'src/app/services/api.service';
 import { Subject } from 'rxjs';
 import {debounceTime, distinctUntilChanged} from "rxjs/internal/operators";
@@ -9,6 +9,8 @@ import {map, startWith} from 'rxjs/operators';
 import {COMMA, ENTER} from '@angular/cdk/keycodes';
 
 import {ErrorStateMatcher} from '@angular/material/core';
+
+import { ToolbarService, LinkService, ImageService, HtmlEditorService } from '@syncfusion/ej2-angular-richtexteditor';
 
 /** Error when invalid control is dirty, touched, or submitted. */
 export class MyErrorStateMatcher implements ErrorStateMatcher {
@@ -24,13 +26,23 @@ export class MyErrorStateMatcher implements ErrorStateMatcher {
   selector: 'app-admin',
   templateUrl: './admin.component.html',
   styleUrls: ['./admin.component.scss'],
-  encapsulation: ViewEncapsulation.None
+  encapsulation: ViewEncapsulation.None,
+  providers: [ToolbarService, LinkService, ImageService, HtmlEditorService]
 })
-export class AdminComponent implements OnInit {
+export class AdminComponent implements OnInit, AfterViewInit {
 
   @ViewChild('scopeInput', {static: false}) fruitInput: ElementRef<HTMLInputElement>;
   @ViewChild('auto', {static: false}) matAutocomplete: MatAutocomplete;
 
+  public test = "aasdasd"
+  public show = false;
+  public tools: object = {
+					items: ['Bold', 'Italic', 'Underline', '|',
+							'Undo', 'Redo', '|',
+							'FontColor', 'BackgroundColor', '|']
+        };
+    
+ 
   visible = true;
   selectable = true;
   removable = true;
@@ -101,17 +113,21 @@ export class AdminComponent implements OnInit {
 
   ngOnInit() {
 
-    this.getTeam();
-    this.getTimes();
-    this.getNews();
-    this.getUsers();
-
     this.teamValChanged.pipe(
       debounceTime(1000), 
       distinctUntilChanged())
       .subscribe(model => {
         this.updateTeamMember(this.teamMemberLastChg);
       });
+
+  }
+
+  ngAfterViewInit(): void {
+
+    this.getTeam();
+    this.getTimes();
+    this.getNews();
+    this.getUsers();
 
   }
 
@@ -489,7 +505,10 @@ export class AdminComponent implements OnInit {
 
   copyVacation(vacationObj){
     let cp = JSON.parse(JSON.stringify(vacationObj));
-    cp.title = cp.title + " (Kopie) "
+    cp.title = cp.title + " (Kopie) ";
+    if (cp._id){
+      delete cp._id;
+    }
     this.vacation.push(cp);
 
      this.snackBar.open("Eintrag kopiert.", "", {

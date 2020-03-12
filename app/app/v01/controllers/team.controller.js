@@ -43,7 +43,7 @@ async function getTeam(req, res){
         res.send(403, "Something went wrong getting the users.");
     }
 
-}; 
+};
 
 function _getActiveTeam(type, flagAlsoInActive=false){
     return new Promise((resolve, reject) => {
@@ -61,7 +61,7 @@ function _getActiveTeam(type, flagAlsoInActive=false){
             }
 
             if (!flagAlsoInActive){
-                filterObj["flagActive"] = true
+                filterObj["flagActive"] = "true"
             }
  
             collection.find(filterObj).toArray(function(error, result){

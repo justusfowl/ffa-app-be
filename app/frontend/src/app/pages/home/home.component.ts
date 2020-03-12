@@ -5,6 +5,7 @@ import { NewsdetailComponent } from '../newsdetail/newsdetail.component';
 import {FormControl, Validators, FormGroup, FormGroupDirective, FormArray} from '@angular/forms';
 import * as L from 'leaflet';
 import { MedrequestComponent } from 'src/app/components/medrequest/medrequest.component';
+import { DomSanitizer } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-home',
@@ -22,6 +23,10 @@ export class HomeComponent implements OnInit {
   vacation : any[] = [];
   teamDocs : any[] = [];
   teamMfa : any[] = [];
+
+  currentVacation: any;
+
+  monthNames = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"];
 
   serviceBullets : any[] = [
     {
@@ -98,7 +103,8 @@ export class HomeComponent implements OnInit {
   constructor(
     private api: ApiService,
     public dialog: MatDialog, 
-    private _snackBar: MatSnackBar
+    private _snackBar: MatSnackBar, 
+    protected sanitizer: DomSanitizer
   ) {
 
   }
@@ -123,6 +129,12 @@ export class HomeComponent implements OnInit {
       }catch(err){ } 
 
     })
+  }
+
+  getInnerText(innerHtmlCode){
+    let c = document.createElement("div");
+    c.innerHTML = innerHtmlCode; 
+    return c.innerText;
   }
 
   public get requestFormValue() {
@@ -159,6 +171,8 @@ export class HomeComponent implements OnInit {
     this.api.get("/times").then((result : any) => {
       this.times = result.opening;
       this.vacation = result.vacation;
+
+     this.currentVacation =  this.getIsVacationClosed(true);
 
     }).catch(err => {
       console.error(err);
@@ -242,13 +256,13 @@ export class HomeComponent implements OnInit {
     if (startDate.getYear() == endDate.getYear()){
 
       if (startDate.getMonth() == endDate.getMonth()){
-        return startDate.getDate() + " - " + endDate.getDate() + "." + (startDate.getMonth()+1) + "." + (startDate.getYear()-100);
+        return startDate.getDate() + " - " + endDate.getDate() + ". " + this.monthNames[startDate.getMonth()] + " " + (startDate.getYear()-100);
       }else{
-        return startDate.getDate() + "." + (startDate.getMonth()+1) + " - " + endDate.getDate() + "." + (endDate.getMonth()+1) + "." + (endDate.getYear()-100) 
+        return startDate.getDate() + ". " + this.monthNames[(startDate.getMonth())] + " - " + endDate.getDate() + ". " + this.monthNames[endDate.getMonth()] + " " + (endDate.getYear()-100) 
       }
      
     }else{
-      return startDate.getDate() + "." + (startDate.getMonth()+1) + "." + (startDate.getYear()-100) + " - " + endDate.getDate() + "." + (endDate.getMonth()+1) + "." + (endDate.getYear()-100) 
+      return startDate.getDate() + ". " + this.monthNames[startDate.getMonth()] + " " + (startDate.getYear()-100) + " - " + endDate.getDate() + ". " + this.monthNames[endDate.getMonth()] + " " + (endDate.getYear()-100) 
     }
 
   }
@@ -310,8 +324,15 @@ export class HomeComponent implements OnInit {
 
   }
 
-  getIsVacationClosed(){
-    let flagIsCurrentlyVacation = "";
+  getIsVacationClosed(returnObject=false){
+    let flagIsCurrentlyVacation;
+
+    if (returnObject){
+      flagIsCurrentlyVacation = null;
+    }else{
+      flagIsCurrentlyVacation = "";
+    }
+    
     let today = new Date();
 
     this.vacation.forEach(element => {
@@ -320,7 +341,12 @@ export class HomeComponent implements OnInit {
       let end = new Date(element.vacationEnd);
 
       if (start <= today && start <= end){
-        flagIsCurrentlyVacation = "Wir befinden uns gerade im Urlaub.";
+        if (returnObject){
+          flagIsCurrentlyVacation = element;
+        }else{
+          flagIsCurrentlyVacation = "Wir befinden uns gerade im Urlaub.";
+        }
+        
       }
       
     });

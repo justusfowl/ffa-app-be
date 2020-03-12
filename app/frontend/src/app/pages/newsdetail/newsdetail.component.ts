@@ -1,5 +1,6 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import { DomSanitizer } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-newsdetail',
@@ -12,13 +13,18 @@ export class NewsdetailComponent implements OnInit {
 
   constructor(
     public dialogRef: MatDialogRef<NewsdetailComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: any
+    @Inject(MAT_DIALOG_DATA) public data: any, 
+    protected sanitizer: DomSanitizer
   ) {
     this.newsObj = data.newsObj;
    }
 
   ngOnInit() {
 
+  }
+
+  sanText(inText){
+    return this.sanitizer.bypassSecurityTrustHtml(inText);
   }
 
   
