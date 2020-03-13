@@ -61,7 +61,7 @@ function _getActiveTeam(type, flagAlsoInActive=false){
             }
 
             if (!flagAlsoInActive){
-                filterObj["flagActive"] = "true"
+                filterObj["flagActive"] = true
             }
  
             collection.find(filterObj).toArray(function(error, result){
