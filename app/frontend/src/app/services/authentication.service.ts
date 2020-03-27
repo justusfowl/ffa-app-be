@@ -50,8 +50,8 @@ export class AuthenticationService {
         this.currentUserSubject.next(userData);
     }
 
-    register(userName, password){
-        return this.http.post<any>(`${this.api.apiURL}/auth/register`, { userName, password })
+    register(userObject){
+        return this.http.post<any>(`${this.api.apiURL}/auth/register`, userObject)
         .pipe(map( (resp : any) => {
             return;
         }));

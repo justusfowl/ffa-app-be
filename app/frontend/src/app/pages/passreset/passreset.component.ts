@@ -104,7 +104,7 @@ export class PassresetComponent implements OnInit {
         .subscribe(
             userData => {
 
-                this.snackBar.open(`Vielen Dank - wir haben Ihr Password zurückgesetzt. Sie werden in Kürze weitergeleitet.`, null, {
+                this.snackBar.open(`Vielen Dank - wir haben Ihr Password zurückgesetzt. Sie werden in Kürze weitergeleitet. Bitte melden Sie sich erneut an.`, null, {
                     duration: 2800,
                   });
 

@@ -1,0 +1,123 @@
+@import "../../../variables.scss";
+
+@media (min-width: 1101px) {
+
+    mwl-calendar-month-view-header{
+        width: 80%;
+    }
+    
+    .cal-days{
+        width: 80%;
+    }
+    
+    .cal-month-view{
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+    
+    .mat-stepper-vertical {
+        margin-top: 8px;
+      }
+      
+    .mat-form-field {
+        margin-top: 16px;
+        width: 400px;
+    }
+
+}
+
+@media (max-width: 1100px) {
+
+    mwl-calendar-month-view-header{
+        width: 100%;
+    }
+    
+    .cal-days{
+        width: 100%;
+    }
+    
+    .cal-month-view{
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+    
+    .mat-stepper-vertical {
+        margin-top: 8px;
+      }
+      
+    .mat-form-field {
+        margin-top: 16px;
+        width: 80%;
+    }
+
+}
+
+.selected-slot{
+    font-size: 30px;
+    width: 100%;
+    text-align: center;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.summary{
+    .datetime-slot{
+        font-size: 30px;
+        color: black;
+        margin-top: 20px;
+        margin-bottom: 20px;
+    }
+
+    .form-group{
+        margin-bottom: 0 !important ;
+    }
+}
+
+.cal-container{
+    margin-top: 20px;
+
+    .btn-primary{
+        border-color: $background_nav;
+        background-color: $background_nav;
+    }
+}
+
+.success-new-appointment{
+    p{
+        color: black;
+    }
+
+    .success-icon{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .icn{
+        color: green;
+        font-size: 50px;
+        height: 70px;
+        width: 70px;
+    }
+}
+
+.evt-loading{
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+mat-vertical-stepper.submitted{
+    mat-step-header{
+        pointer-events: none;
+    }
+}

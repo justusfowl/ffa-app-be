@@ -1,16 +1,10 @@
-/* Template: Aria - Business HTML Landing Page Template
-   Author: Inovatik
-   Created: Jul 2019
-   Description: Custom JS file
-*/
-
 
 (function($) {
     "use strict"; 
 
     try{
 
-        /* Preloader */
+        /* Preloader 
         $(window).on('load', function() {
             var preloaderFadeOutTime = 500;
             function hidePreloader() {
@@ -21,7 +15,7 @@
             }
             hidePreloader();
         });
-
+        */
         
         /* Navbar Scripts */
         // jQuery to collapse the navbar on scroll

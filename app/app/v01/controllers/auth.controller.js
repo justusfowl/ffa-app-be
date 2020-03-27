@@ -35,6 +35,10 @@ async function login(req, res){
 
             let resp = userObj; 
 
+            if (!userObj.validated){
+                return res.send(425, "Please verify your account first."); 
+            }
+
             delete resp.passPhrase;
 
             var token = jwt.sign(resp, config.auth.jwtsec, {
@@ -85,7 +89,16 @@ async function registerUser ( req, res ){
     let newUser = {
         "userName" : userName, 
         "passPhrase" : passPhrase, 
-        "validated" : false
+        "name" : req.body.name || null,
+        "birthdate" : new Date(req.body.birthdate) || null,
+        "validated" : false, 
+        "acceptTerms" : new Date(), 
+        "acceptInfoHistory" : [
+            {
+                "acceptInfo" : req.body.acceptInfo || false, 
+                "timestamp" : new Date()
+            }
+        ]
     };
 
     let userObj = await getUserByName(userName);
@@ -218,6 +231,10 @@ async function getUserByName(userName){
 
 }
 
+/**
+ * Retrieve a single user by Id
+ * @param {*} _id userId in string format  
+ */
 async function getUserById(_id){
     return new Promise ((resolve, reject) => {
         try{
@@ -251,6 +268,43 @@ async function getUserById(_id){
         }
     })
 }
+/**
+ * Function to get array of users based on their IDs
+ * @param {*} _idArray array containing ObjectIds (BSON formated)
+ */
+async function getManyUsersById(_idArray){
+    return new Promise ((resolve, reject) => {
+        try{
+                
+            MongoClient.connect(MongoUrl, function(err, db) {
+        
+                if (err) throw err;
+                
+                let dbo = db.db(config.mongodb.database);
+
+                // Get the documents collection
+                const collection = dbo.collection('users');
+
+                collection.find(
+                    {"_id" : { $in : _idArray }}).toArray(
+                    function(err, u){
+                        if (err){
+                            reject(err);
+                        }
+                        if (u){
+                            resolve(u);
+                        }else{
+                            resolve(false);
+                        }
+                    
+                });
+                
+            });
+        }catch(err){
+            reject(err);
+        }
+    })
+}
 
 
 async function executeAccountValidation(_id){
@@ -266,7 +320,7 @@ async function executeAccountValidation(_id){
             
             collection.updateOne(
                 {"_id" : ObjectID(_id)},
-                {$set : {validated : true}},
+                {$set : {validated : true, acceptTerms : new Date() }},
               function(err, u){
                 if (err){
                     reject(err);
@@ -425,7 +479,7 @@ async function userIssueForgotPasswordEmail (req, res){
     let userObj = await getUserByName(userName);
 
     if (userObj){
-        let userId = userObj.userId;
+        let userId = String(userObj._id);
         _sendAccountForgotPasswordEmail(userId, userObj.userName).then (result => {
             res.json({"message" : "OK - message sent"});
         }).catch(err => {
@@ -587,4 +641,8 @@ module.exports = {
     updateUser, 
     resetUserPassword, 
     userIssueAccountValidationEmail,
-    userIssueForgotPasswordEmail }
+    userIssueForgotPasswordEmail, 
+
+    getManyUsersById, 
+    getUserById
+    }

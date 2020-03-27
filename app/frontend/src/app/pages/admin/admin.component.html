@@ -11,7 +11,7 @@
     </div> 
 </header> 
 
-<div class="content">
+<div class="container">
     <h1>
         Wartung der Website
     </h1>
@@ -314,6 +314,14 @@
                         <input class="newsimage-pic-upload" type="file" placeholder="Bild hochladen" (change)="handleNewsFileUpload(n, $event.target.files)">
                         
 
+                        
+                        <mat-form-field>
+                            <mat-label>Datum</mat-label>
+                            <input disabled  [(ngModel)]="n.date" matInput [matDatepicker]="newsDatePicker">
+                            <mat-datepicker-toggle matSuffix [for]="newsDatePicker"></mat-datepicker-toggle>
+                            <mat-datepicker disabled="false" #newsDatePicker></mat-datepicker>
+                        </mat-form-field>
+
                         <mat-form-field >
                             <input [(ngModel)]="n.header"  matInput type="text" placeholder="Header" >
                         </mat-form-field>
@@ -344,7 +352,7 @@
             </mat-accordion>   
             
             <div class="addBtn-row">
-                <button  class="addBtn" mat-button mat-stroked-button (click)="addNewNews()">
+                <button class="addBtn" mat-button mat-stroked-button (click)="addNewNews()">
                     <mat-icon>add</mat-icon>
                 </button>
             </div>
@@ -402,5 +410,29 @@
                 </mat-autocomplete>
             </div>
         </mat-tab>
+
+        <mat-tab label="Allgemein"  style="margin:10px" *ngIf="settingsObj">
+            <div class="general">
+                <div class="field">
+                    <h4>Impressum</h4>
+    
+                    <ejs-richtexteditor [toolbarSettings]='tools' [(value)]="settingsObj.imprint"  [(ngModel)]="settingsObj.imprint">
+                    </ejs-richtexteditor>
+                </div>
+    
+                <div class="field">
+                    <h4>Datenschutz</h4>
+    
+                    <ejs-richtexteditor [toolbarSettings]='tools' [(value)]="settingsObj.datapriv"  [(ngModel)]="settingsObj.datapriv">
+                    </ejs-richtexteditor>
+                </div>
+            </div>
+
+            <div class="foot">
+                <button class="btn" (click)="saveSettings()" mat-icon color="accent" aria-label="Store the settings object">
+                    Speichern
+                </button>
+            </div>
+          </mat-tab>
     </mat-tab-group>               
 </div>

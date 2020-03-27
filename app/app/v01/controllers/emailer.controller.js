@@ -42,9 +42,9 @@ function sendValidateAccountEmail (userName, tokenUrl) {
     return new Promise((resolve, reject) => {
 
         let options = {
-            from : config.email.smtpEmail, 
+            from : '"' + config.email.smtpEmailSenderName + '" ' + config.email.smtpEmail, 
             to : userName, 
-            subject : "Account-Aktivierung" , 
+            subject : "myFFA | Account-Aktivierung" , 
             template: 'accountActivation',
             context: {
                 "userName": userName, 
@@ -70,9 +70,9 @@ function sendForgotPasswordEmail (userName, tokenUrl) {
     return new Promise((resolve, reject) => {
 
         let options = {
-            from : config.email.smtpEmail, 
+            from : '"' + config.email.smtpEmailSenderName + '" ' + config.email.smtpEmail, 
             to : userName, 
-            subject : "Passwort-Reset" , 
+            subject : "myFFA | Passwort-Reset" , 
             template: 'forgotPassword',
             context: {
                 "userName": userName, 
@@ -181,9 +181,9 @@ function sendPasswordWasResetEmail(contextObj){
     return new Promise((resolve, reject) => {
 
         let options = {
-            from : config.email.smtpEmail, 
+            from : '"' + config.email.smtpEmailSenderName + '" ' + config.email.smtpEmail,  
             to : contextObj.userName, 
-            subject : "Passwort-Reset" , 
+            subject : "myFFA | Passwort-Reset" , 
             template: 'forgotPasswordSuccess',
             context: contextObj
         }
@@ -205,10 +205,63 @@ function sendPreRegistrationEmail (userName, tokenUrl) {
     return new Promise((resolve, reject) => {
 
         let options = {
-            from : config.email.smtpEmail, 
+            from : '"' + config.email.smtpEmailSenderName + '" ' + config.email.smtpEmail, 
             to : userName, 
-            subject : "Account-Aktivierung" , 
+            subject : "myFFA | Account-Aktivierung" , 
             template: 'preregistrationWelcome',
+            context: {
+                "userName": userName, 
+                "activateUrl" : tokenUrl
+            }
+        }
+
+        transporter.sendMail(options, function (err, info){
+            if (err){
+                reject(err); 
+
+            }else{
+                resolve(info);
+            }
+        })
+
+    });
+   
+};
+
+function sendTeleAppointment (contextObj) {
+
+    return new Promise((resolve, reject) => {
+
+        let options = {
+            from : '"' + config.email.smtpEmailSenderName + '" ' + config.email.smtpEmail, 
+            to : config.email.backofficeEmailReceiver, 
+            subject : "myFFA | Ihre Video-Konsultation" , 
+            template: 'teleAppointment',
+            context: contextObj
+        }
+
+        transporter.sendMail(options, function (err, info){
+            if (err){
+                reject(err); 
+
+            }else{
+                resolve(info);
+            }
+        })
+
+    });
+   
+};
+
+function testEmail (userName, tokenUrl) {
+
+    return new Promise((resolve, reject) => {
+
+        let options = {
+            from : '"' + config.email.smtpEmailSenderName + '" ' + config.email.smtpEmail, 
+            to : userName, 
+            subject : "myFFA | Account-Aktivierung" , 
+            template: 'test',
             context: {
                 "userName": userName, 
                 "activateUrl" : tokenUrl
@@ -235,5 +288,6 @@ module.exports = {
     sendMessageToBackOffice, 
     sendForgotPasswordEmail,
     sendPasswordWasResetEmail, 
-    sendPreRegistrationEmail
+    sendPreRegistrationEmail,
+    sendTeleAppointment
 }

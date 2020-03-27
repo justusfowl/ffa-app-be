@@ -48,8 +48,8 @@ export class ApiService {
 
     return new Promise(function(resolve, reject) {
       
-      api.http.get(api.apiURL + endPoint, paramOptions).subscribe(
-        (data: any) => { 
+      api.http.get(api.apiURL + endPoint, {params: paramOptions}).subscribe(
+        (data: any) => {
           
           api.loading = false;
           if (enableLoader){

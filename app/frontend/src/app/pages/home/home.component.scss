@@ -1,5 +1,10 @@
 @import "../../../variables.scss";
 
+.login-dialog .mat-dialog-container{
+    box-shadow: unset !important;
+    background: #ffffff00 !important;
+}
+
 #header{
     h1{
         font: 300 2.5rem/4rem "Roboto", sans-serif;
@@ -256,9 +261,7 @@
     }
 }
 
-.prescription-dialog{
-    max-height: 100vh !important;
-}
+
 
 .med-requests{
     margin-bottom: 20px;

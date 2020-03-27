@@ -27,7 +27,10 @@ import {
   MatTabsModule,
   MatDatepickerModule,
   MatNativeDateModule , 
-  MatAutocompleteModule
+  MatAutocompleteModule, 
+  MatStepperModule,
+  MatDialogRef, 
+  MatSlideToggleModule
 } from '@angular/material';
 
 
@@ -59,7 +62,9 @@ import {
     MatTabsModule,
     MatDatepickerModule,
     MatNativeDateModule,
-    MatAutocompleteModule
+    MatAutocompleteModule, 
+    MatStepperModule, 
+    MatSlideToggleModule
   ],
   exports: [
     MatButtonModule,
@@ -75,7 +80,7 @@ import {
     MatProgressSpinnerModule, 
     MatCheckboxModule, 
     MatTooltipModule, 
-    MatProgressBarModule, 
+    MatProgressBarModule,  
     MatDialogModule, 
     MatSnackBarModule, 
     MatSelectModule, 
@@ -88,7 +93,9 @@ import {
     MatTabsModule,
     MatDatepickerModule,
     MatNativeDateModule,
-    MatAutocompleteModule
+    MatAutocompleteModule, 
+    MatStepperModule, 
+    MatSlideToggleModule
   ], 
   providers : [
     MatDatepickerModule

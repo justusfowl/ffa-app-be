@@ -1,4 +1,4 @@
-<!-- Call Me -->
+
 <div id="login" >
     <div class="container">
         <div class="row">
@@ -17,10 +17,10 @@
                             <path fill="#fff" d=" M 132.72 361.16 C 132.53 370.67 132.76 380.41 136.63 389.26 C 131.93 386.31 127.27 383.32 122.85 379.98 C 123.08 375.35 123.60 370.74 124.11 366.14 C 127.01 364.52 129.86 362.83 132.72 361.16 Z" />
                           </svg>
                    
-                    <form id="loginForm" class="login-form" [class.forgotPW]="forgotPasswordState" [formGroup]="loginForm" data-toggle="validator" data-focus="false">
+                    <form id="loginForm" class="login-form" [class.show]="viewState=='login'" [formGroup]="loginForm" data-toggle="validator" data-focus="false">
                         <div class="form-group">
                             <mat-form-field class="login-forms">
-                                <input matInput type="text" placeholder="User" formControlName="username" class="form-control">
+                                <input matInput type="text" placeholder="User-Email" formControlName="username" class="form-control">
                                 <mat-error *ngIf="loginForm.get('username').invalid">Bitte User-Email eintragen.</mat-error>
                             </mat-form-field>
                         </div>
@@ -37,15 +37,71 @@
                             <button mat-button [disabled]="!loginForm.valid" (click)="login()" class="submit-btn">LOGIN</button>
                         </div>
 
+                        <div class="seperator">
+                            oder
+                        </div>
+
                         <div class="form-group">
-                            <button mat-button (click)="toggleFogotPw()" class="submit-btn small">Passwort vergessen?</button>
+                            <button mat-button (click)="setState('register')" class="submit-btn">REGISTRIEREN</button>
+                        </div>
+
+                        <div class="form-group">
+                            <button mat-button (click)="setState('forgotPass')" class="submit-btn small">Passwort vergessen?</button>
                         </div>
                         
 
                     </form>
 
+                    <form id="registerForm" class="login-form" [class.show]="viewState=='register'" [formGroup]="registerForm" data-toggle="validator" data-focus="false">
+                            
+                            <div class="form-group">
+                                <mat-form-field class="login-forms">
+                                    <input matInput type="text" placeholder="User-Email" formControlName="userName" class="form-control" required>
+                                    <mat-error *ngIf="registerForm.get('userName').invalid">Bitte User-Email eintragen.</mat-error>
+                                </mat-form-field>
+                            </div>
 
-                    <form id="forgotPassword" class="login-form" [class.forgotPW]="!forgotPasswordState" [formGroup]="forgotPasswordForm" data-toggle="validator" data-focus="false">
+                            <div class="form-group">
+                                <mat-form-field class="login-forms">
+                                    <input matInput type="text" placeholder="Name" formControlName="name" class="form-control" required>
+                                    <mat-error *ngIf="registerForm.get('name').invalid">Bitte Name (Vor + Nachnamen) eintragen.</mat-error>
+                                </mat-form-field>
+                            </div>
+
+                            <div class="form-group">
+                                <mat-form-field class="login-forms">
+                                    <input matInput type="password"  placeholder="Passwort"  formControlName="password" class="form-control" >
+                                    <mat-error *ngIf="registerForm.get('password').invalid">Bitte starkes Passwort verwenden.</mat-error>
+                                </mat-form-field>
+                            </div>
+                            
+                            <div class="form-group">
+                                <mat-form-field>
+                                    <input matInput  placeholder="Geburtsdatum" [matDatepicker]="picker" formControlName="birthdate" class="form-control">
+                                    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                                    <mat-datepicker #picker></mat-datepicker>
+                                </mat-form-field>
+                            </div>
+
+                            <div class="form-group">
+                                    <mat-checkbox  formControlName="acceptTerms"  >Ich akzeptiere die <a  target="_blank"  routerLink="/privacy" routerLinkActive="active" >Nutzungsbedingungen</a></mat-checkbox>
+                            </div>
+
+                            <div class="form-group">
+                                    <mat-checkbox  formControlName="acceptInfo" >Ich möchte die <a  target="_blank"  routerLink="/privacy" routerLinkActive="active" >digitalen Gesundheitsservices</a> der Praxis nutzen. </mat-checkbox>
+                            </div>
+                            
+                            <div class="form-group">
+                                <button mat-button [disabled]="registerForm.invalid" (click)="registerNewUser()" class="submit-btn">REGISTRIEREN</button>
+                            </div>
+            
+                            <div class="form-group">
+                                <button mat-button (click)="setState('login')" class="submit-btn small">zu Login</button>
+                            </div>
+                        </form>
+
+
+                    <form id="forgotPassword" class="login-form" [class.show]="viewState=='forgotPass'" [formGroup]="forgotPasswordForm" data-toggle="validator" data-focus="false">
                         <div class="form-group">
                             <mat-form-field class="login-forms">
                                 <input matInput type="text" placeholder="User" formControlName="username" class="form-control">
@@ -58,10 +114,29 @@
                         </div>
 
                         <div class="form-group">
-                            <button mat-button (click)="toggleFogotPw()" class="submit-btn small">zu Login</button>
+                            <button mat-button (click)="setState('login')" class="submit-btn small">zu Login</button>
                         </div>
                     </form>
 
+                    <div id="welcomeNewUser" [class.show]="viewState=='newuser'" >
+
+                            <div class="success-icon">
+                                <mat-icon class="icn" >check_circle_outline</mat-icon>
+                            </div>
+                           
+
+                            <h2>
+                                Herzlich willkommen!
+                            </h2>
+                            
+                            <p>
+                                Wir haben Ihnen soeben eine eMail geschickt, um Ihr eMail-Konto zu verifizieren - bitte beachten Sie, dass sie erst danach beginnen können, digitale Dienste (z.B. Video-Konsultationen) zu buchen.  
+                            </p>
+
+                            <div class="form-group">
+                                <button mat-button (click)="setState('login')" class="submit-btn">Anmelden</button>
+                            </div>
+                    </div>
 
                 </div>
             </div>

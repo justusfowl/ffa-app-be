@@ -90,3 +90,32 @@ nav.top-nav-collapse{
         opacity: 1;
     }
 }
+
+
+.spinner-wrapper{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .message{
+        min-width: 250px;
+        text-align: center;
+        margin-top: 200px;
+        font-size: 40px;
+        color: white;
+        font-weight: 100;
+    }
+}
+
+.spinner-wrapper.msg{
+    background: rgba($background_nav, 0.8);
+}
+
+.prescription-dialog,
+.video-dialog{
+    max-height: 100vh !important;
+}
+
+.video-dialog{
+    width: 90vw !important;
+}

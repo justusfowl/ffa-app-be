@@ -5,10 +5,12 @@ var ObjectID = require('mongodb').ObjectID;
 
 var MongoUrl = config.getMongoUrl();
 
-
+/**
+ * Function to update one's individual user
+ * @param {*} req 
+ * @param {*} res 
+ */
 function updateUser(req, res){
-
-    // @TODO check for admin privileges 
 
    let targetUserId = req.userId;
 
@@ -34,10 +36,17 @@ function updateUser(req, res){
         delete targetUser.userName;
    }
 
-   
    // remove scopes, prevent user changing of the scopes 
    if (targetUser.scopes){
         delete targetUser.scopes;
+    }
+
+    // do not allow modification of master data (e.g. accept terms date)
+    if (targetUser.acceptTerms){
+        delete targetUser.acceptTerms;
+    }
+    if (targetUser.acceptInfoHistory){
+        delete targetUser.acceptInfoHistory;
     }
 
     if (Object.keys(targetUser).length == 0){

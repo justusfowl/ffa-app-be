@@ -48,6 +48,18 @@ const config = {
       smtpEmail : process.env.SMTP_EMAIL,
       smtpEmailSenderName : process.env.SMTP_EMAIL_SENDER_NAME, 
       backofficeEmailReceiver : process.env.BACKOFFICE_EMAIL_RECEIVE
+    }, 
+
+    tele : {
+      loginUrl : process.env.TELE_LOGIN_URL, 
+      apiBase : process.env.TELE_API_BASE, 
+      dialInDoc: process.env.TELE_URL_BASE_DIAL_DOC, 
+      dialInPatient: process.env.TELE_URL_BASE_DIAL_PATIENT,
+      tenantId : process.env.TELE_TENANT_ID, 
+      tenantAlias : process.env.TELE_TENANT_ALIAS, 
+      userAlias : process.env.TELE_USER_ALIAS, 
+      symmetricUserKeyHash : process.env.TELE_SYMMETRIC_KEY_HASH, 
+      userGroupId: process.env.TELE_USER_GROUP_ID
     }
 
   };

@@ -14,13 +14,170 @@
 
 
 <div class="container">
+        <h1>
+            myFFA
+        </h1>
+    
+        <mat-tab-group>
+    
+            <mat-tab label="Profil" > 
+                <div class="content profile" *ngIf="currentUser">
+                    <div class="content-header">
+                        <button mat-button matSuffix mat-stroked-button  (click)="updateUser()" >Speichern</button>    
+                    </div>
+                    
+                    <form id="profileForm"  FormGroupDirective >
 
-    <div class="service">
+                        <div class="form-group">
+                            <mat-form-field class="login-forms">
+                                <input required matInput type="text" placeholder="eMail" class="form-control" readonly [(ngModel)]="currentUser.userName" [ngModelOptions]="{standalone: true}">
+                            </mat-form-field>
+                        </div>
 
-        <div class="srv-itm" *ngIf="">
+                        <div class="form-group">
+                            <mat-form-field class="login-forms">
+                                <input required matInput type="text" placeholder="Name" class="form-control" [(ngModel)]="currentUser.name" [ngModelOptions]="{standalone: true}">
+                                <mat-error  *ngIf="currentUser.name" >Bitte Namen eintragen.</mat-error>
+                            </mat-form-field>
+                        </div>
 
-        </div>
+                        <div class="form-group">
+                            <mat-form-field>
+                                <input matInput placeholder="Geburtsdatum" [matDatepicker]="picker" [(ngModel)]="currentUser.birthdate" [ngModelOptions]="{standalone: true}" class="form-control">
+                                <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                                <mat-datepicker #picker></mat-datepicker>
+                            </mat-form-field>
+                        </div>
 
-    </div>
+                        
+                    </form>
+                </div>
+            </mat-tab>
+            <mat-tab label="Termine" >
+                <div class="appointments">
+                        <div class="content-header ">
+                            <button class="saveBtn" mat-button matSuffix mat-stroked-button (click)="newTeleAppointment()" >
+                                Neuer Video-Termin
+                            </button>
+        
+                            <mat-slide-toggle class="toggle-previous-app">vergangene anzeigen</mat-slide-toggle>
+        
+                        </div>
+        
+                        <div class="" *ngIf="!myAppointments" >
+                                Keine Termine
+                        </div>
+        
+                        <div class="content appointments" *ngIf="myAppointments">
+        
+                            <mat-accordion>
+                                <mat-expansion-panel *ngFor="let app of myAppointments; let i=index;" class="appointment-item" [class.removed]="app.inactive" [expanded]="i==0">
+                                    <mat-expansion-panel-header>
+                                        <mat-panel-title>
+                                            {{app.appointmentObj.start  | date:'medium':'de'}}
+                                        </mat-panel-title>
+                                        <mat-panel-description>
+                                            {{app.appointmentType.name}} 
+                                            
+                                            <span *ngIf="app.tele">(Video)</span>
+                                            <mat-icon *ngIf="app.tele">videocam</mat-icon>
+    
+                                        </mat-panel-description>
+                                    </mat-expansion-panel-header>
+    
+                                <div class="app-content">
+                                                                                    
+                                        <div class="form-group">
+                                            <mat-form-field >
+                                                <input required matInput type="text" placeholder="Arzt" class="form-control" [ngModel]="app.doc.userName" readonly>
+                                            </mat-form-field>
+                                        </div>
+                                
+                                        <div class="form-group">
+                                            <mat-form-field >
+                                                <textarea required matInput type="text" placeholder="Details" class="form-control" [ngModel]="app.appointmentNotes" readonly></textarea>
+                                            </mat-form-field>
+                                        </div>
+    
+                                        <div class="form-group" *ngIf="!app.inactive">
+                                            Patienten-Code: {{app.tele.patientCode}}
+                                        </div>
+    
+                                        <div class="info">
+                                            Wir verwenden mit RED-Medical einen zertifizierten Anbieter für Videosprechstunden. Näheres verfahren Sie <a href="https://www.redmedical.de/" target="_blank" >hier</a>.
+                                        </div>
+    
+                                        <div>
+                                            <button *ngIf="app.inactive" class="saveBtn" mat-button matSuffix mat-stroked-button color="warn">
+                                                gelöscht
+                                            </button>
+    
+                                            <button *ngIf="!app.inactive" class="saveBtn" mat-button matSuffix mat-stroked-button color="warn" (click)="removeTeleAppointment(app)" >
+                                                Termin löschen
+                                            </button>
+    
+                                            <button class="saveBtn floatright" [disabled]="app.inactive" mat-button matSuffix mat-stroked-button (click)="openTeleAppointment(app)" *ngIf="app.tele">
+                                                Beratung starten
+                                            </button>
+                    
+                                        </div>
+    
+                                </div>
+    
+                                </mat-expansion-panel>
+                            </mat-accordion>
+        
+                        </div>
+                </div>
+                
+
+            </mat-tab>
+            <mat-tab label="Rezepte" *ngIf="false">
+
+            </mat-tab>
+            <mat-tab label="Einstellungen" >
+
+                    <mat-accordion>
+                        <mat-expansion-panel  [expanded]="i==0">
+                            <mat-expansion-panel-header>
+                                <mat-panel-title>
+                                    Benachrichtigungen
+                                </mat-panel-title>
+                                <mat-panel-description>
+                                    
+                                    <mat-icon>notification_important</mat-icon>
+
+                                </mat-panel-description>
+                            </mat-expansion-panel-header>
+
+                            <div class="settings-content">
+
+                            </div>
+
+                        </mat-expansion-panel>
+
+                        <mat-expansion-panel>
+                                <mat-expansion-panel-header>
+                                    <mat-panel-title>
+                                        Benachrichtigungen
+                                    </mat-panel-title>
+                                    <mat-panel-description>
+                                        
+                                        <mat-icon>notification_important</mat-icon>
+
+                                    </mat-panel-description>
+                                </mat-expansion-panel-header>
+
+                            <div class="settings-content">
+
+                            </div>
+
+                        </mat-expansion-panel>
+
+                    </mat-accordion>
+
+            </mat-tab>
+
+    </mat-tab-group>
 
 </div>

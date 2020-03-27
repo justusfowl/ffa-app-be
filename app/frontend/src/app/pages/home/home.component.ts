@@ -6,6 +6,9 @@ import {FormControl, Validators, FormGroup, FormGroupDirective, FormArray} from 
 import * as L from 'leaflet';
 import { MedrequestComponent } from 'src/app/components/medrequest/medrequest.component';
 import { DomSanitizer } from '@angular/platform-browser';
+import { NewappointmentComponent } from '../newappointment/newappointment.component';
+import { AuthenticationService } from 'src/app/services/authentication.service';
+import { LoginComponent } from '../login/login.component';
 
 @Component({
   selector: 'app-home',
@@ -44,7 +47,7 @@ export class HomeComponent implements OnInit {
     },
     {
       "icon" : "healing", 
-      "service" : "KLEINE CHIRURGIE, BESTRAHLUNGEN"
+      "service" : "KLEINE CHIRURGIE"
     },
     {
       "icon" : "spa", 
@@ -85,12 +88,12 @@ export class HomeComponent implements OnInit {
       "type" : "prescription", 
       "name" : "Rezeptvorbestellung"
     },
-    /*
+    
     {
-      "type" : "appointment", 
-      "name" : "Terminanfrage"
+      "type" : "video", 
+      "name" : "Video-Konsultation"
     }
-    */
+    
   ];
 
   @ViewChild(FormGroupDirective, {static : true}) formGroupDirective: FormGroupDirective;
@@ -102,6 +105,7 @@ export class HomeComponent implements OnInit {
 
   constructor(
     private api: ApiService,
+    private auth : AuthenticationService,
     public dialog: MatDialog, 
     private _snackBar: MatSnackBar, 
     protected sanitizer: DomSanitizer
@@ -122,9 +126,10 @@ export class HomeComponent implements OnInit {
     this.requestForm.get("type").valueChanges.subscribe(selectedValue => {
       
       try{
-        console.log(selectedValue);
         if (selectedValue.type == "prescription"){
           this.openMedicationDialog();
+        }else if (selectedValue.type == "video"){
+          this.openVideoDialog();
         }
       }catch(err){ } 
 
@@ -434,6 +439,43 @@ export class HomeComponent implements OnInit {
         duration: 1500
       })
     })
+  }
+
+  openVideoDialog(){
+
+    if (this.auth.isAuthorized()){
+
+      if (!this.auth.currentUserValue.validated){
+        this._snackBar.open("Bitte verifizieren Sie ihr Konto bevor Sie digitale Dienste nutzen können. Prüfen Sie ihr Postfach oder gehen Sie auf 'myFFA'", "OK", {
+          duration: 10000
+        })
+        return;
+      }
+
+      const dialogRef = this.dialog.open(NewappointmentComponent, {
+        data: {},
+        panelClass : "video-dialog"
+      });
+  
+      dialogRef.afterClosed().subscribe((resultData : any) => {
+        console.log(resultData);
+      });
+    }else{
+
+      const dialogRef = this.dialog.open(LoginComponent, {
+        data: {
+            flagDialog : true
+          },
+        panelClass : "login-dialog"
+      });
+  
+      dialogRef.afterClosed().subscribe((resultData : any) => {
+        if (resultData){
+          this.openVideoDialog();
+        }
+      });
+    }
+
   }
 
   openMedicationDialog(medications = []) : void {

@@ -9,6 +9,8 @@ var coachRoutes = require('./coach.route');
 var newsRoutes = require('./news.route');
 var timesRoutes = require('./times.route');
 var messageRoutes= require('./message.routes');
+var generalRoutes = require('./general.route');
+var appointmentRoutes = require('./appointment.route');
 
 const tokenValidator = require('../controllers/tokenvalidate.controller');
 
@@ -32,5 +34,8 @@ router.use('/news', newsRoutes);
 
 router.use('/times', timesRoutes);
 
+router.use('/general', generalRoutes)
+
+router.use('/appointment', [tokenValidator.verifyToken, tokenValidator.HasUserVerifiedEmail], appointmentRoutes)
 
 module.exports = router; 

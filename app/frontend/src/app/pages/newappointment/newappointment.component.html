@@ -1,0 +1,284 @@
+
+
+<mat-vertical-stepper [linear]="isLinear" #stepper  [class.submitted]="flagSubmitted">
+  <mat-step [stepControl]="baseInfoForm">
+    <form [formGroup]="baseInfoForm">
+      <ng-template matStepLabel>Ihr Anliegen</ng-template>
+
+      <div class="form-group">
+        <mat-form-field>
+          <mat-label>Name</mat-label>
+          <input matInput placeholder="Last name, First name" formControlName="patientName" required readonly="true">
+        </mat-form-field>
+      </div>
+    
+      <div class="form-group">
+          <mat-form-field>
+            <mat-label>Anfrageart</mat-label>
+            <mat-select  formControlName="appointmentType" required>
+              <mat-option *ngFor="let req of appointmentTypes" [value]="req">
+              {{req.name}}
+              </mat-option>
+            </mat-select>
+            <mat-error *ngIf="baseInfoForm.get('appointmentType').hasError('required')"  >Bitte wählen Sie eine Anfrageart</mat-error>
+          </mat-form-field>
+      </div>
+
+      <div class="form-group">
+          <mat-form-field>
+            <mat-label>Arzt</mat-label>
+            <mat-select  formControlName="doc" required>
+              <mat-option *ngFor="let doc of availableDocs" [value]="doc">
+              {{doc.userName}}
+              </mat-option>
+            </mat-select>
+            <mat-error *ngIf="baseInfoForm.get('doc').hasError('required')"  >Sie können einen Arzt wählen.</mat-error>
+          </mat-form-field>
+      </div>
+
+      <div class="form-group">
+          <mat-form-field>
+            <mat-label>Nachricht</mat-label>
+            <textarea formControlName="appointmentNotes" required type="text" matInput #messageObj maxlength="1000" placeholder="Bitte teilen Sie uns Details zu Ihrer Anfrage mit."></textarea>
+            <mat-hint class="hint" align="end">{{baseInfoForm.value.appointmentNotes.length}} / 1000</mat-hint>
+          </mat-form-field>
+      </div>
+     
+      <div>
+        <button mat-button matStepperNext (click)="fetchEvents()">Weiter</button>
+      </div>
+    </form>
+  </mat-step>
+
+  <mat-step [stepControl]="dateTimeForm">
+
+    <div class="evt-loading" *ngIf="evtLoading">
+        <mat-spinner></mat-spinner>
+    </div>
+
+    <div class="cal-container" *ngIf="!evtLoading">
+
+      <div class="row text-center"  >
+
+          <div class="col-md-4">
+            <div class="btn-group">
+              <div
+                class="btn btn-primary"
+                mwlCalendarPreviousView
+                [view]="view"
+                [(viewDate)]="viewDate"
+                (viewDateChange)="fetchEvents()"
+              >
+                Previous
+              </div>
+              <div
+                class="btn btn-outline-secondary"
+                mwlCalendarToday
+                [(viewDate)]="viewDate"
+              >
+                Today
+              </div>
+              <div
+                class="btn btn-primary"
+                mwlCalendarNextView
+                [view]="view"
+                [(viewDate)]="viewDate"
+                (viewDateChange)="fetchEvents()"
+              >
+                Next
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <h3>{{ viewDate | calendarDate:(view + 'ViewTitle'):locale }}</h3>
+          </div>
+          <div class="col-md-4">
+            
+          </div>
+          <div class="col-md-4" *ngIf="false">
+            <div class="btn-group">
+              <div
+                class="btn btn-primary"
+                (click)="setView(CalendarView.Month)"
+                [class.active]="view === CalendarView.Month"
+              >
+                Month
+              </div>
+              <div
+                class="btn btn-primary"
+                (click)="setView(CalendarView.Week)"
+                [class.active]="view === CalendarView.Week"
+              >
+                Week
+              </div>
+              <div
+                class="btn btn-primary"
+                (click)="setView(CalendarView.Day)"
+                [class.active]="view === CalendarView.Day"
+              >
+                Day
+              </div>
+            </div>
+          </div>
+        </div>
+        <div>
+
+          <div [ngSwitch]="view" >
+              <mwl-calendar-month-view
+                *ngSwitchCase="CalendarView.Month"
+                class="appointment-cal"
+                [viewDate]="viewDate"
+                [events]="events$"
+                [locale]="locale"
+                [refresh]="refresh"
+                [activeDayIsOpen]="activeDayIsOpen"
+                (dayClicked)="dayClicked($event.day)"
+                (eventClicked)="handleEvent('Clicked', $event.event)"
+                (eventTimesChanged)="eventTimesChanged($event)"
+              >
+              </mwl-calendar-month-view>
+              <mwl-calendar-week-view
+                *ngSwitchCase="CalendarView.Week"
+                [viewDate]="viewDate"
+                [events]="events$"
+                [locale]="locale"
+                [refresh]="refresh"
+                (eventClicked)="handleEvent('Clicked', $event.event)"
+                (eventTimesChanged)="eventTimesChanged($event)"
+              >
+              </mwl-calendar-week-view>
+              <mwl-calendar-day-view
+                *ngSwitchCase="CalendarView.Day"
+                [viewDate]="viewDate"
+                [events]="events$"
+                [locale]="locale"
+                [refresh]="refresh"
+                (eventClicked)="handleEvent('Clicked', $event.event)"
+                (eventTimesChanged)="eventTimesChanged($event)"
+              >
+              </mwl-calendar-day-view>
+            </div>
+        </div>
+      
+    </div>
+
+    <form [formGroup]="dateTimeForm">
+      <ng-template matStepLabel>Termin</ng-template>
+
+      <div class="selected-slot" *ngIf="!dateTimeForm.invalid" >
+          {{dateTimeForm.get('appointmentDateStart').value | date:'medium':'de'}} 
+          
+          <button mat-icon-button (click)="removeSlotSelection()">
+            <mat-icon class="remove-slot" >delete</mat-icon>
+          </button>
+          
+      </div>
+      
+      <div>
+        <button mat-button matStepperPrevious>Zurück</button>
+        <button mat-button matStepperNext [disabled]="dateTimeForm.invalid">Weiter</button>
+      </div>
+    </form>
+
+  </mat-step>
+
+  <mat-step [stepControl]="finalForm" >
+
+    <ng-template matStepLabel>Zusammenfassung</ng-template>
+
+    <div class="summary">
+
+        Sie sind fast fertig:
+
+        <p class="datetime-slot">
+            {{dateTimeForm.get('appointmentDateStart').value | date:'medium':'de'}} 
+        </p>
+
+        <div class="form-group">
+            <mat-form-field >
+                <input required matInput type="text" placeholder="Name" class="form-control" [ngModel]="baseInfoForm.value.patientName" readonly>
+            </mat-form-field>
+        </div>
+
+        <div class="form-group">
+            <mat-form-field >
+                <input required matInput type="text" placeholder="Anfrageart" class="form-control" [ngModel]="baseInfoForm.value.appointmentType.name" readonly>
+            </mat-form-field>
+        </div>
+
+        
+        <div class="form-group">
+            <mat-form-field >
+                <input required matInput type="text" placeholder="Arzt" class="form-control" [ngModel]="baseInfoForm.value.doc.userName" readonly>
+            </mat-form-field>
+        </div>
+
+        <div class="form-group">
+            <mat-form-field >
+                <textarea required matInput type="text" placeholder="Details" class="form-control" [ngModel]="baseInfoForm.value.appointmentNotes" readonly></textarea>
+            </mat-form-field>
+        </div>
+        
+       
+        <br/>    
+        <form [formGroup]="finalForm">
+    
+            <div class="form-group">
+              <div class="form-group">
+                  <mat-checkbox  formControlName="acceptTerms"  >Ich akzeptiere die <a  target="_blank"  routerLink="/privacy" routerLinkActive="active" >Nutzungsbedingungen</a></mat-checkbox>
+              </div>
+            </div>
+    
+        </form>
+
+    </div>
+   
+
+    <div>
+
+      <button mat-button matStepperPrevious>Zurück</button>
+
+      <button mat-button [disabled]="!finalForm.get('acceptTerms').value" (click)="initiateAppointment()">Termin vereinbaren</button>
+
+    </div>
+  </mat-step>
+
+  <mat-step >
+
+    <ng-template *ngIf="finalForm.get('initiated').value == 'success'" matStepLabel>Bestätigung</ng-template>
+    <ng-template *ngIf="finalForm.get('initiated').value != 'success'" matStepLabel>Fehler</ng-template>
+
+    <div class="success-new-appointment"  *ngIf="finalForm.get('initiated').value == 'success'" >
+      <div class="success-icon">
+          <mat-icon class="icn" >check_circle_outline</mat-icon>
+      </div>
+        <p>Vielen Dank - Sie erhalten von uns eine Email mit den Einwahl-Daten. Sie benötigen dafür einen Computer/Smartphone mit 
+          Internet-Zugang sowie einer Kamera / Webcam. 
+        </p>
+        <p>
+          Bitte beachten Sie: Falls Sie den Termin nicht wahrnehmen können, sagen Sie diesen bitte bequem über ihr myFFA Konto ab. 
+        </p>
+
+        <div>
+          <button mat-button (click)="closeModal()">Schließen</button>
+        </div>
+    </div>
+
+    <div class="" *ngIf="finalForm.get('initiated').value != 'success'" >
+
+        <p>Etwas ist leider schief gelaufen - bitte gehen Sie zurück und wählen einen alternativen Termin aus.</p>
+
+        <div>
+          <button mat-button matStepperPrevious>Zurück</button>
+          <button mat-button (click)="closeModal()">Abbrechen</button>
+        </div>
+    </div>
+
+  </mat-step>
+
+  
+
+
+</mat-vertical-stepper>
+
+

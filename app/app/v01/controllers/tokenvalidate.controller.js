@@ -72,6 +72,18 @@ function verifyToken(req, res, next) {
 
   }
 
+  async function HasUserVerifiedEmail (req, res, next){
+    
+      let userId = req.userId;
+      let userObj = await authCtrl.getUserById(userId);
+      if (userObj.validated){
+        next();
+      }else{
+        return res.send(412, { auth: false, message: 'Die eMail wurde nicht verifiziert.' });  
+      }
+    
+  }
+
   function HasScope(scope) {
     return async function(req, res, next) {
 
@@ -90,4 +102,4 @@ function verifyToken(req, res, next) {
   }
 
 
-module.exports = { verifyToken, detectToken, HasScope } ;
+module.exports = { verifyToken, detectToken, HasScope, HasUserVerifiedEmail} ;

@@ -1,11 +1,16 @@
 @import "../../../variables.scss";
 
+.form-group{
+    margin-bottom: 0.25rem;
+}
+
+ 
 #login{
-    background-color: #ebebf0;
+    // background-color: #ebebf0;
 }
 
 .log-container{
-    height: 100vh;
+    // height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -20,7 +25,7 @@
 
     .log{
         background-color: $background_nav;
-        padding: 40px;
+        padding: 20px;
         box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
         border-radius: 4px;
         display: flex;
@@ -55,22 +60,73 @@
 }
 
 #loginForm, 
-#forgotPassword{
-    max-height: 500px; 
-    transition: 0.5s;
+#forgotPassword,
+#registerForm, 
+#welcomeNewUser{
     overflow:hidden;
-}
-
-#forgotPassword.forgotPW,
-#loginForm.forgotPW{
     max-height: 0px;
     opacity: 0; 
 }
 
+#welcomeNewUser{
+    background-color: white;
+    border-radius: 4px;
+    padding: 20px;
+    max-width: 350px;
+
+    .success-icon{
+        text-align: center;
+        color: green;
+    }
+
+    .icn{
+        height: 50px;
+        width: 50px;
+        font-size: 50px;
+    }
+
+    p, h2{
+        margin-top: 15px;
+    }
+
+    .submit-btn{
+        color: $background_nav;
+    }
+}
+
+.seperator{
+    font-size: 12px;
+    text-align: center;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    color: white;
+}
+
+#registerForm.show,
+#loginForm.show,
+#forgotPassword.show, 
+#welcomeNewUser.show
+{
+    padding: 20px;
+    max-height: 5000px; 
+    transition: 0.5s;
+    opacity: 1;
+}
+
 .login-form{
+
+    a{
+        color: $primary;
+    }
 
     .mat-checkbox-frame {
         border-color: $background_light;
+    }
+
+    .mat-checkbox-label{
+        white-space: normal;
+        max-width: 350px;
+        color: white;
     }
 
     .mat-select-value, 

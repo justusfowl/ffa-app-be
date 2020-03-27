@@ -101,6 +101,8 @@ export class AdminComponent implements OnInit, AfterViewInit {
 
   matcher = new MyErrorStateMatcher();
 
+  settingsObj : any;
+
 
   constructor(
     private api : ApiService, 
@@ -128,6 +130,25 @@ export class AdminComponent implements OnInit, AfterViewInit {
     this.getTimes();
     this.getNews();
     this.getUsers();
+    this.getGeneralSettings();
+  }
+
+  getGeneralSettings(refresher?){
+
+    this.api.get("/general/settings").then((result : any) => {
+      if (result && result.length > 0){
+        this.settingsObj = result[0];
+      }else{
+        this.settingsObj = { }
+      }
+      
+
+      if (refresher){
+        refresher.target.complete();
+      }
+    }).catch(err => {
+      console.error(err);
+    })
 
   }
 
@@ -657,7 +678,26 @@ export class AdminComponent implements OnInit, AfterViewInit {
       console.error(err);
     })
 
+  }
 
+  saveSettings(){
+    let id = "/1";
+    if ( this.settingsObj._id){
+      id = "/" + this.settingsObj._id;
+    }
+    this.api.put("/general/settings" + id, this.settingsObj, true).then((result : any) => {
+     
+      this.snackBar.open("Einstellungen aktualisiert.", "", {
+        duration: 1500
+      });
+
+      if (id == ""){
+        this.getGeneralSettings();
+      }
+
+    }).catch(err => {
+      console.error(err);
+    })
   }
 
 }

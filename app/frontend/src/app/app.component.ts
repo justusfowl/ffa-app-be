@@ -1,4 +1,4 @@
-import {  Component, ViewChild, AfterViewInit, ElementRef } from '@angular/core';
+import { Component, ViewChild, AfterViewInit, ElementRef } from '@angular/core';
 import { AuthenticationService } from './services/authentication.service';
 import { Router } from '@angular/router';
 import { LoaderService } from './services/loader.service';
@@ -12,6 +12,9 @@ import { ApiService } from './services/api.service';
 export class AppComponent implements AfterViewInit {
   
   @ViewChild('globalLoader', {static: true}) public globalLoader: ElementRef;
+  @ViewChild('globalMessageLoader', {static: true}) public globalMessageLoader: ElementRef;
+
+  
   title = 'Facharztpraxis für Allgemeinmedizin';
 
   times : any[] = [];
@@ -27,8 +30,14 @@ export class AppComponent implements AfterViewInit {
   }
 
   ngAfterViewInit(){
+
     this.loaderSrv.setGlobalLoader(this.globalLoader);
+    this.loaderSrv.setGlobalMsgLoader(this.globalMessageLoader);
+
     this.getTimes();
+
+    this.loaderSrv.setMsgLoading(false);
+
   }
 
   getTimes(){

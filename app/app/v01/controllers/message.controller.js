@@ -63,7 +63,8 @@ async function handlePrescriptionMessage(req, res){
 
         let contextObject = {
             userName : userName, 
-            medications : medications
+            medications : medications, 
+            userEmail : email
         };
 
         let message = "Ihre Rezeptvorbestellung für: ";
