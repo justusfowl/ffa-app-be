@@ -1,5 +1,35 @@
 @import "../variables.scss";
 
+#global-announcement{
+    min-height: 0;
+    max-height: 0;
+    background-color: white;
+    position: fixed;
+    width: 100vw;
+    top: 0;
+    z-index: 9999;
+    transition: 0.5s;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+
+    a{
+        padding-left: 5px;
+        padding-right: 5px;
+        color: $background_nav;
+        font-weight: 600;
+    }
+}
+
+#global-announcement.show{
+    max-height: 50px;
+    min-height: 50px;
+}
+
+.container{
+    padding: 20px;
+}
+
 .full-height-dialog{
     max-height : 100vh !important;
 }
@@ -22,6 +52,10 @@
 
 a:hover{
     cursor: pointer;
+}
+
+.navbar.globalAnnouncement{
+    top: 50px;
 }
 
 nav{

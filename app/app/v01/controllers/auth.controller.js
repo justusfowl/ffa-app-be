@@ -343,8 +343,23 @@ async function validateUserScope(userId, scope){
     if (typeof(user.scopes) == "undefined"){
         return false;
     }else{
-        if (user.scopes.indexOf(scope) != -1){
-            return true;
+
+        if (Array.isArray(scope)){
+            let flagHasScope = false;
+            scope.forEach(element => {
+                if (user.scopes.indexOf(element) != -1){
+                    flagHasScope = true;
+                }else{
+                    flagHasScope = false;
+                }
+            });
+            return flagHasScope; 
+        }else if (typeof scope === 'string' || scope instanceof String){
+            if (user.scopes.indexOf(scope) != -1){
+                return true;
+            }else{
+                return false;
+            }
         }else{
             return false;
         }

@@ -1,6 +1,8 @@
 import { BrowserModule } from '@angular/platform-browser';
-import { registerLocaleData } from '@angular/common';
-import { NgModule } from '@angular/core';
+
+import { NgModule, LOCALE_ID  } from '@angular/core';
+
+
 import { HttpClientModule, HTTP_INTERCEPTORS  } from '@angular/common/http'; 
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AppRoutingModule } from './app-routing.module';
@@ -28,14 +30,17 @@ import { AuthComponent } from './pages/auth/auth.component';
 
 import { RichTextEditorAllModule } from '@syncfusion/ej2-angular-richtexteditor';
 
-import localeDe from '@angular/common/locales/de';
+
 import { CalendarModule, DateAdapter } from 'angular-calendar';
 import { adapterFactory } from 'angular-calendar/date-adapters/date-fns';
 
 import { DatePipe } from '@angular/common';
+import { TeleSlotComponent } from './components/tele-slot/tele-slot.component';
+import { ConfirmDialogComponent } from './components/confirm-dialog/confirm-dialog.component';
+import { ImprintComponent } from './pages/imprint/imprint.component';
 
 
-registerLocaleData(localeDe);
+
 
 
 @NgModule({
@@ -52,7 +57,10 @@ registerLocaleData(localeDe);
     MedrequestComponent, 
     AppointmentsComponent,
     NewappointmentComponent, 
-    AuthComponent
+    AuthComponent,
+    TeleSlotComponent,
+    ConfirmDialogComponent, 
+    ImprintComponent
   ],
   imports: [
     HttpClientModule,
@@ -69,6 +77,7 @@ registerLocaleData(localeDe);
     })
   ],
   providers: [
+    { provide: LOCALE_ID, useValue: "de-DE" },
     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
     ApiService, 
@@ -77,6 +86,6 @@ registerLocaleData(localeDe);
     DatePipe
   ],
   bootstrap: [AppComponent], 
-  entryComponents : [NewsdetailComponent, MedrequestComponent, LoginComponent]
+  entryComponents : [NewsdetailComponent, MedrequestComponent, LoginComponent, TeleSlotComponent, ConfirmDialogComponent, NewappointmentComponent]
 })
 export class AppModule { }

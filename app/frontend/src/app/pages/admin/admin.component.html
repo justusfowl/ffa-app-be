@@ -196,6 +196,14 @@
         </mat-tab>
 
         <mat-tab label="Urlaubszeiten" >
+
+            <div class="addBtn-row">
+                <button  class="addBtn" mat-button mat-stroked-button (click)="addNewVacation()">
+                    <mat-icon>add</mat-icon>
+                </button>
+            </div>
+
+
             <mat-accordion  class="vacation">
                 <mat-expansion-panel *ngFor="let vac of vacation; let i=index;">
                     <mat-expansion-panel-header>
@@ -287,15 +295,17 @@
                 
             </mat-accordion>  
 
-            <div class="addBtn-row">
-                <button  class="addBtn" mat-button mat-stroked-button (click)="addNewVacation()">
-                    <mat-icon>add</mat-icon>
-                </button>
-            </div>
+            
 
         </mat-tab>
 
         <mat-tab label="Praxisnews"> 
+            <div class="addBtn-row">
+                <button class="addBtn" mat-button mat-stroked-button (click)="addNewNews()">
+                    <mat-icon>add</mat-icon>
+                </button>
+            </div>
+
             <mat-accordion>
                 <mat-expansion-panel *ngFor="let n of news; let i=index;">
                     <mat-expansion-panel-header>
@@ -351,11 +361,7 @@
 
             </mat-accordion>   
             
-            <div class="addBtn-row">
-                <button class="addBtn" mat-button mat-stroked-button (click)="addNewNews()">
-                    <mat-icon>add</mat-icon>
-                </button>
-            </div>
+            
         </mat-tab>
 
         <mat-tab label="Benutzer" class="user-list" style="margin:10px"> 
@@ -409,6 +415,28 @@
                     </mat-option>
                 </mat-autocomplete>
             </div>
+        </mat-tab>
+
+        <mat-tab label="Telemedizin"  style="margin:10px" >
+
+            <div class="addBtn-row">
+                <button  class="addBtn" mat-button mat-stroked-button (click)="openTeleSlot()">
+                    <mat-icon>add</mat-icon>
+                </button>
+            </div>
+            
+            <mwl-calendar-week-view
+                class="teleSlotCal"
+                [excludeDays]="excludeDays"
+                [viewDate]="viewDate"
+                [events]="teleSlots"
+                [dayStartHour]="7"
+                [dayEndHour]="19"
+                [hourSegments]="2"
+                (click)="openTeleSlot()"
+            >
+            </mwl-calendar-week-view>
+        
         </mat-tab>
 
         <mat-tab label="Allgemein"  style="margin:10px" *ngIf="settingsObj">

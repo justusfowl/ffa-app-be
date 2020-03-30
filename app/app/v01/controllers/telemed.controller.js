@@ -95,12 +95,15 @@ async function login(){
             "class": "auth",
             "method": "login",
             "Tenant": {
-                "alias": config.tele.TELE_TENANT_ALIAS
+                "alias": config.tele.tenantAlias
             },
             "User": {
-                "alias": config.tele.TELE_USER_ALIAS,
-                "symmetricUserKeyHash": config.tele.TELE_SYMMETRIC_KEY_HASH
-            }
+                "alias": config.tele.userAlias,
+                "symmetricUserKeyHash": config.tele.symmetricUserKeyHash
+            },
+            "session": {
+                "deviceId": config.tele.deviceId
+          }
         }
 
         try{

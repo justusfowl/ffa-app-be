@@ -59,7 +59,8 @@ const config = {
       tenantAlias : process.env.TELE_TENANT_ALIAS, 
       userAlias : process.env.TELE_USER_ALIAS, 
       symmetricUserKeyHash : process.env.TELE_SYMMETRIC_KEY_HASH, 
-      userGroupId: process.env.TELE_USER_GROUP_ID
+      userGroupId: process.env.TELE_USER_GROUP_ID, 
+      deviceId : process.env.TELE_DEVICE_ID
     }
 
   };

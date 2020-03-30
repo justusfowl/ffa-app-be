@@ -1,0 +1,11 @@
+
+@import "../../../variables.scss";
+
+.page-appointments{
+    padding: 20px;
+    
+    .btn-primary{
+        border-color: $background_nav;
+        background-color: $background_nav;
+    }
+}

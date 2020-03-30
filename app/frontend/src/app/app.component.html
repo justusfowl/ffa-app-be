@@ -21,8 +21,20 @@
 </div>
 
 
+<div id="global-announcement" [class.show]="flagShowGlobalAnnouncement">
 
-  <nav class="navbar navbar-expand-md navbar-dark navbar-custom fixed-top" *ngIf="showNavBar()">
+    
+    <button mat-icon-button  (click)="closeGlobalAnnouncement()">
+            <mat-icon>close</mat-icon>
+    </button>
+
+    Bitte beachten Sie - wir bieten Ihnen ab sofort ausgewählte Video-Sprechstunden an. Klicken Sie <a (click)="goToTag('contact')">hier</a>, um einen Termin zu vereinbaren.
+
+</div>
+
+  <nav class="navbar navbar-expand-md navbar-dark navbar-custom fixed-top" *ngIf="showNavBar()" [class.globalAnnouncement]="flagShowGlobalAnnouncement">
+
+    
 
       <!-- Text Logo - Use this if you don't have a graphic logo -->
       <!-- <a class="navbar-brand logo-text page-scroll" href="index.html">Aria</a> -->
@@ -95,6 +107,7 @@
 
 <mat-menu #myMenu="matMenu">
     <button routerLink="/my" routerLinkActive="active"  mat-menu-item>Profil</button>
+    <button *ngIf="auth.checkUIForRole(['admin', 'doc'])" routerLink="/appointments" routerLinkActive="active"  mat-menu-item>Termine</button>
     <button *ngIf="auth.checkUIForRole('admin')" routerLink="/admin" routerLinkActive="active"  mat-menu-item>Administration</button>
     <button (click)="auth.logout()" mat-menu-item>logout</button>
 </mat-menu>
@@ -127,7 +140,7 @@
                             <a class="white"  routerLink="/privacy" routerLinkActive="active" >Datenschutz</a>
                         </li>
                         <li class="media">
-                            <a class="white"  routerLink="/privacy" routerLinkActive="active" >Impressum</a>
+                            <a class="white"  routerLink="/impressum" routerLinkActive="active" >Impressum</a>
                         </li>
                     </ul>
                 </div> <!-- end of text-container -->

@@ -149,9 +149,12 @@ function _getSlots(userId=null){
             let filterObj = {};
             
             try{
-                // if requested ID is an actual BSON, then search for it
-                let userIdAsBSON = ObjectID(userId);
-                filterObj = {"userId" : userId}
+                if (userId){
+                    // if requested ID is an actual BSON, then search for it
+                    let userIdAsBSON = ObjectID(userId);
+                    filterObj = {"userId" : userId}
+                }
+               
             }catch(err){
 
             }
@@ -214,7 +217,7 @@ async function _enrichSlotsWithUserInfo(slots){
         let userIdx = userObjArray.findIndex(x => x._id == element.userId);
 
         if (userIdx >= 0){
-            element["userName"] = userObjArray[userIdx]["userName"] || "noch unbekannt";
+            element["userName"] = userObjArray[userIdx]["name"] || userObjArray[userIdx]["userName"];
         }
 
     });
@@ -222,7 +225,7 @@ async function _enrichSlotsWithUserInfo(slots){
     return slots;
 }
 
-async function getAvailableDocs(req, res){
+function getAvailableDocs(req, res){
     try{
 
         MongoClient.connect(MongoUrl, function(err, db) {
@@ -231,20 +234,13 @@ async function getAvailableDocs(req, res){
             
             let dbo = db.db(config.mongodb.database);
  
-            const collection = dbo.collection('appslots');
+            const collection = dbo.collection('users');
 
-            collection.aggregate( [ { $group : { _id : "$userId" } } ] ).toArray(async function(error, result){
-
-                let userIds = [];
-                result.forEach(element => {
-                    userIds.push(ObjectID(element._id))
-                });
-
-                let userObjArray = await authCtrl.getManyUsersById(userIds);
+            collection.find({"scopes" : "doc"}).toArray(async function(error, result){
 
                 let docsArray = [];
 
-                userObjArray.forEach(element => {
+                result.forEach(element => {
                     docsArray.push({
                         _id : element._id, 
                         userName : element.name || element.userName
@@ -453,6 +449,7 @@ async function _insertTeleAppointment(appointmentObj){
                         let userObj = await authCtrl.getUserById(userId);
 
                         let emailContext = {
+                            userEmail : userObj.userName,
                             userName : userObj.name || userObj.userName,
                             patientCode : videoAppointmentObj.patientCode, 
                             dialInUrlPatient : videoAppointmentObj["dialInUrlPatient"], 
@@ -474,6 +471,7 @@ async function _insertTeleAppointment(appointmentObj){
                 }
 
             }catch(err){
+                res.send(500, "An error occured adding a tele appointment.")
                 throw err;
             }
             
@@ -485,10 +483,16 @@ async function _insertTeleAppointment(appointmentObj){
 
 async function getMyAppointments(req, res){
     try{
-        let userId = req.userId; 
-        let startDate = new Date('01-01-1900');
-        let endDate = new Date('01-01-2099');
-        
+        let userId = req.userId;
+        let startDate, endDate; 
+
+        if (req.query.startDate && req.query.endDate){
+            startDate = req.query.startDate;
+            endDate = req.query.endDate;
+        }else{
+            startDate = new Date('01-01-1900');
+            endDate = new Date('01-01-2099');
+        }
     
         let appointments = await _getAppointmentsFromDateRange(startDate, endDate, userId, true);
     
@@ -497,6 +501,36 @@ async function getMyAppointments(req, res){
         res.send(500, err)
     }
 }
+
+async function getAppointments(req, res){
+    try{
+        let startDate, endDate; 
+
+        if (req.query.startDate && req.query.endDate){
+            startDate = new Date(req.query.startDate);
+            endDate = new Date(req.query.endDate);
+
+            if ((endDate.getTime() - startDate.getTime())/(1000*60*60*24) > 35 ){
+                return res.send(500, "Invalid timeframe - limit to 35 days.")
+            }
+        }else{
+            return res.send(500, "please provide start/end dates")
+        }
+
+        
+        
+        /*let startDate = new Date('01-01-1900');
+        let endDate = new Date('01-01-2099');
+        */
+    
+        let appointments = await _getAppointmentsFromDateRange(startDate, endDate);
+    
+        res.json(appointments)
+    }catch(err){
+        res.send(500, err)
+    }
+}
+
 
 // @TODO: implement so that admins can remove appointments
 async function removeAppointment(req, res){
@@ -555,12 +589,148 @@ async function removeAppointment(req, res){
 
 }
 
+async function adminGetTeleSlots(req, res){
+    try{
+        let slots = await _getSlots(null);
+        slots = await _enrichSlotsWithUserInfo(slots);
+        res.json(slots);
+
+    }catch(err){
+        return res.send(500, err);
+    }
+}
+
+function adminAddTeleSlot(req, res){
+    try{
+
+        let body = req.body;
+        
+        let newSlot = {
+            userId : body.userId, 
+            dayId : body.dayId, 
+            startTime : body.startTime, 
+            endTime : body.endTime
+        }
+
+        MongoClient.connect(MongoUrl, function(err, db) {
+  
+            if (err) throw err;
+            
+            let dbo = db.db(config.mongodb.database);
+ 
+            const collection = dbo.collection('appslots');
+
+            collection.insertOne(
+                newSlot,
+              function(err, result){
+                if (err) throw err;
+                res.json(result);
+              });
+
+        });
+ 
+    }catch(error){
+        return res.send(500, error);
+    }
+}
+
+function adminUpdateTeleSlot(req, res){
+    try{
+
+        let slot = req.body;
+        let slotId = slot._id; 
+        let allowedAttributes = ["dayId" , "startTime", "endTime", "userId"];
+
+        if (!slotId){
+            return res.send(500, "Please provide an Id")
+        }
+
+        const keys = Object.keys(slot)
+        for (const key of keys) {
+            if (allowedAttributes.findIndex(x => x == key) < 0){
+                delete slot[key];
+            }
+        }
+
+        MongoClient.connect(MongoUrl, function(err, db) {
+  
+            if (err) throw err;
+            
+            let dbo = db.db(config.mongodb.database);
+ 
+            const collection = dbo.collection('appslots');
+
+            collection.updateOne(
+                {
+                    "_id" : ObjectID(slotId)
+                }, 
+                {
+                    $set: slot
+                },
+                function(err, docs){
+                    if (err){
+                        throw err;
+                    }
+                    res.json({"message" : "ok"});
+                }
+            );
+
+        });
+ 
+    }catch(error){
+        return res.send(500, error);
+    }
+}
+
+function removeAdminTeleSlot(req, res){
+    try{
+
+        var slotId = req.params.slotId;
+        if (!slotId){
+            return res.send(500, "Please provide an Id")
+        }
+
+        MongoClient.connect(MongoUrl, function(err, db) {
+    
+            if (err) throw err;
+            
+            let dbo = db.db(config.mongodb.database);
+    
+            const collection = dbo.collection('appslots');
+    
+            collection.deleteOne(
+              {
+                  "_id" : ObjectID(slotId)
+              },
+              function(err, result){
+                if (err) throw err;
+                res.json(result);
+              });
+          });
+
+    }catch(err){
+        console.error(error)
+        res.send(500, "An error occured adding a team member: " + JSON.stringify(req.body) );
+    }
+}
+
+
+
+
+
+
 module.exports = {
     getAvailableSlots, 
     getAvailableDocs, 
 
     addTeleAppointment, 
-    getMyAppointments, 
+    getMyAppointments,
+    getAppointments, 
 
-    removeAppointment
+    removeAppointment, 
+
+    adminGetTeleSlots, 
+    adminAddTeleSlot, 
+    adminUpdateTeleSlot,
+    removeAdminTeleSlot
 }

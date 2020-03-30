@@ -1,15 +1,18 @@
-import { Component, ViewChild, AfterViewInit, ElementRef } from '@angular/core';
+import { Component, ViewChild, AfterViewInit, ElementRef, OnInit } from '@angular/core';
 import { AuthenticationService } from './services/authentication.service';
-import { Router } from '@angular/router';
+import { Router, NavigationEnd  } from '@angular/router';
 import { LoaderService } from './services/loader.service';
 import { ApiService } from './services/api.service';
+import { registerLocaleData } from '@angular/common';
+import localeDe from '@angular/common/locales/de';
+declare var $: any;
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent implements AfterViewInit {
+export class AppComponent implements OnInit, AfterViewInit {
   
   @ViewChild('globalLoader', {static: true}) public globalLoader: ElementRef;
   @ViewChild('globalMessageLoader', {static: true}) public globalMessageLoader: ElementRef;
@@ -20,13 +23,28 @@ export class AppComponent implements AfterViewInit {
   times : any[] = [];
   vacation : any[] = [];
 
+  flagShowGlobalAnnouncement : boolean = false;
+
+  globalAnnouncement : string = "";
+
   constructor(
     public auth: AuthenticationService, 
     private router:Router, 
     public loaderSrv : LoaderService, 
     private api : ApiService
   ){  
+    this.globalAnnouncement = "Bitte beachten Sie - wir bieten Ihnen ab sofort Video-Konsultationen."
+  }
 
+  ngOnInit(){
+    registerLocaleData(localeDe);
+
+    this.router.events.subscribe((evt) => {
+      if (!(evt instanceof NavigationEnd)) {
+          return;
+      }
+      window.scrollTo(0, 0)
+  });
   }
 
   ngAfterViewInit(){
@@ -37,7 +55,19 @@ export class AppComponent implements AfterViewInit {
     this.getTimes();
 
     this.loaderSrv.setMsgLoading(false);
+    this.showGlobalAnnouncement();
 
+  }
+
+  closeGlobalAnnouncement(){
+    this.flagShowGlobalAnnouncement = false;
+  }
+
+  showGlobalAnnouncement(){
+    let self = this; 
+    setTimeout(function(){
+      self.flagShowGlobalAnnouncement = true;
+    }, 1500)
   }
 
   getTimes(){
@@ -62,15 +92,28 @@ export class AppComponent implements AfterViewInit {
 
   
   goToTag(tagId, route='home'){
+    let self = this; 
+    this.api.setLoading(true);
 
     try{
       if (this.router.url.search(route) < 0){
         this.router.navigate(["/"+ route]);
       }
-      let d = document.getElementById(tagId);
+
 
       setTimeout(function(){
-        d.scrollIntoView();
+        try{
+
+          $('html, body').animate({
+              scrollTop: ($('#'+tagId).offset().top)-$('nav').height()-$('#global-announcement').height()
+          },500);
+
+        }catch(err){
+
+        }
+
+        self.api.setLoading(false);
+        
       }, 500);
     }catch(err){
     }

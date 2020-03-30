@@ -4,6 +4,7 @@ import { ApiService } from 'src/app/services/api.service';
 import { MatSnackBar, MatDialog } from '@angular/material';
 import { LoginComponent } from '../login/login.component';
 import { NewappointmentComponent } from '../newappointment/newappointment.component';
+import { ConfirmDialogComponent } from 'src/app/components/confirm-dialog/confirm-dialog.component';
 
 @Component({
   selector: 'app-my',
@@ -51,17 +52,32 @@ export class MyComponent implements OnInit {
     });
   }
 
+  
+
   removeTeleAppointment(appointmentObj){
 
-    this.api.delete("/appointment/my/"+appointmentObj._id).then(result => {
-      console.log("removed..")
-      appointmentObj.inactive = true;
-      this._snackBar.open("Termin wurde gelöscht.", "", {
-        duration: 2000,
-      });
-    }).catch(err => {
-      console.error(err);
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      data: {meta : {"type" : "confirm", "title" : "Termin absagen", "messageText" : "Sind Sie sicher, dass Sie Ihren Termin löschen möchten?"}}
     });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result.answerConfirm){
+       
+        this.api.delete("/appointment/my/"+appointmentObj._id).then(result => {
+          console.log("removed..")
+          appointmentObj.inactive = true;
+          this._snackBar.open("Termin wurde gelöscht.", "", {
+            duration: 2000,
+          });
+        }).catch(err => {
+          console.error(err);
+        });
+
+      }
+      console.log('The dialog was closed');
+    });
+
+   
     
   }
 

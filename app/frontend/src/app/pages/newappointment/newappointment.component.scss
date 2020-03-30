@@ -121,3 +121,17 @@ mat-vertical-stepper.submitted{
         pointer-events: none;
     }
 }
+
+.appointment-cal{
+    .cal-out-month{
+        opacity: 0;
+    }
+}
+
+.cal-container{
+    .no-slots{
+        background-color: $background_nav;
+        color: white;
+        border-radius: 4px;
+    }
+}

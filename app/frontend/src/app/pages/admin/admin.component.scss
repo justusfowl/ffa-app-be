@@ -220,6 +220,7 @@
     align-items: flex-end;
     justify-content: center;
     margin-top: 10px;
+    margin-bottom: 10px;
 }
 
 .user-list{
@@ -247,4 +248,15 @@
     .field{
         margin-bottom: 20px;
     }
+}
+
+.teleSlotCal{
+    .cal-week-view .cal-day-headers span{
+        display: none;
+    }
+
+    .teleslot-action{
+        padding-right: 3px;
+    }
+    
 }

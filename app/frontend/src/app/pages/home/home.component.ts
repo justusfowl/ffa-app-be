@@ -9,6 +9,7 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { NewappointmentComponent } from '../newappointment/newappointment.component';
 import { AuthenticationService } from 'src/app/services/authentication.service';
 import { LoginComponent } from '../login/login.component';
+declare var $: any;
 
 @Component({
   selector: 'app-home',
@@ -397,11 +398,26 @@ export class HomeComponent implements OnInit {
     }
   }
 
-  goToTag(tagId){
+  goToTag(tagId, route='home'){
+    let self = this; 
+    this.api.setLoading(true);
 
     try{
-      let d = document.getElementById(tagId)
-      d.scrollIntoView()
+    
+      setTimeout(function(){
+        try{
+
+          $('html, body').animate({
+              scrollTop: ($('#'+tagId).offset().top)-$('nav').height()-$('#global-announcement').height()
+          },500);
+
+        }catch(err){
+
+        }
+
+        self.api.setLoading(false);
+        
+      }, 500);
     }catch(err){
     }
 

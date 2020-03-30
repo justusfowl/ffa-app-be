@@ -1,8 +1,8 @@
-import { Component, OnInit, AfterViewInit, ViewEncapsulation, ElementRef, ViewChild} from '@angular/core';
+import { Component, OnInit, AfterViewInit, ViewEncapsulation, ElementRef, ViewChild, ChangeDetectionStrategy} from '@angular/core';
 import { ApiService } from 'src/app/services/api.service';
 import { Subject } from 'rxjs';
 import {debounceTime, distinctUntilChanged} from "rxjs/internal/operators";
-import { MatSnackBar, MatChipInputEvent, MatAutocomplete } from '@angular/material';
+import { MatSnackBar, MatChipInputEvent, MatAutocomplete, MatDialog } from '@angular/material';
 import { FormControl, FormGroupDirective, NgForm, Validators } from '@angular/forms';
 import {Observable} from 'rxjs';
 import {map, startWith} from 'rxjs/operators';
@@ -11,6 +11,24 @@ import {COMMA, ENTER} from '@angular/cdk/keycodes';
 import {ErrorStateMatcher} from '@angular/material/core';
 
 import { ToolbarService, LinkService, ImageService, HtmlEditorService } from '@syncfusion/ej2-angular-richtexteditor';
+
+import { CalendarEvent, CalendarView, DAYS_OF_WEEK, CalendarEventTimesChangedEvent } from 'angular-calendar';
+import {
+  subDays,
+  addDays,
+  addHours,
+  isSameMonth,
+  isSameDay,
+  startOfMonth,
+  endOfMonth,
+  startOfWeek,
+  endOfWeek,
+  startOfDay,
+  endOfDay,
+  format
+} from 'date-fns';
+import { TeleSlotComponent } from 'src/app/components/tele-slot/tele-slot.component';
+import { ConfirmDialogComponent } from 'src/app/components/confirm-dialog/confirm-dialog.component';
 
 /** Error when invalid control is dirty, touched, or submitted. */
 export class MyErrorStateMatcher implements ErrorStateMatcher {
@@ -36,10 +54,14 @@ export class AdminComponent implements OnInit, AfterViewInit {
 
   public test = "aasdasd"
   public show = false;
+
   public tools: object = {
-					items: ['Bold', 'Italic', 'Underline', '|',
-							'Undo', 'Redo', '|',
-							'FontColor', 'BackgroundColor', '|']
+				items: ['Bold', 'Italic', 'Underline', 'StrikeThrough',
+            'FontColor', 'BackgroundColor','SuperScript', 'SubScript', '|',
+            'Formats', 'Alignments', 'OrderedList', 'UnorderedList',
+            'Outdent', 'Indent', '|',
+            'CreateTable', 'CreateLink', 'Image', '|', 'ClearFormat', 'Print',
+            'SourceCode', 'FullScreen', '|', 'Undo', 'Redo']
         };
     
  
@@ -52,7 +74,8 @@ export class AdminComponent implements OnInit, AfterViewInit {
   allScopes = [
     "admin", 
     "user", 
-    "patient"
+    "patient", 
+    "doc"
   ];
   scopeCtrl = new FormControl();
 
@@ -103,10 +126,22 @@ export class AdminComponent implements OnInit, AfterViewInit {
 
   settingsObj : any;
 
+  /* Telemedicine area */
+
+  teleSlots : any[] = [];
+  // exclude weekends
+  excludeDays: number[] = [0, 6];
+
+  weekStartsOn = DAYS_OF_WEEK.MONDAY;
+
+  CalendarView = CalendarView.Week;
+
+  viewDate: Date = new Date();
 
   constructor(
     private api : ApiService, 
-    private snackBar : MatSnackBar
+    private snackBar : MatSnackBar,
+    public dialog: MatDialog
   ) {
     this._filteredScopes = this.scopeCtrl.valueChanges.pipe(
       startWith(null),
@@ -131,9 +166,13 @@ export class AdminComponent implements OnInit, AfterViewInit {
     this.getNews();
     this.getUsers();
     this.getGeneralSettings();
+    this.getAdminSlots();
+   
+
   }
 
-  getGeneralSettings(refresher?){
+
+  getGeneralSettings(){
 
     this.api.get("/general/settings").then((result : any) => {
       if (result && result.length > 0){
@@ -141,16 +180,14 @@ export class AdminComponent implements OnInit, AfterViewInit {
       }else{
         this.settingsObj = { }
       }
-      
 
-      if (refresher){
-        refresher.target.complete();
-      }
     }).catch(err => {
       console.error(err);
     })
 
   }
+
+
 
   getTimes(refresher?){
 
@@ -219,7 +256,6 @@ export class AdminComponent implements OnInit, AfterViewInit {
     })
   }
 
-
   async handleTeamFileInput(files: FileList, teamMember){
 
     this.api.setLoading(true);
@@ -247,7 +283,6 @@ export class AdminComponent implements OnInit, AfterViewInit {
     })
 
   }
-
 
   async handleFileInput(files: FileList){
     this.newTeamMemberFile = files.item(0);
@@ -698,6 +733,204 @@ export class AdminComponent implements OnInit, AfterViewInit {
     }).catch(err => {
       console.error(err);
     })
+  }
+
+  getAdminSlots(){
+        
+    let viewPortTeleCal = this._getTeleViewStartEndDates();
+    let daysArray = this._getDaysArray(viewPortTeleCal.start, viewPortTeleCal.end);
+
+
+    this.api.get("/appointment/slots").then((result : any) => {
+
+      result.forEach(element => {
+
+        element = this._formatTeleSlotEvent(daysArray, element);
+        
+      });
+
+      this.teleSlots = result;
+
+    }).catch(err => {
+      console.error(err);
+    })
+  }
+
+  _getTeleViewStartEndDates(){
+    const getStart: any = {
+      month: startOfMonth,
+      week: startOfWeek,
+      day: startOfDay
+    }[this.CalendarView];
+
+    const getEnd: any = {
+      month: endOfMonth,
+      week: endOfWeek,
+      day: endOfDay
+    }[this.CalendarView];
+
+    let start = format(getStart(this.viewDate), 'MM-dd-yyyy')
+    let end = format(getEnd(this.viewDate), 'MM-dd-yyyy');
+    return {start, end}
+  }
+
+  _formatTeleSlotEvent(daysArray, element){
+    
+    let dayIdx = daysArray.findIndex(x => x.getDay() == element.dayId);
+    if (dayIdx >= 0){
+      let elementStart = new Date(daysArray[dayIdx]);
+      let elemHrs = parseInt(element.startTime.substring(0,element.startTime.indexOf(":")));
+      let elemMin = parseInt(element.startTime.substring(element.startTime.indexOf(":")+1,element.startTime.length));
+      elementStart.setHours(elemHrs, elemMin)
+
+      element.start = elementStart;
+
+      let elementEndDate = new Date(daysArray[dayIdx]);
+      elemHrs = parseInt(element.endTime.substring(0,element.endTime.indexOf(":")));
+      elemMin = parseInt(element.endTime.substring(element.endTime.indexOf(":")+1,element.endTime.length));
+      elementEndDate.setHours(elemHrs, elemMin)
+
+      element.end = elementEndDate;
+
+      element.title = element.userName || element.name;
+      
+      element.actions = [
+        {
+          label: '<i class="fas fa-edit teleslot-action"></i>',
+          onClick: ({ event }: { event: CalendarEvent }): void => {
+            this.openTeleSlot(event)
+          },
+        },
+        {
+          label: '<i class="fas fa-trash-alt  teleslot-action" style="color: red;"></i>',
+          onClick: ({ event }: { event: CalendarEvent }): void => {
+            this.openTeleSlotRemoveDialog(event)
+          },
+        }
+      ];
+    }
+
+    return element
+  }
+
+  _getDaysArray(start, end, flagIncludeWeekends=false) {
+      start = new Date(start); 
+      end = new Date(end); 
+
+      for(var arr=[],dt=start; dt<=end; dt.setDate(dt.getDate()+1)){
+
+          let newDate = new Date(dt); 
+
+          if((newDate.getDay() == 0 || newDate.getDay() == 6) && flagIncludeWeekends){
+              arr.push(newDate);
+          }else if (newDate.getDay() < 6 && newDate.getDay() > 0){
+              arr.push(newDate);
+          }
+          
+      }
+      return arr;
+  };
+
+  eventTimesChangedTele({
+    event,
+    newStart,
+    newEnd,
+  }: CalendarEventTimesChangedEvent): void {
+
+    console.log(event);
+    event.start = newStart;
+    event.end = newEnd;
+    this.updateTeleSlot(event);
+    
+  }
+
+  openTeleSlot(teleslotObj?){
+
+    const dialogRef = this.dialog.open(TeleSlotComponent, {
+      data: {teleslotObj},
+      panelClass : "teleslot-dialog"
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result){
+
+        if (result._id){
+          this.updateTeleSlot(result);
+        }else{
+          this.addTeleSlot(result);
+        }  
+        
+      }
+      console.log('The dialog was closed');
+    });
+
+  }
+
+  updateTeleSlot(teleSlotObj){
+    this.api.put("/appointment/slots", teleSlotObj).then(res => {
+      
+      this.getAdminSlots();
+
+      this.snackBar.open("Slot aktualisiert.", "", {
+        duration: 1500
+      })
+
+      
+    }).catch(err => {
+      console.warn(err);
+      this.snackBar.open("Der Slot konnte nicht aktualisiert werden, bitte erneut versuchen.", "", {
+        duration: 1500
+      })
+    })
+  }
+
+  addTeleSlot(teleSlotObj){
+    this.api.post("/appointment/slots", teleSlotObj).then(res => {
+      
+      this.getAdminSlots();
+      this.snackBar.open("Slot zugefügt.", "", {
+        duration: 1500
+      })
+
+      
+    }).catch(err => {
+      console.warn(err);
+      this.snackBar.open("Der Slot konnte nicht aktualisiert werden, bitte erneut versuchen.", "", {
+        duration: 1500
+      })
+    })
+  }
+
+  removeTeleSlot(teleSlotObj){
+    this.api.delete("/appointment/slots/"+teleSlotObj._id).then(res => {
+      
+      this.getAdminSlots();
+      this.snackBar.open("Slot gelöscht.", "", {
+        duration: 1500
+      })
+
+      
+    }).catch(err => {
+      console.warn(err);
+      this.snackBar.open("Der Slot konnte nicht aktualisiert werden, bitte erneut versuchen.", "", {
+        duration: 1500
+      })
+    })
+  }
+
+  openTeleSlotRemoveDialog(teleSlotObj){
+
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      data: {meta : {"type" : "confirm", "title" : "Slot löschen", "messageText" : "Sind Sie sicher, dass Sie den Slot löschen möchten?"}}
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result.answerConfirm){
+        this.removeTeleSlot(teleSlotObj);   
+      }
+      console.log('The dialog was closed');
+    });
+
   }
 
 }

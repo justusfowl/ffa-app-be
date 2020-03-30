@@ -10,12 +10,13 @@
         </div> 
     </div> 
 </header> 
+
 <div class="ex-basic-2">
     <div class="container">
-        <h1>Datenschutz</h1>
+        <h1>Impressum</h1>
         <div class="row" *ngIf="settingsObj">
             
-            <div class="privacy-body" [innerHtml]="sanText(settingsObj.datapriv)">
+            <div class="imprint-body" [innerHtml]="sanText(settingsObj.imprint)">
 
             </div>
         </div> 

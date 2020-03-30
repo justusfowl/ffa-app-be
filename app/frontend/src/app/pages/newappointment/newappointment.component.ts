@@ -60,7 +60,7 @@ function getTimezoneOffsetString(date: Date): string {
 @Component({
   selector: 'app-newappointment',
   templateUrl: './newappointment.component.html',
-  styleUrls: ['./newappointment.component.scss', '../../app.component.scss'],
+  styleUrls: ['./newappointment.component.scss'],
   encapsulation: ViewEncapsulation.None
 })
 export class NewappointmentComponent implements OnInit {
@@ -86,31 +86,14 @@ export class NewappointmentComponent implements OnInit {
     event: CalendarEvent;
   };
 
-  actions: CalendarEventAction[] = [
-    /*
-    {
-      label: '<i class="fa fa-fw fa-pencil"></i>',
-      a11yLabel: 'Edit',
-      onClick: ({ event }: { event: CalendarEvent }): void => {
-        this.handleEvent('Edited', event);
-      }
-    },
-    {
-      label: '<i class="fa fa-fw fa-times"></i>',
-      a11yLabel: 'Delete',
-      onClick: ({ event }: { event: CalendarEvent }): void => {
-        this.events = this.events.filter(iEvent => iEvent !== event);
-        this.handleEvent('Deleted', event);
-      }
-    }
-    */
-  ];
+  actions: CalendarEventAction[] = [];
 
   evtLoading : boolean = false;
 
   refresh: Subject<any> = new Subject();
 
   events$: Observable<Array<CalendarEvent<{ any:any }>>>;
+  flagHasSlots : boolean = false;
 
   activeDayIsOpen: boolean = true;
 
@@ -152,6 +135,7 @@ export class NewappointmentComponent implements OnInit {
     private datePipe : DatePipe, 
     private auth: AuthenticationService
     ) {
+
   }
 
   ngOnInit() {
@@ -213,6 +197,12 @@ export class NewappointmentComponent implements OnInit {
 
         this.api.get("/appointment/new", params).then((result : any) => {
 
+          if (result.length > 0){
+            this.flagHasSlots = true;
+          }else{
+            this.flagHasSlots = false;
+          }
+
           result.forEach(element => {
             element.start = new Date(element.start);
             element.end = new Date(element.end);
@@ -237,7 +227,6 @@ export class NewappointmentComponent implements OnInit {
         "userName" : "Egal"
       })
       this.availableDocs = docs;
-      console.log(docs);
     }).catch(err => {
       console.error(err);
     })

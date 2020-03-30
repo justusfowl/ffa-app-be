@@ -112,7 +112,7 @@
                     </div>
                     <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordionOne">
                         <div class="accordion-body">
-                            Wir fühlen uns primär der medizinischen Versorgung unserer Patienten verpflichtet. Als allgemeinmedizinische Praxis SEHEN WIR DEN MENSCHEN GANZHEITLICH.
+                            Als allgemeinmedizinische Praxis betreuen wir unsere Patienten ganzheitlich von jung bis alt, von Kopf bis Fuß. Dabei fühlen wir uns primär der medizinischen Versorgung unserer Patienten verpflichtet.  
                         </div>
                     </div>
                 </div> <!-- end of item -->
@@ -138,9 +138,9 @@
                     </div>
                     <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#accordionOne">
                         <div class="accordion-body">
-                                Für besondere Untersuchungen und planbare langwierige Behandlungen und Gespräche ist eine Terminvereinbarung vorteilhaft.
-
-                                BITTE TERMINE AUCH ABSAGEN -> NUTZEN SIE HIERFÜR GERN AUCH UNSER KONTO
+                                Für besondere Untersuchungen und planbare langwierige Behandlungen und Gespräche ist eine Terminvereinbarung vorteilhaft. 
+                                <br/><br/>
+                                Für einen reibungslosen Ablauf bitten wir Sie stets, Termine, die Sie nicht wahrnehmen können, abzusagen.
                         </div>
                     </div>
                 </div> <!-- end of item -->
@@ -418,6 +418,17 @@
                     <!-- Contact Form -->
                     <form id="requestForm"  FormGroupDirective  [formGroup]="requestForm"  class="form-dark" data-toggle="validator" data-focus="false">
 
+                        <div class="form-group">
+                            <mat-form-field>
+                                <mat-label>Anfrageart</mat-label>
+                                <mat-select  formControlName="type" required>
+                                    <mat-option *ngFor="let req of requestTypes" [value]="req">
+                                    {{req.name}}
+                                    </mat-option>
+                                </mat-select>
+                                <mat-error *ngIf="requestForm.get('type').hasError('required')"  >Bitte wählen Sie eine Anfrageart</mat-error>
+                            </mat-form-field>
+                        </div>
 
                         <div class="form-group">
                             <mat-form-field class="login-forms">
@@ -435,17 +446,7 @@
                         </div>
 
                             
-                        <div class="form-group">
-                            <mat-form-field>
-                                <mat-label>Anfrageart</mat-label>
-                                <mat-select  formControlName="type" required>
-                                    <mat-option *ngFor="let req of requestTypes" [value]="req">
-                                    {{req.name}}
-                                    </mat-option>
-                                </mat-select>
-                                <mat-error *ngIf="requestForm.get('type').hasError('required')"  >Bitte wählen Sie eine Anfrageart</mat-error>
-                            </mat-form-field>
-                        </div>
+                        
 
                         <div class="form-group" *ngIf="requestForm.value.type.type == 'general'">
                             <mat-form-field>
@@ -540,47 +541,6 @@
                         </ul>
                         
                     </div> <!-- end of text-container -->
-                </div> <!-- end of col -->
-                <div class="col-lg-6" *ngIf="false">
-                    
-                    <!-- Contact Form --> 
-                    <form id="contactForm"  [formGroup]="contactForm" data-toggle="validator" data-focus="false">
-
-                        <div class="form-group">
-                            <mat-form-field class="login-forms">
-                                <input formControlName="name" matInput type="text" placeholder="Name" class="form-control" required>
-                                <mat-error *ngIf="contactForm.get('name').hasError('required')">Bitte Namen eintragen.</mat-error>
-                            </mat-form-field>
-                        </div>
-                        
-                        <div class="form-group">
-                            <mat-form-field class="login-forms">
-                                <input  formControlName="email"  required matInput type="text" placeholder="eMail" class="form-control">
-                                <mat-error *ngIf="contactForm.get('email').invalid">Bitte Email eintragen.</mat-error>
-                            </mat-form-field>
-                        </div>
-                            
-                        <div class="form-group">
-                            <mat-form-field class="example-full-width">
-                                <mat-label>Nachricht</mat-label>
-                                <textarea formControlName="message" required type="text" matInput #messageObj maxlength="256" placeholder="Ihre generelle Anfrage"></textarea>
-                                <mat-hint align="start"><strong>Bitte senden Sie hierüber keine sensiblen Informationen</strong> </mat-hint>
-                                <mat-hint align="end">{{contactForm.value.message.length}} / 256</mat-hint>
-                                <mat-error *ngIf="contactForm.get('message').hasError('required')">Bitte verfassen Sie eine Nachricht.</mat-error>
-                            </mat-form-field>
-                        </div>
-
-                        <div class="form-group">
-                            <mat-checkbox formControlName="acceptTerms"  >Ich akzeptiere die <a  target="_blank"  routerLink="/privacy" routerLinkActive="active" >Nutzungsbedingungen</a></mat-checkbox>
-                        </div>
-
-                        <div class="form-group">
-                            <button mat-button [disabled]="!contactForm.valid" class="form-control-submit-button" (click)="setMessage()">Abschicken</button>
-                        </div>
-                      
-                    </form>
-                    <!-- end of contact form -->
-  
                 </div> <!-- end of col -->
             </div> <!-- end of row -->
         </div> <!-- end of container -->

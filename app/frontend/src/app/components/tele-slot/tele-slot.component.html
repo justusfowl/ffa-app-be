@@ -1,0 +1,59 @@
+
+
+<div class="tele-slot-edit">
+
+        <h3>Slot Video-Konsultation</h3>
+
+        <p>
+            Bearbeiten des Video-Slots.
+        </p>
+       
+        <form [formGroup]="slotForm" class="med-itm">
+
+            <mat-form-field class="doc">
+                <mat-label>Arzt</mat-label>
+                <mat-select  required 
+                formControlName="userId"
+                fxLayout="row">
+                    <mat-option *ngFor="let doc of availableDocs" [value]="doc._id"  >
+                    {{doc.userName}}
+                    </mat-option>
+                </mat-select>
+                <mat-error *ngIf="slotForm.get('userId').hasError('required')"  >Bitte wählen Sie einen Arzt</mat-error>
+            </mat-form-field>
+
+            <mat-form-field class="dayId">
+                <mat-label>Wochentag</mat-label>
+                <mat-select  required 
+                formControlName="dayId"
+                fxLayout="row">
+                    <mat-option *ngFor="let d of days" [value]="d.dayId"  >
+                    {{d.dayName}}
+                    </mat-option>
+                </mat-select>
+                <mat-error *ngIf="slotForm.get('dayId').hasError('required')"  >Bitte wählen Sie einen Arzt</mat-error>
+            </mat-form-field>
+
+            <mat-form-field  class="time">
+                <input  matInput type="time" placeholder="Start" formControlName="startTime" >
+            </mat-form-field>
+            <mat-form-field  class="time">
+                <input   matInput type="time" placeholder="Ende"  formControlName="endTime">
+            </mat-form-field>
+          
+        </form>
+
+        <div class="menu-row">
+    
+            <button  class="saveBtn" mat-button (click)="abort()">
+                Abbruch
+            </button>
+
+            <button  class="saveBtn" mat-button (click)="confirm()" [disabled]="slotForm.invalid">
+                OK
+            </button>
+
+        </div>
+    </div>
+    
+    

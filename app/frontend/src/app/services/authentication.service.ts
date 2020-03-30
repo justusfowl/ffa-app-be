@@ -91,7 +91,12 @@ export class AuthenticationService {
         }));
     }
 
+    /**
+     * Function to return if the current user has any of the requested scopes
+     * @param reqScope String or Array of strings containing different scopes to be checked for
+     */
     checkUIForRole(reqScope){
+
         if (this.isAuthorized()){
 
             if (!this.currentUserSubject.value.scopes){
@@ -99,11 +104,28 @@ export class AuthenticationService {
             }
 
             let scopes = this.currentUserSubject.value.scopes;
-            if (scopes.indexOf(reqScope) != -1){
-                return true;
+
+            if (Array.isArray(reqScope)){
+                let flagHasScope = false;
+                reqScope.forEach(element => {
+                    if (scopes.indexOf(element) != -1){
+                        flagHasScope = true;
+                    }else{
+                        flagHasScope = false;
+                    }
+                });
+                return flagHasScope; 
+            }else if (typeof reqScope === 'string' || reqScope instanceof String){
+                if (scopes.indexOf(reqScope) != -1){
+                    return true;
+                }else{
+                    return false;
+                }
             }else{
                 return false;
             }
+
+            
         }else{
             return false;
         }

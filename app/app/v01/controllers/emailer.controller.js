@@ -234,7 +234,7 @@ function sendTeleAppointment (contextObj) {
 
         let options = {
             from : '"' + config.email.smtpEmailSenderName + '" ' + config.email.smtpEmail, 
-            to : config.email.backofficeEmailReceiver, 
+            to : contextObj.userEmail, 
             subject : "myFFA | Ihre Video-Konsultation" , 
             template: 'teleAppointment',
             context: contextObj

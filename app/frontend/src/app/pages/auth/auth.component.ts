@@ -29,7 +29,8 @@ export class AuthComponent implements OnInit {
 
   openDialog(): void {
     const dialogRef = this.dialog.open(LoginComponent, {
-      data: {}
+      data: {},
+      panelClass : "login-dialog"
     });
 
     dialogRef.afterClosed().subscribe(result => {

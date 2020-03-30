@@ -1,0 +1,16 @@
+<div class="custom-dialog">
+    <h4>{{title}}</h4>
+    <p>
+        {{messageText}}
+    </p>
+    <div class="btns">
+
+        <button (click)="abort()" mat-button  >
+            Abbruch
+        </button>
+
+        <button (click)="confirm()" mat-button  >
+            OK
+        </button>
+    </div>
+</div>
