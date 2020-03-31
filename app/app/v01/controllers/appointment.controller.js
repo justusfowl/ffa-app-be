@@ -228,8 +228,8 @@ function _getSlots(userId=null){
 function _validateSlotAgainstAppointments(slot, appointments){
 
     let confictIdx = appointments.findIndex(x => 
-        (x.appointmentObj.end >= slot.start && x.appointmentObj.end <= slot.end) || 
-        (x.appointmentObj.start >= slot.start && x.appointmentObj.start <= slot.end) || 
+        (x.appointmentObj.end > slot.start && x.appointmentObj.end < slot.end) || 
+        (x.appointmentObj.start > slot.start && x.appointmentObj.start < slot.end) || 
         (x.appointmentObj.start <= slot.start && x.appointmentObj.end >= slot.end)
         )
     if (confictIdx > -1){
@@ -414,8 +414,9 @@ async function getAvailableSlots(req, res){
 async function _insertTeleAppointment(appointmentObj){
 
     // ensure start/end timestamps are properly formatted as dates.
-    appointmentObj.appointmentObj.start = moment(appointmentObj.appointmentObj.start);
-    appointmentObj.appointmentObj.end = moment(appointmentObj.appointmentObj.end);
+    // these must be of type DATE for proper usage within mongodb
+    appointmentObj.appointmentObj.start = new Date(moment(appointmentObj.appointmentObj.start).format());
+    appointmentObj.appointmentObj.end = new Date(moment(appointmentObj.appointmentObj.end).format());
 
     return new Promise((resolve, reject) => {
         try{
@@ -498,12 +499,14 @@ async function _insertTeleAppointment(appointmentObj){
 
                         let userObj = await authCtrl.getUserById(userId);
 
+                        let displayStartDate = startDate.locale("de");
+
                         let emailContext = {
                             userEmail : userObj.userName,
                             userName : userObj.name || userObj.userName,
                             patientCode : videoAppointmentObj.patientCode, 
                             dialInUrlPatient : videoAppointmentObj["dialInUrlPatient"], 
-                            appointmentDate : startDate, 
+                            appointmentDate : displayStartDate.format("LLLL"), 
                             appointmentType : appointmentObject.appointmentType.name, 
                             docName : appointmentObject.doc.userName
                         }
