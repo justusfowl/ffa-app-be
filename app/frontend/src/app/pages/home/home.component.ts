@@ -40,7 +40,7 @@ export class HomeComponent implements OnInit {
     },
     {
       "icon" : "tag_faces", 
-      "service" : "Kindervorsorge-Untersuchungen"
+      "service" : "KINDERVORSORGE-UNTERSUCHUNG"
     },
     {
       "icon" : "pool", 
@@ -53,23 +53,23 @@ export class HomeComponent implements OnInit {
     },
     {
       "icon" : "spa", 
-      "service" : "GESUNDHEITSCHECK-UP"
+      "service" : "GESUNDHEITS-CHECK-UP"
     },
     {
       "icon" : "local_dining", 
-      "service" : "ERNÄHRUNGSBERATUNG"
+      "service" : "ERNÄHRUNGS-BERATUNG"
     },
     {
       "icon" : "child_care", 
-      "service" : "JUGENDSCHUTZ-UNTERSUCHUNGEN"
+      "service" : "JUGENDSCHUTZ-UNTERSUCHUNGEN" 
     },
     {
       "icon" : "directions_bike", 
-      "service" : "FAHRRADBERLASTUNGS - EKG"
+      "service" : "FAHRRAD-BERLASTUNGS - EKG"
     },
     {
       "icon" : "search", 
-      "service" : "KREBSFRÜHERKENNUNG"
+      "service" : "KREBS-FRÜHERKENNUNG"
     },
     {
       "icon" : "pin_drop", 
@@ -94,6 +94,18 @@ export class HomeComponent implements OnInit {
     {
       "type" : "video", 
       "name" : "Video-Konsultation"
+    }
+    
+  ];
+
+  medrequestDelivery : any[] = [
+    {
+      "type" : "collect", 
+      "name" : "Abholung in der Praxis"
+    },
+    {
+      "type" : "drugstore", 
+      "name" : "Apotheke:"
     }
     
   ];
@@ -168,6 +180,8 @@ export class HomeComponent implements OnInit {
       email : new FormControl('', [Validators.required, Validators.pattern("^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$")]),
       type : new FormControl('', Validators.required),
       acceptTerms : new FormControl(false, Validators.requiredTrue),
+      deliveryType : new FormControl(""),
+      collectDrugStore : new FormControl(""),
       message : new FormControl('')
     });
 
@@ -443,6 +457,10 @@ export class HomeComponent implements OnInit {
     this.openMedicationDialog(this.medicationsRequest);
   }
 
+  sendMessage2(){
+    console.log(this.requestFormValue)
+  }
+
   sendMessage(){
 
     let f = this.requestFormValue;
@@ -453,6 +471,10 @@ export class HomeComponent implements OnInit {
     }else if (f.type.type == 'prescription'){
       endPoint += "prescription"
       f.medications = this.medicationsRequest;
+
+      if (f.deliveryType == 'drugstore' && (!f.collectDrugStore || f.collectDrugStore == "")){
+        return;
+      }
     }
 
     this.googleAnalytics.sendEvent("contactform",{

@@ -467,8 +467,28 @@
                            
 
                             <div class="med">
-                                    {{ med.name }} ...
+                                    <mat-icon> local_hospital</mat-icon> {{ med.name }} ...
                             </div>
+
+                        </div>
+
+                        <div class="form-group" *ngIf="requestForm.get('type').value.type == 'prescription'">
+                            <mat-form-field>
+                                <mat-label>Empfangsweg</mat-label>
+                                <mat-select  formControlName="deliveryType" required>
+                                    <mat-option *ngFor="let req of medrequestDelivery" [value]="req.type">
+                                    {{req.name}}
+                                    </mat-option>
+                                </mat-select>
+                                <mat-error   >Bitte wählen Sie einen Empfangsweg</mat-error>
+                            </mat-form-field>
+                        </div>
+
+                        <div class="form-group" *ngIf="requestForm.get('deliveryType').value == 'drugstore'">
+                            <mat-form-field>
+                                <input  formControlName="collectDrugStore"  matInput type="text" placeholder="Apotheke" class="form-control" required>
+                                <mat-error *ngIf="requestForm.get('deliveryType').value == 'drugstore' && requestForm.get('collectDrugStore').value == ''"  >Bitte wählen Sie eine Apotheke </mat-error>
+                            </mat-form-field>
                         </div>
 
                         <div class="form-group">
@@ -477,6 +497,7 @@
 
                         <div class="form-group">
                             <button mat-button [disabled]="!requestForm.valid"  class="form-control-submit-button" (click)="sendMessage()">Abschicken</button>
+                            <button *ngIf="false" mat-button  class="form-control-submit-button" (click)="sendMessage2()">Abschicken</button>
                         </div>
                         
                     </form>

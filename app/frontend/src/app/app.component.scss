@@ -3,9 +3,9 @@
 #global-announcement{
     min-height: 0;
     max-height: 0;
-    background-color: white;
+    background-color: #ffffffeb;
     position: fixed;
-    width: 100vw;
+    width: 100%;
     top: 0;
     z-index: 9999;
     transition: 0.5s;
@@ -21,9 +21,20 @@
     }
 }
 
-#global-announcement.show{
-    max-height: 50px;
-    min-height: 50px;
+
+
+@media (max-width: 1100px) {
+    #global-announcement.show{
+        max-height: 300px;
+        min-height: 300px;
+    }
+}
+
+@media (min-width: 1101px) {
+    #global-announcement.show{
+        max-height: 50px;
+        min-height: 50px;
+    }
 }
 
 .container{
@@ -152,4 +163,8 @@ nav.top-nav-collapse{
 
 .video-dialog{
     width: 90vw !important;
+}
+
+.cc-revoke, .cc-window{
+    z-index: 200;
 }

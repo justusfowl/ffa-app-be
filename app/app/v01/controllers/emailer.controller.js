@@ -230,6 +230,10 @@ function sendPreRegistrationEmail (userName, tokenUrl) {
 
 function sendTeleAppointment (contextObj) {
 
+    if (contextObj.docName == 'Egal'){
+        contextObj.docName = "einem unserer Fachärzte*innen"
+    }
+
     return new Promise((resolve, reject) => {
 
         let options = {

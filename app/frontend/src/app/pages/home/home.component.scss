@@ -190,7 +190,7 @@
 
 #mapid{
     overflow: hidden;
-    z-index: -1;
+    z-index: 0;
 }
 
 #contactForm, 
@@ -254,6 +254,9 @@
     color: $background_nav;
 }
 
+.prescription-dialog{
+    max-height: 100vh;
+}
 
 @media (min-width: 1100px) {
     .prescription-dialog{
@@ -261,11 +264,25 @@
     }
 }
 
+@media (max-width: 1100px) {
+    .prescription-dialog{
+        max-width: 100vw !important;
+    }
+}
+
+
 
 
 .med-requests{
     margin-bottom: 20px;
     color: white;
+
+    .med{
+        display: flex; 
+        mat-icon{
+            margin-right: 5px; 
+        }
+    }
 }
 
 .service-list{
@@ -305,6 +322,17 @@
 
 
 }
+
+@media (max-width: 1100px) {
+
+    .opening-statement{
+
+        .announcement{
+            margin: 0px 0px 20px 0px;
+        }  
+    
+    }
+ }
 
 #projects .container{
     padding: 0 !important;

@@ -22,7 +22,8 @@ async function handleGeneralMessage (req, res){
 
         let contextObject = {
             userName : userName, 
-            messageText : message
+            messageText : message, 
+            userEmail : email
         }
 
         let isVacationObj = await timesCtrl.getIsCurrentlyVacation();
@@ -56,15 +57,24 @@ async function handlePrescriptionMessage(req, res){
         let userName = messageObj.name;
         let email = messageObj.email; 
         let medications = messageObj.medications;
+        let deliveryType = messageObj.deliveryType; 
+        let collectDrugStore = messageObj.collectDrugStore; 
 
-        if (!userName || !email || !medications || medications.length == 0){
+        if (!userName || !email || !medications || medications.length == 0 || (deliveryType == 'drugstore' && collectDrugStore.length < 1)){
             return res.send(500, "Please provide a valid message");
+        }
+
+        let flagCollectFromPractice = false;
+        if (deliveryType == 'collect'){
+            flagCollectFromPractice = true;
         }
 
         let contextObject = {
             userName : userName, 
             medications : medications, 
-            userEmail : email
+            userEmail : email, 
+            flagCollectFromPractice : flagCollectFromPractice, 
+            collectDrugStore : collectDrugStore
         };
 
         let message = "Ihre Rezeptvorbestellung für: ";

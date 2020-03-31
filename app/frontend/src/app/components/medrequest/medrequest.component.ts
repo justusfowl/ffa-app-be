@@ -5,7 +5,7 @@ import { FormArray, FormGroup, FormControl, Validators } from '@angular/forms';
 @Component({
   selector: 'app-medrequest',
   templateUrl: './medrequest.component.html',
-  styleUrls: ['./medrequest.component.scss'],
+  styleUrls: ['./medrequest.component.scss', '../../app.component.scss'],
   encapsulation: ViewEncapsulation.None
 })
 export class MedrequestComponent implements OnInit {

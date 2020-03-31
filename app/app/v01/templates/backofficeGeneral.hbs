@@ -282,7 +282,7 @@
           <div class="content">
 
             <!-- START CENTERED WHITE CONTAINER -->
-            <span class="preheader">Sezten Sie Ihr Kennwort zurück.</span>
+            <span class="preheader">Eintrag über die Website</span>
             <table class="main">
 
               <!-- START MAIN CONTENT AREA -->
@@ -303,6 +303,16 @@
                           </p>
                           {{/if}}
                           
+                          {{#if flagCollectFromPractice}}
+                            <p>
+                              Der Patient bittet darum, das Rezept in der Praxis abzuholen.
+                            </p>
+                          {{else}}
+                            <p>
+                              Der Patient bittet darum, das Rezept in einer Apotheke abzuholen: [{{collectDrugStore}}]
+                            </p>
+                          {{/if}}
+
                           {{#if medications}}
 
                             Folgende Anfrage zur Rezeptvorbestellung:
