@@ -361,14 +361,14 @@ async function getAvailableSlots(req, res){
                 // let slotStartHours = parseFloat(slot.startTime.substring(0,slot.startTime.indexOf(":")));
                 // let slotStartMin = parseFloat(slot.startTime.substring(slot.startTime.indexOf(":")+1, slot.startTime.length));
 
-                let startingEvent = moment(t_date.format("MM-DD-YYYY") + " " + slot.startTime, "MM-DD-YYYY HH:ss").tz(config.timeZone);
+                let startingEvent = moment.tz(t_date.format("MM-DD-YYYY") + " " + slot.startTime, "MM-DD-YYYY HH:ss", config.timeZone);
                 // startingEvent.setHours(slotStartHours, slotStartMin);
 
                 // last ending time based on the slot provided 
                 // let slotEndHours = parseFloat(slot.endTime.substring(0,slot.endTime.indexOf(":")));
                 // let slotEndMin = parseFloat(slot.endTime.substring(slot.endTime.indexOf(":")+1, slot.endTime.length));
 
-                let endingEvent = moment(t_date.format("MM-DD-YYYY") + " " + slot.endTime, "MM-DD-YYYY HH:ss").tz(config.timeZone);
+                let endingEvent = moment.tz(t_date.format("MM-DD-YYYY") + " " + slot.endTime, "MM-DD-YYYY HH:ss", config.timeZone);
                 // endingEvent.setHours(slotEndHours, slotEndMin);
 
                 let eventEnd;
@@ -377,7 +377,7 @@ async function getAvailableSlots(req, res){
 
                     do {
 
-                        eventEnd = moment((startingEvent.unix()*1000) + (duration*1000)).tz(config.timeZone); 
+                        eventEnd = moment.tz((startingEvent.unix()*1000) + (duration*1000), config.timeZone); 
 
                         let event = {
                             "startMoment" : startingEvent.toString(),
