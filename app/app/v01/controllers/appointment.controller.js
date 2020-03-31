@@ -305,8 +305,7 @@ async function getAvailableSlots(req, res){
     try{
 
         let today = new Date();
-        let test = moment().tz(config.timeZone).format();
-
+       
         let userId = req.userId;
 
         let startDate = req.query.startDate; 
@@ -380,13 +379,14 @@ async function getAvailableSlots(req, res){
                         eventEnd = moment((startingEvent.unix()*1000) + (duration*1000)).tz(config.timeZone); 
 
                         let event = {
+                            "startMoment" : startingEvent.toString(),
                             "start"  : startingEvent,
                             "end" : eventEnd,
                             "title" : slot.userName, 
                             "appointmentType" : appointmentType
                         }
 
-                        if (endingEvent.unix() >= eventEnd.unix()){
+                        if (endingEvent.eventunix() >= eventEnd.unix()){
                             if (_validateSlotAgainstAppointments(event, existingAppointments)){
                                 allTheoSlots.push(event);
                             }

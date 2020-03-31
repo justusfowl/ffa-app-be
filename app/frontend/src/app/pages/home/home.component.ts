@@ -129,6 +129,7 @@ export class HomeComponent implements OnInit {
   }
 
   ngOnInit() {
+    
     this.getTimes();
     this.getNews();
     this.getTeam();
@@ -136,7 +137,6 @@ export class HomeComponent implements OnInit {
 
     this.initContactForm();
     this.initRequestForm();
-
 
     this.requestForm.get("type").valueChanges.subscribe(selectedValue => {
       
@@ -146,8 +146,10 @@ export class HomeComponent implements OnInit {
         }else if (selectedValue.type == "video"){
           this.openVideoDialog();
         }
-      }catch(err){ } 
-
+      }catch(err){
+        console.error(err);
+      } 
+        
     })
   }
 

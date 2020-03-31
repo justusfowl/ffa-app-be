@@ -1,4 +1,4 @@
-import { Component, ViewChild, AfterViewInit, ElementRef, OnInit } from '@angular/core';
+import { Component, ViewChild, AfterViewInit, ElementRef, OnInit, OnDestroy } from '@angular/core';
 import { AuthenticationService } from './services/authentication.service';
 import { Router, NavigationEnd  } from '@angular/router';
 import { LoaderService } from './services/loader.service';
@@ -8,6 +8,7 @@ import localeDe from '@angular/common/locales/de';
 import { NgcCookieConsentService, NgcInitializeEvent, NgcStatusChangeEvent, NgcNoCookieLawEvent } from 'ngx-cookieconsent';
 import { Subscription } from 'rxjs';
 import { GoogleAnalyticsService } from './services/google-analytics.service';
+import { Title } from '@angular/platform-browser';
 
 
 declare var $: any;
@@ -17,13 +18,13 @@ declare var $: any;
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent implements OnInit, AfterViewInit {
+export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
   
   @ViewChild('globalLoader', {static: true}) public globalLoader: ElementRef;
   @ViewChild('globalMessageLoader', {static: true}) public globalMessageLoader: ElementRef;
 
   
-  title = 'Facharztpraxis für Allgemeinmedizin';
+  title = 'Facharztpraxis für Allgemeinmedizin | Dres. Kaulfuß & Gärtner';
 
   times : any[] = [];
   vacation : any[] = [];
@@ -32,13 +33,7 @@ export class AppComponent implements OnInit, AfterViewInit {
 
   globalAnnouncement : string = "";
 
-  //keep refs to subscriptions to be able to unsubscribe later
-  private popupOpenSubscription: Subscription;
-  private popupCloseSubscription: Subscription;
-  private initializeSubscription: Subscription;
   private statusChangeSubscription: Subscription;
-  private revokeChoiceSubscription: Subscription;
-  private noCookieLawSubscription: Subscription;
 
   constructor(
     public auth: AuthenticationService, 
@@ -46,13 +41,17 @@ export class AppComponent implements OnInit, AfterViewInit {
     public loaderSrv : LoaderService, 
     private api : ApiService,
     private ccService: NgcCookieConsentService, 
-    private googleAnalytics : GoogleAnalyticsService
+    private googleAnalytics : GoogleAnalyticsService,
+    private titleService: Title
   ){  
     this.globalAnnouncement = "Bitte beachten Sie - wir bieten Ihnen ab sofort Video-Konsultationen."
   }
 
   ngOnInit(){
+
     registerLocaleData(localeDe);
+
+    this.setTitle(this.title);
 
     this.router.events.subscribe((evt) => {
       if (!(evt instanceof NavigationEnd)) {
@@ -65,28 +64,6 @@ export class AppComponent implements OnInit, AfterViewInit {
       this.googleAnalytics.initGA()
     }
 
-    // subscribe to cookieconsent observables to react to main events
-    this.popupOpenSubscription = this.ccService.popupOpen$.subscribe(
-      () => {
-        // you can use this.ccService.getConfig() to do stuff...
-        console.log("PopOpen")
-        this.getCookieConsent();
-      });
-
-    this.popupCloseSubscription = this.ccService.popupClose$.subscribe(
-      () => {
-        // you can use this.ccService.getConfig() to do stuff...
-        console.log("popupClose")
-        this.getCookieConsent();
-      });
-
-    this.initializeSubscription = this.ccService.initialize$.subscribe(
-      (event: NgcInitializeEvent) => {
-        // you can use this.ccService.getConfig() to do stuff...
-        console.log("initialize")
-        this.getCookieConsent();
-      });
-
     this.statusChangeSubscription = this.ccService.statusChange$.subscribe(
       (event: NgcStatusChangeEvent) => {
         // you can use this.ccService.getConfig() to do stuff...
@@ -96,29 +73,17 @@ export class AppComponent implements OnInit, AfterViewInit {
         console.log(event);
       });
 
-    this.revokeChoiceSubscription = this.ccService.revokeChoice$.subscribe(
-      () => {
-        // you can use this.ccService.getConfig() to do stuff...
-        console.log("PopOrevokeChoicepen")
-        this.getCookieConsent();
-      });
-
-      this.noCookieLawSubscription = this.ccService.noCookieLaw$.subscribe(
-      (event: NgcNoCookieLawEvent) => {
-        // you can use this.ccService.getConfig() to do stuff...
-        console.log("noCookieLaw")
-        this.getCookieConsent();
-      });
-
-      console.log("wie ist der consent ?")
-      this.getCookieConsent(); 
+      
   }
 
-  getCookieConsent(){
-    console.log("consented:" + this.ccService.hasConsented())
+  ngOnDestroy() {
+    // unsubscribe to cookieconsent observables to prevent memory leaks
+    this.statusChangeSubscription.unsubscribe();
   }
 
-
+  public setTitle( newTitle: string) {
+    this.titleService.setTitle( newTitle );
+  }
 
   ngAfterViewInit(){
 
