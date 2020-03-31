@@ -5,6 +5,7 @@ import { first } from 'rxjs/operators';
 import {MatSnackBar } from '@angular/material';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Router, ActivatedRoute } from '@angular/router';
+import { GoogleAnalyticsService } from 'src/app/services/google-analytics.service';
 
 
 
@@ -42,7 +43,8 @@ export class LoginComponent implements OnInit {
     private authenticationService : AuthenticationService, 
     private snackBar : MatSnackBar, 
     private router : Router, 
-    private route : ActivatedRoute
+    private route : ActivatedRoute, 
+    private googleAnalytics : GoogleAnalyticsService
   ) {
 
     this.forgotPasswordForm =  new FormGroup({
@@ -101,6 +103,12 @@ export class LoginComponent implements OnInit {
                     });
 
                     this.dialogRef.close(true);
+
+                    
+                  this.googleAnalytics.sendEvent("login",{
+                    category: "auth", 
+                    label : "success"
+                  });
                   
               },
               error => {
@@ -109,9 +117,21 @@ export class LoginComponent implements OnInit {
                   this.snackBar.open("Bitte verifizieren Sie Ihr Konto, bevor Sie Ihr Konto verwenden können. Prüfen Sie Ihr Email-Postfach.", "OK", {
                     duration : 10000
                   });
+
+                  this.googleAnalytics.sendEvent("login",{
+                    category: "auth", 
+                    label : "account not validated yet"
+                  });
+
+
                 }else{
                   this.snackBar.open("Das hat leider nicht geklappt, bitte erneut versuchen.", "OK", {
                     duration : 3000
+                  });
+
+                  this.googleAnalytics.sendEvent("login",{
+                    category: "auth", 
+                    label : "Error logging in"
                   });
                 }
 
@@ -134,6 +154,11 @@ export class LoginComponent implements OnInit {
               });
 
               this.dialogRef.close(true);
+
+              this.googleAnalytics.sendEvent("passreset",{
+                category: "auth", 
+                label : "Requesting password reset"
+              });
         },
         error => {
 
@@ -174,6 +199,11 @@ export class LoginComponent implements OnInit {
 
             this.registerForm.resetForm()
 
+            this.googleAnalytics.sendEvent("register",{
+              category: "auth", 
+              label : "register new user"
+            });
+
             // this.router.navigate([this.returnUrl]);
         },
         error => {
@@ -182,6 +212,12 @@ export class LoginComponent implements OnInit {
             this.snackBar.open("Es scheint, als wäre diese eMail bereits registriert. Eventuell hilft das Zurücksetzen des Passworts.", "OK", {
               duration : 4000
             });
+
+            this.googleAnalytics.sendEvent("register",{
+              category: "auth", 
+              label : "user already exists"
+            });
+
           }else{
             this.snackBar.open("Das hat leider nicht geklappt, bitte erneut versuchen.", "OK", {
               duration : 3000

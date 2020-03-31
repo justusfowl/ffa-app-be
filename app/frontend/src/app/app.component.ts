@@ -5,6 +5,11 @@ import { LoaderService } from './services/loader.service';
 import { ApiService } from './services/api.service';
 import { registerLocaleData } from '@angular/common';
 import localeDe from '@angular/common/locales/de';
+import { NgcCookieConsentService, NgcInitializeEvent, NgcStatusChangeEvent, NgcNoCookieLawEvent } from 'ngx-cookieconsent';
+import { Subscription } from 'rxjs';
+import { GoogleAnalyticsService } from './services/google-analytics.service';
+
+
 declare var $: any;
 
 @Component({
@@ -27,11 +32,21 @@ export class AppComponent implements OnInit, AfterViewInit {
 
   globalAnnouncement : string = "";
 
+  //keep refs to subscriptions to be able to unsubscribe later
+  private popupOpenSubscription: Subscription;
+  private popupCloseSubscription: Subscription;
+  private initializeSubscription: Subscription;
+  private statusChangeSubscription: Subscription;
+  private revokeChoiceSubscription: Subscription;
+  private noCookieLawSubscription: Subscription;
+
   constructor(
     public auth: AuthenticationService, 
     private router:Router, 
     public loaderSrv : LoaderService, 
-    private api : ApiService
+    private api : ApiService,
+    private ccService: NgcCookieConsentService, 
+    private googleAnalytics : GoogleAnalyticsService
   ){  
     this.globalAnnouncement = "Bitte beachten Sie - wir bieten Ihnen ab sofort Video-Konsultationen."
   }
@@ -44,8 +59,66 @@ export class AppComponent implements OnInit, AfterViewInit {
           return;
       }
       window.scrollTo(0, 0)
-  });
+    });
+
+    if (this.ccService.hasConsented()){
+      this.googleAnalytics.initGA()
+    }
+
+    // subscribe to cookieconsent observables to react to main events
+    this.popupOpenSubscription = this.ccService.popupOpen$.subscribe(
+      () => {
+        // you can use this.ccService.getConfig() to do stuff...
+        console.log("PopOpen")
+        this.getCookieConsent();
+      });
+
+    this.popupCloseSubscription = this.ccService.popupClose$.subscribe(
+      () => {
+        // you can use this.ccService.getConfig() to do stuff...
+        console.log("popupClose")
+        this.getCookieConsent();
+      });
+
+    this.initializeSubscription = this.ccService.initialize$.subscribe(
+      (event: NgcInitializeEvent) => {
+        // you can use this.ccService.getConfig() to do stuff...
+        console.log("initialize")
+        this.getCookieConsent();
+      });
+
+    this.statusChangeSubscription = this.ccService.statusChange$.subscribe(
+      (event: NgcStatusChangeEvent) => {
+        // you can use this.ccService.getConfig() to do stuff...
+        if (event.status){
+          this.googleAnalytics.initGA()
+        }
+        console.log(event);
+      });
+
+    this.revokeChoiceSubscription = this.ccService.revokeChoice$.subscribe(
+      () => {
+        // you can use this.ccService.getConfig() to do stuff...
+        console.log("PopOrevokeChoicepen")
+        this.getCookieConsent();
+      });
+
+      this.noCookieLawSubscription = this.ccService.noCookieLaw$.subscribe(
+      (event: NgcNoCookieLawEvent) => {
+        // you can use this.ccService.getConfig() to do stuff...
+        console.log("noCookieLaw")
+        this.getCookieConsent();
+      });
+
+      console.log("wie ist der consent ?")
+      this.getCookieConsent(); 
   }
+
+  getCookieConsent(){
+    console.log("consented:" + this.ccService.hasConsented())
+  }
+
+
 
   ngAfterViewInit(){
 
@@ -91,7 +164,8 @@ export class AppComponent implements OnInit, AfterViewInit {
   }
 
   
-  goToTag(tagId, route='home'){
+  goToTag(tagId, route='home', navSrc="main-nav"){
+
     let self = this; 
     this.api.setLoading(true);
 
@@ -102,20 +176,28 @@ export class AppComponent implements OnInit, AfterViewInit {
 
 
       setTimeout(function(){
+        
         try{
-
+ 
           $('html, body').animate({
               scrollTop: ($('#'+tagId).offset().top)-$('nav').height()-$('#global-announcement').height()
           },500);
 
-        }catch(err){
+          self.googleAnalytics.sendEvent(navSrc, {
+            category: "nav", 
+            label : tagId
+          })
 
+        }catch(err){
+          console.error(err);
         }
 
         self.api.setLoading(false);
         
       }, 500);
+
     }catch(err){
+
     }
 
   }

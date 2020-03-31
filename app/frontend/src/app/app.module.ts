@@ -29,7 +29,7 @@ import { MedrequestComponent } from './components/medrequest/medrequest.componen
 import { AuthComponent } from './pages/auth/auth.component';
 
 import { RichTextEditorAllModule } from '@syncfusion/ej2-angular-richtexteditor';
-
+import {NgcCookieConsentModule, NgcCookieConsentConfig} from 'ngx-cookieconsent';
 
 import { CalendarModule, DateAdapter } from 'angular-calendar';
 import { adapterFactory } from 'angular-calendar/date-adapters/date-fns';
@@ -38,9 +38,33 @@ import { DatePipe } from '@angular/common';
 import { TeleSlotComponent } from './components/tele-slot/tele-slot.component';
 import { ConfirmDialogComponent } from './components/confirm-dialog/confirm-dialog.component';
 import { ImprintComponent } from './pages/imprint/imprint.component';
+import { GoogleAnalyticsService } from './services/google-analytics.service';
+import { environment } from '../environments/environment';
 
-
-
+const cookieConfig:NgcCookieConsentConfig = {
+  cookie: {
+    domain: environment.domain
+  },
+  palette: {
+    popup: {
+      background: '#000'
+    },
+    button: {
+      background: '#972c30'
+    }
+  },
+  theme: 'edgeless',
+  type: 'opt-in',
+  content : {
+    "message": "Wir möchten Ihnen das bestmögliche Nutzererlebnis bei unseren digitalen Gesundheitsdiensten bieten und nutzen dafür Cookies.",
+    "dismiss": "OK!",
+    "allow": "OK!",
+    "deny": "Ablehnen",
+    "link": "mehr Infos",
+    "href": "/privacy",
+    "policy": "Datenschutz"
+  }
+};
 
 
 @NgModule({
@@ -74,8 +98,9 @@ import { ImprintComponent } from './pages/imprint/imprint.component';
     CalendarModule.forRoot({
       provide: DateAdapter,
       useFactory: adapterFactory
-    })
-  ],
+    }),
+    NgcCookieConsentModule.forRoot(cookieConfig)
+  ], 
   providers: [
     { provide: LOCALE_ID, useValue: "de-DE" },
     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
@@ -83,7 +108,8 @@ import { ImprintComponent } from './pages/imprint/imprint.component';
     ApiService, 
     ErrorInterceptor, 
     JwtInterceptor,
-    DatePipe
+    DatePipe,
+    GoogleAnalyticsService
   ],
   bootstrap: [AppComponent], 
   entryComponents : [NewsdetailComponent, MedrequestComponent, LoginComponent, TeleSlotComponent, ConfirmDialogComponent, NewappointmentComponent]

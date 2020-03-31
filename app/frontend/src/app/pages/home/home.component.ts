@@ -9,6 +9,7 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { NewappointmentComponent } from '../newappointment/newappointment.component';
 import { AuthenticationService } from 'src/app/services/authentication.service';
 import { LoginComponent } from '../login/login.component';
+import { GoogleAnalyticsService } from 'src/app/services/google-analytics.service';
 declare var $: any;
 
 @Component({
@@ -109,7 +110,8 @@ export class HomeComponent implements OnInit {
     private auth : AuthenticationService,
     public dialog: MatDialog, 
     private _snackBar: MatSnackBar, 
-    protected sanitizer: DomSanitizer
+    protected sanitizer: DomSanitizer, 
+    private googleAnalytics : GoogleAnalyticsService
   ) {
 
   }
@@ -362,6 +364,7 @@ export class HomeComponent implements OnInit {
   }
 
   getIsNowOpen(){
+
     let now = new Date(); 
     now["dayId"] = now.getDay();
 
@@ -370,6 +373,11 @@ export class HomeComponent implements OnInit {
   }
 
   openNews(newsObject) : void {
+
+    this.googleAnalytics.sendEvent("open",{
+      category: "news", 
+      label : newsObject._id
+    });
 
     const dialogRef = this.dialog.open(NewsdetailComponent, {
       data: {newsObj : newsObject},
@@ -398,27 +406,35 @@ export class HomeComponent implements OnInit {
     }
   }
 
-  goToTag(tagId, route='home'){
+  goToTag(tagId, navSrc="main-nav"){
+
     let self = this; 
     this.api.setLoading(true);
 
     try{
-    
+     
       setTimeout(function(){
         try{
-
+ 
           $('html, body').animate({
               scrollTop: ($('#'+tagId).offset().top)-$('nav').height()-$('#global-announcement').height()
           },500);
 
-        }catch(err){
+          self.googleAnalytics.sendEvent(navSrc, {
+            category: "nav", 
+            label : tagId
+          })
 
+        }catch(err){
+          console.error(err);
         }
 
         self.api.setLoading(false);
         
       }, 500);
+      
     }catch(err){
+
     }
 
   }
@@ -439,6 +455,11 @@ export class HomeComponent implements OnInit {
       f.medications = this.medicationsRequest;
     }
 
+    this.googleAnalytics.sendEvent("contactform",{
+      category: "contact", 
+      label : f.type.type
+    });
+
     this.api.post(endPoint, f).then(result => {
       this._snackBar.open("Vielen Dank. Wir haben Ihre Nachricht erhalten.", "OK", {
         duration: 5000
@@ -458,6 +479,12 @@ export class HomeComponent implements OnInit {
   }
 
   openVideoDialog(){
+
+    
+    this.googleAnalytics.sendEvent("open",{
+      category: "video-dialog", 
+      label : ""
+    });
 
     if (this.auth.isAuthorized()){
 

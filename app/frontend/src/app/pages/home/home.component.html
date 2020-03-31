@@ -13,14 +13,14 @@
                             <p class="sub p-heading p-large">{{WELCOME_SUBHEADER}}</p>
                             <div class="opening-statement">
                                 <div class="announcement open" *ngIf="getIsNowOpen()">
-                                    Wir haben aktuell geöffnet, klicken Sie <strong><a (click)="goToTag('times')">[hier]</a></strong>, um die Öffnungszeiten anzusehen.
+                                    Wir haben aktuell geöffnet, klicken Sie <strong><a (click)="goToTag('times', 'announcement')">[hier]</a></strong>, um die Öffnungszeiten anzusehen.
                                 </div>
                                 <div class="announcement closed" *ngIf="!getIsNowOpen()">
-                                    Wir haben aktuell geschlossen, klicken Sie <strong><a (click)="goToTag('times')">[hier]</a></strong>, um die Öffnungs- & Vertretungszeiten anzusehen.
+                                    Wir haben aktuell geschlossen, klicken Sie <strong><a (click)="goToTag('times', 'announcement')">[hier]</a></strong>, um die Öffnungs- & Vertretungszeiten anzusehen.
                                     <p *ngIf="getIsVacationClosed()">{{getIsVacationClosed()}}</p>
                                 </div>
                             </div>
-                            <a class="btn-solid-lg page-scroll" (click)="goToTag('contact')">Anfrage</a>
+                            <a class="btn-solid-lg page-scroll" (click)="goToTag('contact', 'header')">Anfrage</a>
                            
                         </div>
                     </div> <!-- end of col -->
@@ -533,7 +533,7 @@
                     <div class="text-container">
                         <div class="section-title">PRAXIS</div>
                         <h2>KONTAKT</h2>
-                        <p>Sie erreichen uns zu unseren Sprechzeiten an folgender Adresse oder für generelle Anfragen über das <strong class="link" (click)="goToTag('contact')">Formular</strong></p>
+                        <p>Sie erreichen uns zu unseren Sprechzeiten an folgender Adresse oder für generelle Anfragen über das <strong class="link" (click)="goToTag('contact', 'footer')">Formular</strong></p>
                         <ul class="list-unstyled li-space-lg">
                             <li class="address"><i class="fas fa-map-marker-alt"></i>Ringstrasse 33, 65346 Eltville-Erbach</li>
                             <li class="address"><i class="fas fa-phone"></i><a href="tel:00496123902910">+49 6123 90 29 10</a></li>

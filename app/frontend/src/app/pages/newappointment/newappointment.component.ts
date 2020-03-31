@@ -30,6 +30,7 @@ import { LoaderService } from 'src/app/services/loader.service';
 import { ApiService } from 'src/app/services/api.service';
 import { DatePipe } from '@angular/common';
 import { AuthenticationService } from 'src/app/services/authentication.service';
+import { GoogleAnalyticsService } from 'src/app/services/google-analytics.service';
 
 const colors: any = {
   red: {
@@ -133,7 +134,8 @@ export class NewappointmentComponent implements OnInit {
     private loaderSrv : LoaderService, 
     private api : ApiService, 
     private datePipe : DatePipe, 
-    private auth: AuthenticationService
+    private auth: AuthenticationService, 
+    private googleAnalytics : GoogleAnalyticsService
     ) {
 
   }
@@ -299,6 +301,12 @@ export class NewappointmentComponent implements OnInit {
   initiateAppointment(){
 
     let appointmentRequest = this.baseInfoForm.value; 
+
+    this.googleAnalytics.sendEvent("initiateAppointment",{
+      category: "video-dialog", 
+      label : appointmentRequest.appointmentType || "unknown appointment type"
+    });
+    
     appointmentRequest["acceptTerms"] = this.finalForm.get("acceptTerms").value;
     appointmentRequest["appointmentObj"] = this.dateTimeForm.get("appointmentObj").value
 

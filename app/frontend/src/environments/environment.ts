@@ -9,7 +9,9 @@ export const environment = {
   apiBase : "localhost", 
   apiPort: "8000", 
   apiEnd : "/api/v01", 
-  socketPort: "8000"
+  socketPort: "8000", 
+  gaId : "UA-72119245-1",
+  domain: "localhost"
 };
 
 /*

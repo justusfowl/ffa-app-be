@@ -15,6 +15,8 @@ else if (env == 'production'){
 }
 
 const config = {
+
+    timeZone : "Europe/Berlin",
     env: env,
     port: port,
 

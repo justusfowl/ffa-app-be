@@ -11,6 +11,8 @@ var emailCtrl = require('./emailer.controller');
 
 var util = require('../util');
 
+var moment = require('moment-timezone');
+
 // @TODO: Add those meta config data into the database 
 
 var appointmentMeta = [{
@@ -36,7 +38,13 @@ var appointmentMeta = [{
     "durationInSeconds" : 600
   }]
 
-function _getDaysArray(start, end, flagIncludeWeekends=false) {
+  /**
+   * Deprecated function
+   * @param {*} start 
+   * @param {*} end 
+   * @param {*} flagIncludeWeekends 
+   */
+function _getDaysArray_dep(start, end, flagIncludeWeekends=false) {
     start = new Date(start); 
     end = new Date(end); 
 
@@ -52,6 +60,36 @@ function _getDaysArray(start, end, flagIncludeWeekends=false) {
         
     }
     return arr;
+};
+/**
+ * Function to return an array of moments/dates between two input dates. Input dates are included.
+ * @param {*} startDate start date, format MM-DD-YYYY
+ * @param {*} endDate end date, format MM-DD-YYYY
+ * @param {*} flagIncludeWeekends 
+ */
+function _getDaysArray (startDate, endDate, flagIncludeWeekends=false) {
+
+    var dates = [];
+
+    var currDate = moment(startDate, 'MM-DD-YYYY').startOf('day');
+    var lastDate = moment(endDate, 'MM-DD-YYYY').startOf('day');
+
+    dates.push(currDate);
+
+    while(currDate.add(1, 'days').diff(lastDate) < 0) {
+    
+        let newDate = currDate.clone();
+        
+        if((newDate.weekday() == 0 || newDate.weekday() == 6) && flagIncludeWeekends){
+            dates.push(newDate);
+        }else if (newDate.weekday() < 6 && newDate.weekday() > 0){
+            dates.push(newDate);
+        }
+    }
+
+    dates.push(lastDate);
+
+    return dates;
 };
 
 
@@ -264,102 +302,111 @@ function getAvailableDocs(req, res){
 
 async function getAvailableSlots(req, res){
 
-    let today = new Date();
-    let userId = req.userId;
+    try{
 
-    let startDate = req.query.startDate; 
-    let endDate = req.query.endDate;
-    let appointmentType = req.query.appointmentType;
-    let docId = req.query.docId;
+        let today = new Date();
+        let test = moment().tz(config.timeZone).format();
 
-    let appointmentTypeIdx = appointmentMeta.findIndex(x => x.type == appointmentType);
-    let appointmentTypeObj;
+        let userId = req.userId;
 
-    if (new Date(startDate).getTime() < today.getTime()){
-        // no meetings before today 
-        startDate = util.convertDateToString(today);
-    }
+        let startDate = req.query.startDate; 
+        let endDate = req.query.endDate;
+        let appointmentType = req.query.appointmentType;
+        let docId = req.query.docId;
 
-    if (new Date(endDate).getTime() < today.getTime()){
-        // return empty set of appointments for 
-        return res.json([])
-    }
+        let appointmentTypeIdx = appointmentMeta.findIndex(x => x.type == appointmentType);
+        let appointmentTypeObj;
 
-    if (appointmentTypeIdx < 0){
-        return res.send(500, "Please provide a valid appointment type");
-    }else{
-        appointmentTypeObj = appointmentMeta[appointmentTypeIdx];
-    }
+        if (new Date(startDate).getTime() < today.getTime()){
+            // no meetings before today 
+            startDate = util.convertDateToString(today);
+        }
 
-    if (!startDate || !endDate){
-        return res.send(500, "Please provide start / end dates");
-    }
+        if (new Date(endDate).getTime() < today.getTime()){
+            // return empty set of appointments for 
+            return res.json([])
+        }
 
-    let datesInBetween =  _getDaysArray(startDate, endDate);
+        if (appointmentTypeIdx < 0){
+            return res.send(500, "Please provide a valid appointment type");
+        }else{
+            appointmentTypeObj = appointmentMeta[appointmentTypeIdx];
+        }
 
-    if (datesInBetween.length > 35){
-        return res.send(500, "Please limit date ranges to 35 days.");
-    }
+        if (!startDate || !endDate){
+            return res.send(500, "Please provide start / end dates");
+        }
 
-    let slots = await _getSlots(docId);
+        let datesInBetween =  _getDaysArray(startDate, endDate);
 
-    slots = await _enrichSlotsWithUserInfo(slots);
+        if (datesInBetween.length > 35){
+            return res.send(500, "Please limit date ranges to 35 days.");
+        }
 
-    let existingAppointments = await _getAppointmentsFromDateRange(startDate, endDate);
+        let slots = await _getSlots(docId);
 
-    // create all theoretical slots for that type of appointment
+        slots = await _enrichSlotsWithUserInfo(slots);
 
-    let allTheoSlots = [];
-    let duration = appointmentTypeObj.durationInSeconds;
+        let existingAppointments = await _getAppointmentsFromDateRange(startDate, endDate);
 
-    datesInBetween.forEach(t_date => {
-        slots.forEach(slot => {
+        // create all theoretical slots for that type of appointment
 
-            // first possible time based on the slot provided 
-            let slotStartHours = parseFloat(slot.startTime.substring(0,slot.startTime.indexOf(":")));
-            let slotStartMin = parseFloat(slot.startTime.substring(slot.startTime.indexOf(":")+1, slot.startTime.length));
+        let allTheoSlots = [];
+        let duration = appointmentTypeObj.durationInSeconds;
 
-            let startingEvent = new Date(t_date);
-            startingEvent.setHours(slotStartHours, slotStartMin);
+        datesInBetween.forEach(t_date => {
+            slots.forEach(slot => {
 
-            // last ending time based on the slot provided 
-            let slotEndHours = parseFloat(slot.endTime.substring(0,slot.endTime.indexOf(":")));
-            let slotEndMin = parseFloat(slot.endTime.substring(slot.endTime.indexOf(":")+1, slot.endTime.length));
+                // first possible time based on the slot provided 
+                // let slotStartHours = parseFloat(slot.startTime.substring(0,slot.startTime.indexOf(":")));
+                // let slotStartMin = parseFloat(slot.startTime.substring(slot.startTime.indexOf(":")+1, slot.startTime.length));
 
-            let endingEvent = new Date(t_date);
-            endingEvent.setHours(slotEndHours, slotEndMin);
+                let startingEvent = moment(t_date.format("MM-DD-YYYY") + " " + slot.startTime, "MM-DD-YYYY HH:ss").tz(config.timeZone);
+                // startingEvent.setHours(slotStartHours, slotStartMin);
 
-            let eventEnd;
+                // last ending time based on the slot provided 
+                // let slotEndHours = parseFloat(slot.endTime.substring(0,slot.endTime.indexOf(":")));
+                // let slotEndMin = parseFloat(slot.endTime.substring(slot.endTime.indexOf(":")+1, slot.endTime.length));
 
-            if (t_date.getDay() == slot.dayId){
+                let endingEvent = moment(t_date.format("MM-DD-YYYY") + " " + slot.endTime, "MM-DD-YYYY HH:ss").tz(config.timeZone);
+                // endingEvent.setHours(slotEndHours, slotEndMin);
 
-                do {
+                let eventEnd;
 
-                    eventEnd = new Date(startingEvent.getTime() + (duration * 1000));
+                if (t_date.day() == slot.dayId){
 
-                    let event = {
-                        "start"  : startingEvent,
-                        "end" : eventEnd,
-                        "title" : slot.userName, 
-                        "appointmentType" : appointmentType
-                    }
+                    do {
 
-                    if (endingEvent.getTime() >= eventEnd.getTime()){
-                        if (_validateSlotAgainstAppointments(event, existingAppointments)){
-                            allTheoSlots.push(event);
+                        eventEnd = moment((startingEvent.unix()*1000) + (duration*1000)).tz(config.timeZone); 
+
+                        let event = {
+                            "start"  : startingEvent,
+                            "end" : eventEnd,
+                            "title" : slot.userName, 
+                            "appointmentType" : appointmentType
                         }
-                    }
 
-                    startingEvent = eventEnd;
+                        if (endingEvent.unix() >= eventEnd.unix()){
+                            if (_validateSlotAgainstAppointments(event, existingAppointments)){
+                                allTheoSlots.push(event);
+                            }
+                        }
 
-                }while (endingEvent.getTime() >= eventEnd.getTime())
+                        startingEvent = eventEnd;
 
-            }
-            
+                    }while (endingEvent.unix() >= eventEnd.unix())
+
+                }
+                
+            });
         });
-    });
 
-    res.json(allTheoSlots);
+        res.json(allTheoSlots);
+
+    }catch(err){
+        console.error(err); 
+        return res.send(500, "Something went wrong retrieving slots.")
+    }
 
 }
 
