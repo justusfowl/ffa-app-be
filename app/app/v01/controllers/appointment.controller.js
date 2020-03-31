@@ -61,6 +61,7 @@ function _getDaysArray_dep(start, end, flagIncludeWeekends=false) {
     }
     return arr;
 };
+
 /**
  * Function to return an array of moments/dates between two input dates. Input dates are included.
  * @param {*} startDate start date, format MM-DD-YYYY
@@ -386,7 +387,7 @@ async function getAvailableSlots(req, res){
                             "appointmentType" : appointmentType
                         }
 
-                        if (endingEvent.eventunix() >= eventEnd.unix()){
+                        if (endingEvent.unix() >= eventEnd.unix()){
                             if (_validateSlotAgainstAppointments(event, existingAppointments)){
                                 allTheoSlots.push(event);
                             }
@@ -413,8 +414,8 @@ async function getAvailableSlots(req, res){
 async function _insertTeleAppointment(appointmentObj){
 
     // ensure start/end timestamps are properly formatted as dates.
-    appointmentObj.appointmentObj.start = new Date(appointmentObj.appointmentObj.start);
-    appointmentObj.appointmentObj.end = new Date(appointmentObj.appointmentObj.end);
+    appointmentObj.appointmentObj.start = moment(appointmentObj.appointmentObj.start);
+    appointmentObj.appointmentObj.end = moment(appointmentObj.appointmentObj.end);
 
     return new Promise((resolve, reject) => {
         try{
@@ -460,11 +461,13 @@ async function _insertTeleAppointment(appointmentObj){
         let appointmentObject = req.body;
         appointmentObject["userId"] = userId;
 
-        let startDate = new Date(appointmentObject.appointmentObj.start);
-        let endDate = new Date(appointmentObject.appointmentObj.end);
+       // let startDate = new Date(appointmentObject.appointmentObj.start);
+       // let endDate = new Date(appointmentObject.appointmentObj.end);
+       let startDate = moment(appointmentObject.appointmentObj.start);
+       let endDate = moment(appointmentObject.appointmentObj.end);
 
         // get duration in seconds
-        let durationInSec = (endDate.getTime() - startDate.getTime()) / 1000;
+        let durationInSec = (endDate.unix() - startDate.unix());
         
         teleMedCtrl.insertAppointment(appointmentObject.appointmentObj.start, durationInSec).then(async response => {
 

@@ -4,6 +4,8 @@ var MongoClient = require('mongodb').MongoClient;
 var ObjectID = require('mongodb').ObjectID;
 var MongoUrl = config.getMongoUrl();
 
+var moment = require('moment-timezone');
+
 async function generateDialInCodes(id) { 
 
     return new Promise(async (resolve, reject) => {
@@ -209,7 +211,7 @@ async function insertAppointment(startDate, durationInSecs){
                     "class": "crud",
                     "method": "create",
                     "VideoAppointment": {
-                        "start": new Date(startDate).toISOString(),
+                        "start": moment(startDate).toISOString(),
                         "VideoAppointmentDetails": {
                             "patientName": "nwNny3mWCV3WUo/nY4dOHiJH1k tv/G3mWajkv6Ultn5yMDbmBb3Y7X4N4BjD0rgjZo",
                             "doctorName": "FFA",

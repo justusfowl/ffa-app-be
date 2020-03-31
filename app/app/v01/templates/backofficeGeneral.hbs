@@ -302,18 +302,18 @@
                             {{messageText}}
                           </p>
                           {{/if}}
-                          
-                          {{#if flagCollectFromPractice}}
-                            <p>
-                              Der Patient bittet darum, das Rezept in der Praxis abzuholen.
-                            </p>
-                          {{else}}
-                            <p>
-                              Der Patient bittet darum, das Rezept in einer Apotheke abzuholen: [{{collectDrugStore}}]
-                            </p>
-                          {{/if}}
 
                           {{#if medications}}
+
+                            {{#if flagCollectFromPractice}}
+                              <p>
+                                Der Patient bittet darum, das Rezept in der Praxis abzuholen.
+                              </p>
+                            {{else}}
+                              <p>
+                                Der Patient bittet darum, das Rezept in einer Apotheke abzuholen: [{{collectDrugStore}}]
+                              </p>
+                            {{/if}}
 
                             Folgende Anfrage zur Rezeptvorbestellung:
 
