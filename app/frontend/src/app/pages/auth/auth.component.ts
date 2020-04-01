@@ -12,6 +12,8 @@ import { AuthenticationService } from 'src/app/services/authentication.service';
 })
 export class AuthComponent implements OnInit {
 
+  returnUrl : string = "/";
+
   constructor(
     public dialog: MatDialog, 
     private route: ActivatedRoute, 
@@ -25,7 +27,9 @@ export class AuthComponent implements OnInit {
 
   ngOnInit() {
     this.openDialog();
+    this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
   }
+
 
   openDialog(): void {
     const dialogRef = this.dialog.open(LoginComponent, {
@@ -34,7 +38,7 @@ export class AuthComponent implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      this.router.navigate(['/']);
+      this.router.navigate([this.returnUrl]);
     });
   }
 

@@ -36,6 +36,6 @@ router.use('/times', timesRoutes);
 
 router.use('/general', generalRoutes)
 
-router.use('/appointment', [tokenValidator.verifyToken, tokenValidator.HasUserVerifiedEmail], appointmentRoutes)
+router.use('/appointment', appointmentRoutes)
 
 module.exports = router; 

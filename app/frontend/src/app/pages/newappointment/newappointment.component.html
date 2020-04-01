@@ -8,7 +8,7 @@
       <div class="form-group">
         <mat-form-field>
           <mat-label>Name</mat-label>
-          <input matInput placeholder="Last name, First name" formControlName="patientName" required readonly="true">
+          <input matInput placeholder="Last name, First name" formControlName="patientName" required [readonly]="data.guestObject">
         </mat-form-field>
       </div>
     

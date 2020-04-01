@@ -1,5 +1,5 @@
 var jwt = require('jsonwebtoken');
-//var jwks = require('jwks-rsa');
+var ObjectID = require('mongodb').ObjectID;
 const config = require('../../config/config');
 var authCtrl = require('./auth.controller');
 
@@ -31,6 +31,11 @@ function verifyToken(req, res, next) {
         // if everything is good, save to request for use in other routes
         req.userId = decoded._id;
 
+        if (decoded.appointmentId){
+          req.appointmentId = decoded.appointmentId;
+        }
+        
+
         next();
 
         });
@@ -42,9 +47,12 @@ function verifyToken(req, res, next) {
   }
 
 // difference: let all requests pass and decode token for the requests where token exists
+// include: guest requests and mark them as such 
   function detectToken(req, res, next) {
 
     let token = req.headers['x-access-token'] || req.headers['authorization']; // Express headers are auto converted to lowercase
+    let guestUserEmail = req.headers['x-guest-user-email'];
+   
 
     if (token){
 
@@ -66,7 +74,22 @@ function verifyToken(req, res, next) {
         next();
   
       });
-    }else{
+    }else if (guestUserEmail){
+
+      let guestUserName = req.headers['x-guest-user-name'];
+
+      req.flagGuest = true;
+      req.guestObject = {
+        userName : guestUserEmail,
+        userEmail : guestUserEmail,
+        name : guestUserName
+      }
+      next();
+    }    
+    else{
+      req.userId = null;
+      req.flagGuest = false;
+      req.flagAnonymous = true;
       next();
     }
 
@@ -74,6 +97,17 @@ function verifyToken(req, res, next) {
 
   async function HasUserVerifiedEmail (req, res, next){
     
+    let flagValidUserIdAsBSON = false;
+
+    if (req.userId){
+      try{
+        ObjectID(req.userId)
+        flagValidUserIdAsBSON = true;
+      }catch(err){
+      }
+    }
+
+    if (flagValidUserIdAsBSON){
       let userId = req.userId;
       let userObj = await authCtrl.getUserById(userId);
       if (userObj.validated){
@@ -81,7 +115,10 @@ function verifyToken(req, res, next) {
       }else{
         return res.send(412, { auth: false, message: 'Die eMail wurde nicht verifiziert.' });  
       }
-    
+    }else {
+      next();
+    }
+ 
   }
 
   function HasScope(scope) {

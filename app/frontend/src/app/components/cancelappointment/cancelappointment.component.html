@@ -1,0 +1,25 @@
+<div class="cancel-appointment-container">
+    <div class="error"  *ngIf="flagError">
+
+        <div class="error-icon">
+            <mat-icon class="icn" >close_circle_outline</mat-icon>
+        </div>
+        <p>
+            Leider konnten wir Ihren Termin nicht absagen - ggf. ist Ihr Link nicht mehr aktiv oder Sie haben keinen Zugriff auf diese Resource.
+        </p>
+    </div>
+
+    <div class="success" *ngIf="!flagError">
+        <div class="success-icon">
+            <mat-icon class="icn" >check_circle_outline</mat-icon>
+        </div>
+
+        <p>
+            Vielen Dank für Ihre Rückmeldung - Ihr Termin wurde abgesagt.
+        </p>
+    </div>
+
+    <button  class="saveBtn" mat-button (click)="close()">
+        Schließen
+    </button>
+</div>

@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectionStrategy, ViewChild,   TemplateRef, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, ViewChild,   TemplateRef, ViewEncapsulation, Inject } from '@angular/core';
 
 import {
   subDays,
@@ -25,7 +25,7 @@ import {
 
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import { HttpParams } from '@angular/common/http';
-import { MatStepper, MatDialogRef } from '@angular/material';
+import { MatStepper, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { LoaderService } from 'src/app/services/loader.service';
 import { ApiService } from 'src/app/services/api.service';
 import { DatePipe } from '@angular/common';
@@ -131,6 +131,7 @@ export class NewappointmentComponent implements OnInit {
   constructor(
     private _formBuilder: FormBuilder,
     public dialogRef: MatDialogRef<NewappointmentComponent>, 
+    @Inject(MAT_DIALOG_DATA) public data: any, 
     private loaderSrv : LoaderService, 
     private api : ApiService, 
     private datePipe : DatePipe, 
@@ -138,13 +139,18 @@ export class NewappointmentComponent implements OnInit {
     private googleAnalytics : GoogleAnalyticsService
     ) {
 
+
   }
 
   ngOnInit() {
+    let patientName;
 
-    // check: is logged-on? retrieve user data
-
-    let patientName = this.auth.currentUserValue.name || this.auth.currentUserValue.userName;
+    if (this.auth.isAuthorized()){
+      patientName = this.auth.currentUserValue.name || this.auth.currentUserValue.userName;
+    }else if (this.auth.isGuest()){
+      let guestObject = this.auth.guestObjectValue;
+      patientName = guestObject.name;
+    }
     
     this.baseInfoForm = this._formBuilder.group({
       patientName: [patientName, Validators.required],
@@ -234,39 +240,6 @@ export class NewappointmentComponent implements OnInit {
     })
   }
 
-  loadSlots(){
-
-    return new Promise((resolve, reject) => {
-      setTimeout(function(){
-        resolve([{
-          start: subDays(startOfDay(new Date()), 1),
-          title: '08:00 | Dr. Kaulfuss',
-          color: colors.yellow,
-          meta : {
-            "doc" : "harald"
-          }
-        },
-        {
-          start: startOfDay(new Date()),
-          title: '08:40 | Dr. Kaulfuss',
-          color: colors.yellow
-        },
-        {
-          start: subDays(endOfMonth(new Date()), 3),
-          title: '08:45 | Dr. Kaulfuss',
-          color: colors.yellow
-        },
-        {
-          start: addHours(startOfDay(new Date()), 2),
-          end: addHours(new Date(), 2),
-          title: '12:15 | Dr. Gärtner',
-          color: colors.blue
-        }]);
-      }, 2500)
-    })
-
-  }
-
   dayClicked({ date, events }: { date: Date; events: CalendarEvent[] }): void {
     if (isSameMonth(date, this.viewDate)) {
       if (
@@ -300,7 +273,7 @@ export class NewappointmentComponent implements OnInit {
 
   initiateAppointment(){
 
-    let appointmentRequest = this.baseInfoForm.value; 
+    let appointmentRequest = this.baseInfoForm.value;
 
     this.googleAnalytics.sendEvent("initiateAppointment",{
       category: "video-dialog", 
@@ -308,7 +281,9 @@ export class NewappointmentComponent implements OnInit {
     });
     
     appointmentRequest["acceptTerms"] = this.finalForm.get("acceptTerms").value;
-    appointmentRequest["appointmentObj"] = this.dateTimeForm.get("appointmentObj").value
+    appointmentRequest["appointmentObj"] = this.dateTimeForm.get("appointmentObj").value;
+
+    appointmentRequest.doc = appointmentRequest["appointmentObj"]["doc"];
 
     let self = this;
 

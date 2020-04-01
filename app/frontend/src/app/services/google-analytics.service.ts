@@ -36,10 +36,13 @@ export class GoogleAnalyticsService {
 
   }
 
-  initGA(){ 
+  initGA(){
+    if (!this.active){
+      return;
+    }
     gtag('js', new Date());
     gtag('config', this.gaId);
-    console.info("Initialized");
+
     this.active = true;
 
     this.router.events.subscribe(event => {

@@ -15,6 +15,12 @@ export class AuthenticationService {
     private currentUserSubject: BehaviorSubject<any>;
     public currentUser: Observable<any>;
 
+    private guestObjectSubject : BehaviorSubject<any>;
+    public guestObject : Observable<any>;
+
+
+    private tmpToken : string = ""; 
+
     constructor(
         private http: HttpClient, 
         private api : ApiService, 
@@ -24,10 +30,17 @@ export class AuthenticationService {
         ) {
         this.currentUserSubject = new BehaviorSubject<any>(JSON.parse(localStorage.getItem('userData')));
         this.currentUser = this.currentUserSubject.asObservable();
+
+        this.guestObjectSubject = new BehaviorSubject<any>(JSON.parse(localStorage.getItem('guestData')));
+        this.guestObject = this.guestObjectSubject.asObservable();
     }
 
     public get currentUserValue() {
         return this.currentUserSubject.value;
+    }
+
+    public get guestObjectValue(){
+        return this.guestObjectSubject.value;
     }
 
     login(userName, password) {
@@ -38,11 +51,29 @@ export class AuthenticationService {
                 let userData = resp.data; 
 
                 this.setUserData(userData);
+                this.setGuestStatus(null);
 
                 this.loaderSrv.setLoading(false);
 
                 return userData;
             }));
+    }
+
+    setTmpToken(token){
+
+        if (token){
+            this.logout();
+        }
+        this.tmpToken = token;
+
+    }
+
+    getTmpToken(){
+        return this.tmpToken;
+    }
+
+    setGuestStatus(object){
+        this.guestObjectSubject.next(object);
     }
 
     setUserData(userData){
@@ -61,6 +92,7 @@ export class AuthenticationService {
         // remove user from local storage and set current user to null
         localStorage.removeItem('userData');
         this.currentUserSubject.next(null);
+        this.setGuestStatus(null);
         this.router.navigate(["/"]);
 
         this.snackBar.open("Abgemeldet", "", {
@@ -73,6 +105,14 @@ export class AuthenticationService {
         .pipe(map( (resp : any) => {
             return;
         }));
+    }
+
+    isGuest(){
+        if (this.guestObjectValue) {
+            return true;
+        }else{
+            return false;
+        }
     }
 
     isAuthorized(){

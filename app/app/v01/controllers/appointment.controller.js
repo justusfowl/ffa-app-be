@@ -2,7 +2,7 @@
 const config = require('../../config/config');
 var MongoClient = require('mongodb').MongoClient;
 var ObjectID = require('mongodb').ObjectID;
-
+var jwt = require('jsonwebtoken'); 
 var MongoUrl = config.getMongoUrl();
 
 var authCtrl = require('./auth.controller');
@@ -71,24 +71,23 @@ function _getDaysArray_dep(start, end, flagIncludeWeekends=false) {
 function _getDaysArray (startDate, endDate, flagIncludeWeekends=false) {
 
     var dates = [];
+    var DAY; 
+    var iterr = 0;
 
-    var currDate = moment(startDate, 'MM-DD-YYYY').startOf('day');
-    var lastDate = moment(endDate, 'MM-DD-YYYY').startOf('day');
+    var currDate = moment(startDate, 'MM-DD-YYYY');
+    var lastDate = moment(endDate, 'MM-DD-YYYY');
 
-    dates.push(currDate);
-
-    while(currDate.add(1, 'days').diff(lastDate) < 0) {
-    
-        let newDate = currDate.clone();
+    do{
+        DAY = currDate.clone().add(iterr, 'days');
+        iterr++;
         
-        if((newDate.weekday() == 0 || newDate.weekday() == 6) && flagIncludeWeekends){
-            dates.push(newDate);
-        }else if (newDate.weekday() < 6 && newDate.weekday() > 0){
-            dates.push(newDate);
+        if((DAY.weekday() == 0 || DAY.weekday() == 6) && flagIncludeWeekends){
+            dates.push(DAY);
+        }else if (DAY.weekday() < 6 && DAY.weekday() > 0){
+            dates.push(DAY);
         }
-    }
 
-    dates.push(lastDate);
+    }while(DAY.unix() < lastDate.unix())
 
     return dates;
 };
@@ -131,7 +130,7 @@ async function getAppointmentById(_id){
     })
 }
 
-function _getAppointmentsFromDateRange(startDate, endDate, userId=null, flagIncludeInActive=false){
+function _getAppointmentsFromDateRange(startDate, endDate, userId=null, docId=null, flagIncludeInActive=false){
 
     return new Promise((resolve, reject) =>{
         try{
@@ -144,6 +143,12 @@ function _getAppointmentsFromDateRange(startDate, endDate, userId=null, flagIncl
             if (userId){
                 filterArray.push(
                     {"userId":  userId}
+                )
+            }
+
+            if (docId){
+                filterArray.push(
+                    {"doc._id":  docId}
                 )
             }
 
@@ -305,7 +310,7 @@ async function getAvailableSlots(req, res){
 
     try{
 
-        let today = new Date();
+        let firstAvailableDate = moment(moment().add(2, 'day').format("MM-DD-YYYY"), "MM-DD-YYYY")
        
         let userId = req.userId;
 
@@ -317,12 +322,12 @@ async function getAvailableSlots(req, res){
         let appointmentTypeIdx = appointmentMeta.findIndex(x => x.type == appointmentType);
         let appointmentTypeObj;
 
-        if (new Date(startDate).getTime() < today.getTime()){
+        if (moment(startDate, "MM-DD-YYYY").unix() < firstAvailableDate.unix()){
             // no meetings before today 
-            startDate = util.convertDateToString(today);
+            startDate = firstAvailableDate.format("MM-DD-YYYY");
         }
 
-        if (new Date(endDate).getTime() < today.getTime()){
+        if (moment(endDate, "MM-DD-YYYY").unix() < firstAvailableDate.unix()){
             // return empty set of appointments for 
             return res.json([])
         }
@@ -343,6 +348,11 @@ async function getAvailableSlots(req, res){
             return res.send(500, "Please limit date ranges to 35 days.");
         }
 
+        // no further planning > 50 days
+        if (moment(endDate, "MM-DD-YYYY").diff(firstAvailableDate, 'days') > 62){
+            return res.json([])
+        }
+
         let slots = await _getSlots(docId);
 
         slots = await _enrichSlotsWithUserInfo(slots);
@@ -358,18 +368,10 @@ async function getAvailableSlots(req, res){
             slots.forEach(slot => {
 
                 // first possible time based on the slot provided 
-                // let slotStartHours = parseFloat(slot.startTime.substring(0,slot.startTime.indexOf(":")));
-                // let slotStartMin = parseFloat(slot.startTime.substring(slot.startTime.indexOf(":")+1, slot.startTime.length));
-
                 let startingEvent = moment.tz(t_date.format("MM-DD-YYYY") + " " + slot.startTime, "MM-DD-YYYY HH:ss", config.timeZone);
-                // startingEvent.setHours(slotStartHours, slotStartMin);
 
                 // last ending time based on the slot provided 
-                // let slotEndHours = parseFloat(slot.endTime.substring(0,slot.endTime.indexOf(":")));
-                // let slotEndMin = parseFloat(slot.endTime.substring(slot.endTime.indexOf(":")+1, slot.endTime.length));
-
                 let endingEvent = moment.tz(t_date.format("MM-DD-YYYY") + " " + slot.endTime, "MM-DD-YYYY HH:ss", config.timeZone);
-                // endingEvent.setHours(slotEndHours, slotEndMin);
 
                 let eventEnd;
 
@@ -384,7 +386,11 @@ async function getAvailableSlots(req, res){
                             "start"  : startingEvent,
                             "end" : eventEnd,
                             "title" : slot.userName, 
-                            "appointmentType" : appointmentType
+                            "appointmentType" : appointmentType, 
+                            "doc" : {
+                                "userName" : slot.userName, 
+                                "_id" : slot.userId
+                            }
                         }
 
                         if (endingEvent.unix() >= eventEnd.unix()){
@@ -454,16 +460,17 @@ async function _insertTeleAppointment(appointmentObj){
     try{
 
         let userId = req.userId;
-
-        if (!userId){
+        let appointmentObject = req.body;
+        
+        if (req.flagGuest){
+            appointmentObject["userId"] = req.guestObject.userEmail;
+            appointmentObject["flagGuest"] = true;
+        }else if (!userId){
             return res.send(500, "Please provide userId");
+        }else{
+            appointmentObject["userId"] = userId;
         }
 
-        let appointmentObject = req.body;
-        appointmentObject["userId"] = userId;
-
-       // let startDate = new Date(appointmentObject.appointmentObj.start);
-       // let endDate = new Date(appointmentObject.appointmentObj.end);
        let startDate = moment(appointmentObject.appointmentObj.start);
        let endDate = moment(appointmentObject.appointmentObj.end);
 
@@ -495,25 +502,63 @@ async function _insertTeleAppointment(appointmentObj){
 
                     _insertTeleAppointment(appointmentObject).then(async insertRes => {
 
-                        res.json(response);
+                        if (insertRes.insertedCount < 1){
+                            res.send(500, "Unknown error inserting into FFA")
+                        }else{
+                            
 
-                        let userObj = await authCtrl.getUserById(userId);
+                            let appointmentId = insertRes.insertedId.toString();
 
-                        let displayStartDate = startDate.locale("de");
+                            let userObj; 
+                            if (req.flagGuest){
+                                userObj = req.guestObject;
+                            }else{
+                                userObj = await authCtrl.getUserById(userId);
+                            }
+    
+                            let data = {
+                                "_id" : appointmentObject["userId"], 
+                                "appointmentId" : appointmentId
+                            };
+    
+                            let now = moment();
+                        
+                            var token = jwt.sign(data, config.auth.jwtsec, {
+                                expiresIn: ((endDate.unix() - now.unix())*1000)
+                            });
+                        
+                            let urlBase;
+                    
+                            if (config.env == "development"){
+                                urlBase = config.hostProto + "://" + config.hostBase + ":" + config.hostExposedPort  + "/home?c=cancel-appointment&appointmentId="  + appointmentId  + "&token=";
+                            }else{
+                                urlBase = config.hostProto + "://" + config.hostBase + "/home?c=cancel-appointment&appointmentId="  + appointmentId  + "&token=";
+                            }
+                    
+                            let tokenUrl = encodeURI(urlBase + token); 
+    
+                            let displayStartDate = startDate.locale("de");
+    
+                            let emailContext = {
+                                userEmail : userObj.userName,
+                                userName : userObj.name || userObj.userName,
+                                patientCode : videoAppointmentObj.patientCode, 
+                                dialInUrlPatient : videoAppointmentObj["dialInUrlPatient"], 
+                                appointmentDate : displayStartDate.format("LLLL"), 
+                                appointmentType : appointmentObject.appointmentType.name, 
+                                docName : appointmentObject.doc.userName, 
+                                startDate : startDate, 
+                                endDate : endDate, 
+                                tokenUrl : tokenUrl
+                            }
+    
+                            await emailCtrl.sendTeleAppointment(emailContext).catch(err => {
+                                console.error(err);
+                            })
 
-                        let emailContext = {
-                            userEmail : userObj.userName,
-                            userName : userObj.name || userObj.userName,
-                            patientCode : videoAppointmentObj.patientCode, 
-                            dialInUrlPatient : videoAppointmentObj["dialInUrlPatient"], 
-                            appointmentDate : displayStartDate.format("LLLL"), 
-                            appointmentType : appointmentObject.appointmentType.name, 
-                            docName : appointmentObject.doc.userName
+                            res.json(response);
                         }
-
-                        emailCtrl.sendTeleAppointment(emailContext).catch(err => {
-                            console.error(err);
-                        })
+                        
 
                     }).catch(err => {
                         throw err;
@@ -539,6 +584,10 @@ async function getMyAppointments(req, res){
         let userId = req.userId;
         let startDate, endDate; 
 
+        if (!userId){
+            return res.send(401, "No userId provided.")
+        }
+
         if (req.query.startDate && req.query.endDate){
             startDate = req.query.startDate;
             endDate = req.query.endDate;
@@ -547,7 +596,7 @@ async function getMyAppointments(req, res){
             endDate = new Date('01-01-2099');
         }
     
-        let appointments = await _getAppointmentsFromDateRange(startDate, endDate, userId, true);
+        let appointments = await _getAppointmentsFromDateRange(startDate, endDate, userId, null, true);
     
         res.json(appointments)
     }catch(err){
@@ -557,7 +606,9 @@ async function getMyAppointments(req, res){
 
 async function getAppointments(req, res){
     try{
-        let startDate, endDate; 
+        let startDate, endDate, docId; 
+
+        docId = req.query.docId;
 
         if (req.query.startDate && req.query.endDate){
             startDate = new Date(req.query.startDate);
@@ -570,28 +621,37 @@ async function getAppointments(req, res){
             return res.send(500, "please provide start/end dates")
         }
 
-        
-        
-        /*let startDate = new Date('01-01-1900');
-        let endDate = new Date('01-01-2099');
-        */
-    
-        let appointments = await _getAppointmentsFromDateRange(startDate, endDate);
-    
+        let appointments; 
+        if (docId){
+            appointments = await _getAppointmentsFromDateRange(startDate, endDate, null, docId);
+        }else{
+            appointments = await _getAppointmentsFromDateRange(startDate, endDate);
+        }
+       
         res.json(appointments)
     }catch(err){
         res.send(500, err)
     }
 }
 
-
-// @TODO: implement so that admins can remove appointments
 async function removeAppointment(req, res){
 
     try{
 
         var appointmentId = req.params.appointmentId;
         let userId = req.userId;
+
+        // When a URL is provided to cancel a meeting, the parameter provided in the DELETE 
+        // request must match the decoded information from the token
+        // for normal deletions, there will not be any appointmentId information available 
+        // from a token, yet the token itself will be valid
+        if (req.appointmentId){
+            if (req.appointmentId != appointmentId){
+                return res.send(403, "Modifications only allowed on provided appointment Ids from the cancel-url")
+            }else{
+                
+            }
+        }
 
         let appointmentObj = await getAppointmentById(appointmentId);
 
@@ -625,7 +685,6 @@ async function removeAppointment(req, res){
                         }else{
                             res.json({"message" : "ok"});
                         }
-                        
                     }
                 );
     
@@ -634,8 +693,6 @@ async function removeAppointment(req, res){
             res.send(500, err);
         })
         
-
-
     }catch(err){
         res.sen(500, err);
     }
@@ -766,11 +823,6 @@ function removeAdminTeleSlot(req, res){
         res.send(500, "An error occured adding a team member: " + JSON.stringify(req.body) );
     }
 }
-
-
-
-
-
 
 module.exports = {
     getAvailableSlots, 

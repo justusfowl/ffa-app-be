@@ -10,6 +10,9 @@ import { NewappointmentComponent } from '../newappointment/newappointment.compon
 import { AuthenticationService } from 'src/app/services/authentication.service';
 import { LoginComponent } from '../login/login.component';
 import { GoogleAnalyticsService } from 'src/app/services/google-analytics.service';
+import { ActivatedRoute } from '@angular/router';
+import { CancelappointmentComponent } from 'src/app/components/cancelappointment/cancelappointment.component';
+import { LoaderService } from 'src/app/services/loader.service';
 declare var $: any;
 
 @Component({
@@ -123,12 +126,24 @@ export class HomeComponent implements OnInit {
     public dialog: MatDialog, 
     private _snackBar: MatSnackBar, 
     protected sanitizer: DomSanitizer, 
-    private googleAnalytics : GoogleAnalyticsService
+    private googleAnalytics : GoogleAnalyticsService, 
+    private route : ActivatedRoute,
+    private loaderSrv : LoaderService
   ) {
 
   }
 
   ngOnInit() {
+
+    let command = this.route.snapshot.queryParamMap.get('c');
+
+    if (command == 'cancel-appointment'){
+      let token = this.route.snapshot.queryParamMap.get('token');
+      let appointmentId = this.route.snapshot.queryParamMap.get('appointmentId');
+      if (token && appointmentId){
+        this.openCancelAppointment(token, appointmentId);
+      }
+    }
     
     this.getTimes();
     this.getNews();
@@ -502,7 +517,7 @@ export class HomeComponent implements OnInit {
     })
   }
 
-  openVideoDialog(){
+  openVideoDialog(guestObject?){
 
     
     this.googleAnalytics.sendEvent("open",{
@@ -520,7 +535,19 @@ export class HomeComponent implements OnInit {
       }
 
       const dialogRef = this.dialog.open(NewappointmentComponent, {
-        data: {},
+        data: { },
+        panelClass : "video-dialog"
+      });
+  
+      dialogRef.afterClosed().subscribe((resultData : any) => {
+        console.log(resultData);
+      });
+    }else if (guestObject) {
+      
+      const dialogRef = this.dialog.open(NewappointmentComponent, {
+        data: {
+          guestObject : guestObject
+        },
         panelClass : "video-dialog"
       });
   
@@ -531,14 +558,20 @@ export class HomeComponent implements OnInit {
 
       const dialogRef = this.dialog.open(LoginComponent, {
         data: {
-            flagDialog : true
+            flagDialog : true, 
+            flagEnableGuest : true
           },
         panelClass : "login-dialog"
       });
   
       dialogRef.afterClosed().subscribe((resultData : any) => {
         if (resultData){
-          this.openVideoDialog();
+          if (resultData.flagGuest){
+            this.openVideoDialog(resultData.data);
+          }else{
+            this.openVideoDialog();
+          }
+          
         }
       });
     }
@@ -556,6 +589,21 @@ export class HomeComponent implements OnInit {
       if (medicationsArray){
         this.medicationsRequest = medicationsArray;
       }
+    });
+
+  }
+
+  openCancelAppointment(token, appointmentId) : void {
+
+    this.loaderSrv.setMsgLoading(true, "Wir bearbeiten Ihre Anfrage...");
+
+    const dialogRef = this.dialog.open(CancelappointmentComponent, {
+      data: {token : token, appointmentId : appointmentId},
+      panelClass : "cancel-appointment-dialog"
+    });
+
+    dialogRef.afterClosed().subscribe((result : any) => {
+      this.loaderSrv.setMsgLoading(false);
     });
 
   }

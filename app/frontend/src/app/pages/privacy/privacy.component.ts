@@ -5,7 +5,7 @@ import { DomSanitizer } from '@angular/platform-browser';
 @Component({
   selector: 'app-privacy',
   templateUrl: './privacy.component.html',
-  styleUrls: ['./privacy.component.scss']
+  styleUrls: ['./privacy.component.scss', '../../app.component.scss']
 })
 export class PrivacyComponent implements OnInit, AfterViewInit {
 

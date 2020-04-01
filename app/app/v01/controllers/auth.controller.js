@@ -3,7 +3,7 @@ const config = require('../../config/config');
 var jwt = require('jsonwebtoken'); 
 var MongoClient = require('mongodb').MongoClient;
 var ObjectID = require('mongodb').ObjectID;
-var bcrypt = require('bcryptjs');
+var bcrypt = require('bcrypt');
 var emailerCtrl = require('./emailer.controller');
 
 var MongoUrl = config.getMongoUrl();
@@ -28,8 +28,6 @@ async function login(req, res){
             res.send(403, "Either username or password invalid"); 
             return;       
         }
-
-        // let passPhrase = crypto.createHash('sha256').update(password).digest("hex");
 
         if(bcrypt.compareSync(password, userObj.passPhrase)) {
 
@@ -84,7 +82,8 @@ async function registerUser ( req, res ){
         return;
     }
 
-    let passPhrase = bcrypt.hashSync(pass); // crypto.createHash('md5').update(pass).digest("hex");
+    var salt = bcrypt.genSaltSync(10);
+    let passPhrase = bcrypt.hashSync(pass, salt);
 
     let newUser = {
         "userName" : userName, 

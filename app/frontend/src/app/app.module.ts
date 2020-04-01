@@ -40,6 +40,7 @@ import { ConfirmDialogComponent } from './components/confirm-dialog/confirm-dial
 import { ImprintComponent } from './pages/imprint/imprint.component';
 import { GoogleAnalyticsService } from './services/google-analytics.service';
 import { environment } from '../environments/environment';
+import { CancelappointmentComponent } from './components/cancelappointment/cancelappointment.component';
 
 const cookieConfig:NgcCookieConsentConfig = {
   cookie: {
@@ -84,7 +85,8 @@ const cookieConfig:NgcCookieConsentConfig = {
     AuthComponent,
     TeleSlotComponent,
     ConfirmDialogComponent, 
-    ImprintComponent
+    ImprintComponent, 
+    CancelappointmentComponent
   ],
   imports: [
     HttpClientModule,
@@ -112,6 +114,14 @@ const cookieConfig:NgcCookieConsentConfig = {
     GoogleAnalyticsService
   ],
   bootstrap: [AppComponent], 
-  entryComponents : [NewsdetailComponent, MedrequestComponent, LoginComponent, TeleSlotComponent, ConfirmDialogComponent, NewappointmentComponent]
+  entryComponents : [
+    NewsdetailComponent, 
+    MedrequestComponent,
+    LoginComponent, 
+    TeleSlotComponent, 
+    ConfirmDialogComponent, 
+    NewappointmentComponent, 
+    CancelappointmentComponent
+  ]
 })
 export class AppModule { }

@@ -20,6 +20,30 @@ function validatePassphrase(c: FormControl) {
   };
 }
 
+function  validateAge(birthDate : FormControl){
+
+  let falseObj = {
+    validateAge : {
+      valid: false
+    }
+  };
+
+  try{
+
+    let bd = new Date(birthDate.value);
+    let today = new Date(); 
+  
+    if ((today.getTime() - bd.getTime()) / (1000*60*60*24*365) > 18){
+      return null;
+    }else{
+      return falseObj
+    }
+  }
+  catch(err){
+    return falseObj;
+  }
+}
+
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
@@ -29,6 +53,7 @@ function validatePassphrase(c: FormControl) {
 
 export class LoginComponent implements OnInit {
 
+  guestform : any;
   registerForm : any;
   forgotPasswordForm : any; 
   loginForm : any;
@@ -36,6 +61,8 @@ export class LoginComponent implements OnInit {
   forgotPasswordState : boolean = false;
 
   viewState = "login"; 
+
+
 
   constructor(
     public dialogRef: MatDialogRef<LoginComponent>,
@@ -47,6 +74,11 @@ export class LoginComponent implements OnInit {
     private googleAnalytics : GoogleAnalyticsService
   ) {
 
+    this.guestform =  new FormGroup({
+      name : new FormControl('', Validators.required),
+      userEmail : new FormControl('', [Validators.required, Validators.pattern("^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$")])
+    });
+
     this.forgotPasswordForm =  new FormGroup({
       username : new FormControl('', [Validators.required, Validators.pattern("^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$")])
     });
@@ -54,7 +86,7 @@ export class LoginComponent implements OnInit {
     this.registerForm =  new FormGroup({
       userName : new FormControl('', [Validators.required, Validators.pattern("^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$")]),
       name : new FormControl('', Validators.required),
-      birthdate : new FormControl('', Validators.required),
+      birthdate : new FormControl('', [Validators.required, validateAge]),
       password : new FormControl('', [Validators.required, validatePassphrase]), 
       acceptTerms : new FormControl(false, Validators.requiredTrue), 
       acceptInfo : new FormControl(false)
@@ -68,18 +100,21 @@ export class LoginComponent implements OnInit {
      // redirect to home if already logged in
      if (this.authenticationService.currentUserValue) {
         this.router.navigate(['/']);
-    }
+     }
+
   }
 
   ngOnInit() {
     this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
   }
 
+
+  /*
   validatePassphrase(pass){
     var mediumRegex = new RegExp("^(((?=.*[a-z])(?=.*[A-Z]))|((?=.*[a-z])(?=.*[0-9]))|((?=.*[A-Z])(?=.*[0-9])))(?=.{6,})");
     return mediumRegex.test(pass)
   }
-
+  */
 
   get f() { return this.loginForm.controls; }
 
@@ -183,8 +218,6 @@ export class LoginComponent implements OnInit {
 
   registerNewUser(){
 
-    console.log(this.registerForm.value)
-
     this.authenticationService.register(this.registerForm.value)
     .pipe(first())
     .subscribe(
@@ -224,10 +257,25 @@ export class LoginComponent implements OnInit {
             });
           }
 
-
         });
-    
+  }
 
+  continueGuest(){
+
+    this.googleAnalytics.sendEvent("guest",{
+      category: "auth", 
+      label : "progress as guest user"
+    });
+
+    console.log(this.guestform.value);
+
+    this.authenticationService.setGuestStatus(this.guestform.value);
+
+    this.dialogRef.close({
+      flagGuest : true,
+      data : this.guestform.value
+    });
+    
   }
 
 

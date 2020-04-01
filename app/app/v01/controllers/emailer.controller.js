@@ -4,10 +4,10 @@
 
 const config = require('../../config/config');
 const path = require('path');
+var moment = require("moment");
+const ical = require('ical-generator');
 
-var sender = 'smtps://' + config.email.smtpEmail // youremailAddress%40gmail.com'   // The emailto use in sending the email
-//(Change the @ symbol to %40 or do a url encoding )
-var password = config.email.smtpPass  // password of the email to use
+
 
 var nodeMailer = require("nodemailer");
 var hbs = require('nodemailer-express-handlebars');
@@ -234,6 +234,27 @@ function sendTeleAppointment (contextObj) {
         contextObj.docName = "einem unserer Fachärzte*innen"
     }
 
+    let domain = config.email.smtpEmail.substring(config.email.smtpEmail.indexOf("@")+1, config.email.smtpEmail.length)
+
+        const cal = ical({
+            domain: domain,
+            prodId: {company: domain, product: 'ical-generator'},
+            timezone: config.timeZone
+        });
+
+        const event = cal.createEvent({
+            start: contextObj.startDate,
+            end: contextObj.endDate,
+            timestamp: moment(),
+            summary: 'Ihre Video-Konsultation (' + contextObj.appointmentType + ') mit ' + contextObj.docName,
+            organizer: config.email.smtpEmailSenderName + ' <' + config.email.smtpEmail + ">", 
+            location : contextObj.dialInUrlPatient, 
+            htmlDescription : '<html><bod><p><h4><a href="' + contextObj.dialInUrlPatient + '">Konsultation starten</a></h4></p><p>Ihr Praxis-Team</p></body></html>'
+        });
+       
+        const alarm = event.createAlarm({type: 'audio', trigger: 300});
+        const category = event.createCategory({name: 'APPOINTMENT'});
+
     return new Promise((resolve, reject) => {
 
         let options = {
@@ -241,7 +262,12 @@ function sendTeleAppointment (contextObj) {
             to : contextObj.userEmail, 
             subject : "myFFA | Ihre Video-Konsultation" , 
             template: 'teleAppointment',
-            context: contextObj
+            context: contextObj, 
+            icalEvent: {
+                filename: 'tele-consult.ics',
+                method: 'request',
+                content: cal.toString()
+            }
         }
 
         transporter.sendMail(options, function (err, info){
@@ -257,9 +283,43 @@ function sendTeleAppointment (contextObj) {
    
 };
 
-function testEmail (userName, tokenUrl) {
+function testEmail (req, res){
+    let email = req.query.email;
+    if (!email){
+        return res.send(500, "Email missing");
+    }
+    testEmailOut(email, "Test").then(result => {
+        res.json({"message" : "OK"})
+    }).catch(err => {
+        console.error(err); 
+        return res.send(500, err);
+    })
+}
+
+function testEmailOut (userName, tokenUrl) {
 
     return new Promise((resolve, reject) => {
+
+        let domain = config.email.smtpEmail.substring(config.email.smtpEmail.indexOf("@")+1, config.email.smtpEmail.length)
+
+        const cal = ical({
+            domain: domain,
+            prodId: {company: domain, product: 'ical-generator'},
+            timezone: config.timeZone
+        });
+
+        const event = cal.createEvent({
+            start: moment().add(15, 'minutes'),
+            end: moment().add(15, 'minutes'),
+            timestamp: moment(),
+            summary: 'Ihre Video-Konsultation',
+            organizer: config.email.smtpEmailSenderName + ' <' + config.email.smtpEmail + ">"
+        });
+       
+        const alarm = event.createAlarm({type: 'audio', trigger: 300});
+        const category = event.createCategory({name: 'APPOINTMENT'});
+        
+        console.log(cal.toString())
 
         let options = {
             from : '"' + config.email.smtpEmailSenderName + '" ' + config.email.smtpEmail, 
@@ -269,6 +329,11 @@ function testEmail (userName, tokenUrl) {
             context: {
                 "userName": userName, 
                 "activateUrl" : tokenUrl
+            }, 
+            icalEvent: {
+                filename: 'tele-consult.ics',
+                method: 'request',
+                content: cal.toString()
             }
         }
 
@@ -293,5 +358,7 @@ module.exports = {
     sendForgotPasswordEmail,
     sendPasswordWasResetEmail, 
     sendPreRegistrationEmail,
-    sendTeleAppointment
+    sendTeleAppointment,
+
+    testEmail
 }

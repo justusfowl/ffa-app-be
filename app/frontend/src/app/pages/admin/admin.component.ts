@@ -338,7 +338,7 @@ export class AdminComponent implements OnInit, AfterViewInit {
     })
 
     this.api.post("/team", formData, true).then(res => {
-      console.log(res);
+      
        this.snackBar.open("Hinzugefügt", "", {
         duration: 1500
       })
@@ -498,7 +498,7 @@ export class AdminComponent implements OnInit, AfterViewInit {
       endPoint = "/news/" +  newsObj._id;
 
       this.api.put(endPoint, formData, true).then(res => {
-        console.log(res);
+        
          this.snackBar.open("Aktualisiert", "", {
           duration: 1500
         });
@@ -516,7 +516,7 @@ export class AdminComponent implements OnInit, AfterViewInit {
       endPoint = "/news"
 
       this.api.post(endPoint, formData, true).then(res => {
-        console.log(res);
+        
          this.snackBar.open("Hinzugefügt", "", {
           duration: 1500
         });
@@ -669,8 +669,6 @@ export class AdminComponent implements OnInit, AfterViewInit {
 
   }
 
-
-
   private _filterScopes(value: string): string[] {
     const filterValue = value.toLowerCase();
 
@@ -681,8 +679,6 @@ export class AdminComponent implements OnInit, AfterViewInit {
   getUsers(refresher?){
     this.api.get("/auth/users", {params : {}}, true).then((result : any) => {
       this.users = result;
-
-      console.log(result)
 
       if (refresher){
         refresher.target.complete();

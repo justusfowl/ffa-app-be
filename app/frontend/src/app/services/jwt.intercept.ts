@@ -18,7 +18,27 @@ export class JwtInterceptor implements HttpInterceptor {
                     Authorization: `Bearer ${userData.token}`
                 }
             });
+        }else if (this.authenticationService.getTmpToken()){
+            let tmpToken = this.authenticationService.getTmpToken();
+            request = request.clone({
+                setHeaders: { 
+                    Authorization: `Bearer ${tmpToken}`
+                }
+            });
         }
+
+        if (this.authenticationService.isGuest()){
+
+            let guestObject = this.authenticationService.guestObjectValue;
+
+            request = request.clone({
+                setHeaders: { 
+                    "x-guest-user-email": `${guestObject.userEmail}`,
+                    "x-guest-user-name": `${guestObject.name}`
+                }
+            });
+        }
+
 
         return next.handle(request);
     }

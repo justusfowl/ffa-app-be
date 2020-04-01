@@ -69,6 +69,9 @@ export class AppointmentsComponent implements OnInit {
 
   activeDayIsOpen: boolean = true;
 
+  availableDocs : any[] = [];
+  appointmentDocSelected : any ; 
+
   constructor(
     private api : ApiService,
     private datePipe : DatePipe,
@@ -78,6 +81,24 @@ export class AppointmentsComponent implements OnInit {
    }
 
   ngOnInit() {
+    this.fetchEvents();
+    this.getAvailableDocs();
+  }
+
+  getAvailableDocs(){ 
+    this.api.get("/appointment/docs").then((docs : any) => {
+
+      docs.unshift({
+        "userName" : "Alle"
+      });
+
+      this.availableDocs = docs;
+    }).catch(err => {
+      console.error(err);
+    })
+  }
+
+  docChanged(){
     this.fetchEvents();
   }
 
@@ -96,30 +117,50 @@ export class AppointmentsComponent implements OnInit {
       day: endOfDay
     }[this.view];
 
-    const params = new HttpParams()
-      .set(
-        'startDate',
-        format(getStart(this.viewDate), 'MM-dd-yyyy')
-      )
-      .set(
-        'endDate',
-        format(getEnd(this.viewDate), 'MM-dd-yyyy')
-      )
+    let params;
 
-        this.api.get("/appointment", params).then((result : any) => {
+    params = new HttpParams()
+          .set(
+            'startDate',
+            format(getStart(this.viewDate), 'MM-dd-yyyy')
+          )
+          .set(
+            'endDate',
+            format(getEnd(this.viewDate), 'MM-dd-yyyy')
+          )
+    
+      if (this.appointmentDocSelected){
+        if (this.appointmentDocSelected._id){
+          params = new HttpParams()
+          .set(
+            'startDate',
+            format(getStart(this.viewDate), 'MM-dd-yyyy')
+          )
+          .set(
+            'endDate',
+            format(getEnd(this.viewDate), 'MM-dd-yyyy')
+          )
+          .set(
+            'docId',
+            this.appointmentDocSelected._id
+          )
+        }
+      }
 
-          result.forEach(element => {
-            element.start = new Date(element.appointmentObj.start);
-            element.end = new Date(element.appointmentObj.end);
-            element.actions = this.actions;
-            element.title = this.datePipe.transform( element.start, "shortTime") + " | " + "Typ: " + element.appointmentType.name + " | Arzt: " + element.doc.userName + " mit " + element.patientName;
-          }); 
+      this.api.get("/appointment", params).then((result : any) => {
 
-          this.events$ = result;
+        result.forEach(element => {
+          element.start = new Date(element.appointmentObj.start);
+          element.end = new Date(element.appointmentObj.end);
+          element.actions = this.actions;
+          element.title = this.datePipe.transform( element.start, "shortTime") + " | " + "Typ: " + element.appointmentType.name + " | Arzt: " + element.doc.userName + " mit " + element.patientName;
+        }); 
 
-        }).catch(err => {
-          console.error(err);
-        });    
+        this.events$ = result;
+
+      }).catch(err => {
+        console.error(err);
+      });    
       
   }
 

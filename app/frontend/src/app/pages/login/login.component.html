@@ -15,9 +15,37 @@
                             <path fill="#fff" d=" M 130.45 203.33 C 146.54 210.29 164.43 215.00 176.76 228.23 C 180.25 236.10 175.90 246.42 167.90 249.86 C 150.57 259.99 130.17 260.98 111.19 266.11 C 117.27 245.08 123.39 224.06 130.45 203.33 Z" />
                             <path fill="#fff" d=" M 55.12 299.16 C 64.70 294.66 74.91 291.96 85.06 289.14 C 78.14 312.04 71.68 335.08 64.89 358.02 C 53.00 354.35 41.33 348.43 33.07 338.93 C 29.64 334.58 26.98 328.65 29.10 323.13 C 33.02 311.32 43.73 303.19 55.12 299.16 Z" />
                             <path fill="#fff" d=" M 132.72 361.16 C 132.53 370.67 132.76 380.41 136.63 389.26 C 131.93 386.31 127.27 383.32 122.85 379.98 C 123.08 375.35 123.60 370.74 124.11 366.14 C 127.01 364.52 129.86 362.83 132.72 361.16 Z" />
-                          </svg>
+                        </svg>
+
+                    <form id="guestform"  [formGroup]="guestform" class="login-form guest-form" *ngIf="data.flagEnableGuest">
+                        
+                        <div class="form-group">
+                            <mat-form-field class="login-forms">
+                                
+                                <input matInput type="text" placeholder="Name" formControlName="name" class="form-control" required>
+                                <mat-error *ngIf="guestform.get('name').invalid">Bitte Namen eintragen.</mat-error>
+                            </mat-form-field>
+                        </div>
+                        
+                        <div class="form-group">
+                            <mat-form-field class="login-forms">
+                                
+                                <input matInput type="text" placeholder="User-Email" formControlName="userEmail" class="form-control" required>
+                                <mat-error *ngIf="guestform.get('userEmail').invalid">Bitte User-Email eintragen.</mat-error>
+                            </mat-form-field>
+                        </div>
+
+                        <div class="form-group">
+                            <button mat-button [disabled]="!guestform.valid" (click)="continueGuest()" class="submit-btn">weiter als Gast</button>
+                        </div>
+                    </form>
                    
                     <form id="loginForm" class="login-form" [class.show]="viewState=='login'" [formGroup]="loginForm" data-toggle="validator" data-focus="false">
+                        
+                        <div class="seperator" *ngIf="data.flagEnableGuest">
+                            oder
+                        </div>
+
                         <div class="form-group">
                             <mat-form-field class="login-forms">
                                 <input matInput type="text" placeholder="User-Email" formControlName="username" class="form-control">
@@ -31,7 +59,6 @@
                                 <mat-error *ngIf="loginForm.get('password').invalid">Bitte Passwort eintragen.</mat-error>
                             </mat-form-field>
                         </div>
-                        
     
                         <div class="form-group">
                             <button mat-button [disabled]="!loginForm.valid" (click)="login()" class="submit-btn">LOGIN</button>
@@ -48,8 +75,6 @@
                         <div class="form-group">
                             <button mat-button (click)="setState('forgotPass')" class="submit-btn small">Passwort vergessen?</button>
                         </div>
-                        
-
                     </form>
 
                     <form id="registerForm" class="login-form" [class.show]="viewState=='register'" [formGroup]="registerForm" data-toggle="validator" data-focus="false">
@@ -70,7 +95,7 @@
 
                             <div class="form-group">
                                 <mat-form-field class="login-forms">
-                                    <input matInput type="password"  placeholder="Passwort"  formControlName="password" class="form-control" >
+                                    <input matInput type="password"  placeholder="Passwort" required formControlName="password" class="form-control" >
                                     <mat-error *ngIf="registerForm.get('password').invalid">Bitte starkes Passwort verwenden.</mat-error>
                                 </mat-form-field>
                             </div>
@@ -80,6 +105,7 @@
                                     <input matInput  placeholder="Geburtsdatum" [matDatepicker]="picker" formControlName="birthdate" class="form-control">
                                     <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
                                     <mat-datepicker #picker></mat-datepicker>
+                                    <mat-error *ngIf="registerForm.get('birthdate').errors?.validateAge">Sie müssen mind. 18 Jahre alt sein.</mat-error>
                                 </mat-form-field>
                             </div>
 

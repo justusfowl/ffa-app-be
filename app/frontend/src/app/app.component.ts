@@ -67,10 +67,9 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
     this.statusChangeSubscription = this.ccService.statusChange$.subscribe(
       (event: NgcStatusChangeEvent) => {
         // you can use this.ccService.getConfig() to do stuff...
-        if (event.status){
+        if (event.status == "allow"){
           this.googleAnalytics.initGA()
         }
-        console.log(event);
       });
 
       
@@ -120,6 +119,14 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
 
   }
  
+  showHintBar(){
+    if (this.router.url.search("home") > -1){
+      return true;
+   }else{
+     return false;
+   }
+  }
+
   showNavBar(){
     if (this.router.url.search("login") > -1 || this.router.url.search("passreset") > -1){
       return false;
