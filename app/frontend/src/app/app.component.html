@@ -23,20 +23,22 @@
 
 <div id="global-announcement" [class.show]="flagShowGlobalAnnouncement">
 
-    
-    <button mat-icon-button  (click)="closeGlobalAnnouncement()">
-            <mat-icon>close</mat-icon>
-    </button>
-
-    <div >
-            Bitte beachten Sie - wir bieten Ihnen ab sofort ausgewählte Video-Sprechstunden an. Klicken Sie <a (click)="goToTag('contact')">hier</a>, um einen Termin zu vereinbaren.
+    <div class="ga-row">
+            <button mat-icon-button  (click)="closeGlobalAnnouncement()">
+                    <mat-icon>close</mat-icon>
+            </button>
+        
+            <div class="message" (click)="goToTag('contact')">
+                    Bitte beachten Sie - wir bieten Ihnen ab sofort ausgewählte Video-Sprechstunden an. Klicken Sie <a (click)="goToTag('contact')">hier</a>, um einen Termin zu vereinbaren.
+            </div>
     </div>
+
+    <mat-icon class="camera-icn" (click)="goToTag('contact')">videocam</mat-icon>
    
 
 </div>
 
   <nav class="navbar navbar-expand-md navbar-dark navbar-custom fixed-top" *ngIf="showNavBar()" [class.globalAnnouncement]="flagShowGlobalAnnouncement">
-
     
 
       <!-- Text Logo - Use this if you don't have a graphic logo -->

@@ -45,6 +45,7 @@
       </div>
      
       <div>
+        <button mat-button (click)="abort()">Abbrechen</button>
         <button mat-button matStepperNext (click)="fetchEvents()">Weiter</button>
       </div>
     </form>
@@ -131,6 +132,7 @@
       </div>
       
       <div>
+          <button mat-button (click)="abort()">Abbrechen</button>
         <button mat-button matStepperPrevious>Zurück</button>
         <button mat-button matStepperNext [disabled]="dateTimeForm.invalid">Weiter</button>
       </div>
@@ -191,9 +193,8 @@
    
 
     <div>
-
+      <button mat-button (click)="abort()">Abbrechen</button>
       <button mat-button matStepperPrevious>Zurück</button>
-
       <button mat-button [disabled]="!finalForm.get('acceptTerms').value" (click)="initiateAppointment()">Termin vereinbaren</button>
 
     </div>

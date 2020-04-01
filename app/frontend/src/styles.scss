@@ -1479,6 +1479,14 @@ input[type='checkbox'] {
 	max-width: 100%;
 	margin: 0;
 	transition: all 0.3s;
+    object-fit: fill;
+}
+
+
+@media(max-width: 1100px){
+	.filter .element-item img{
+		height: 200px;
+	}
 }
 
 .filter .element-item:hover img {
@@ -2599,4 +2607,28 @@ input::-webkit-clear-button {
 /* Remove the rounded corners */
 input { 
     -webkit-appearance: none; 
+}
+
+
+
+.cc-window{
+	height: 105vh;
+	background-color: rgba(0, 0, 0, 0.7) !important;
+	
+	display: flex;
+    align-items: center;
+	justify-content: center;
+	
+	.cc-deny{
+		display: none;
+	}
+
+	.cc-allow{
+		background-color: $background_nav;
+		padding: 30px 40px 30px 40px;
+	}
+}
+
+.cc-window.cc-floating .cc-compliance{
+	flex: unset !important;
 }

@@ -60,6 +60,7 @@
 }
 
 #loginForm, 
+#guestform,
 #forgotPassword,
 #registerForm, 
 #welcomeNewUser{
@@ -97,13 +98,13 @@
 .seperator{
     font-size: 12px;
     text-align: center;
-    margin-top: 20px;
-    margin-bottom: 20px;
+    margin-top: 10px;
+    margin-bottom: 10px;
     color: white;
 }
 
 
-#guestform,
+#guestform.show,
 #registerForm.show,
 #loginForm.show,
 #forgotPassword.show, 

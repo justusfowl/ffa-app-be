@@ -17,7 +17,7 @@
                             <path fill="#fff" d=" M 132.72 361.16 C 132.53 370.67 132.76 380.41 136.63 389.26 C 131.93 386.31 127.27 383.32 122.85 379.98 C 123.08 375.35 123.60 370.74 124.11 366.14 C 127.01 364.52 129.86 362.83 132.72 361.16 Z" />
                         </svg>
 
-                    <form id="guestform"  [formGroup]="guestform" class="login-form guest-form" *ngIf="data.flagEnableGuest">
+                    <form id="guestform"  [formGroup]="guestform" [class.show]="viewState=='guest'" class="login-form guest-form">
                         
                         <div class="form-group">
                             <mat-form-field class="login-forms">
@@ -36,12 +36,26 @@
                         </div>
 
                         <div class="form-group">
-                            <button mat-button [disabled]="!guestform.valid" (click)="continueGuest()" class="submit-btn">weiter als Gast</button>
+                            <button mat-button [disabled]="!guestform.valid" (click)="continueGuest()" class="submit-btn">WEITER ALS GAST</button>
                         </div>
+
+                        <div class="seperator" >
+                            oder
+                        </div>
+
+                        <div class="form-group">
+                            <button mat-button (click)="setState('login')" class="submit-btn">MIT KONTO ANMELDEN</button>
+                        </div>
+
+
                     </form>
                    
                     <form id="loginForm" class="login-form" [class.show]="viewState=='login'" [formGroup]="loginForm" data-toggle="validator" data-focus="false">
                         
+                        <div class="form-group" *ngIf="data.flagEnableGuest">
+                            <button mat-button (click)="setState('guest')" class="submit-btn">GASTZUGANG</button>
+                        </div>
+
                         <div class="seperator" *ngIf="data.flagEnableGuest">
                             oder
                         </div>

@@ -315,4 +315,8 @@ export class NewappointmentComponent implements OnInit {
     this.dialogRef.close(this.finalForm.value);
   }
 
+  abort(){
+    this.dialogRef.close(null);
+  }
+
 }
