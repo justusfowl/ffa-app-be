@@ -36,11 +36,16 @@ export class GoogleAnalyticsService {
 
   }
 
+  setStatus(status){
+    this.active = status;
+  }
+
   initGA(){
     if (!this.active){
       return;
     }
     gtag('js', new Date());
+    console.log("Initiatilizing GA with...#" + this.gaId)
     gtag('config', this.gaId);
 
     this.active = true;

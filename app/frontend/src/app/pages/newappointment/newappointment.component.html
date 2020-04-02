@@ -8,7 +8,7 @@
       <div class="form-group">
         <mat-form-field>
           <mat-label>Name</mat-label>
-          <input matInput placeholder="Last name, First name" formControlName="patientName" required [readonly]="data.guestObject">
+          <input matInput placeholder="Last name, First name" formControlName="patientName" required readonly>
         </mat-form-field>
       </div>
     
@@ -32,14 +32,14 @@
               {{doc.userName}}
               </mat-option>
             </mat-select>
-            <mat-error *ngIf="baseInfoForm.get('doc').hasError('required')"  >Sie können einen Arzt wählen.</mat-error>
+            <mat-error *ngIf="baseInfoForm.get('doc').hasError('required')">Sie können einen Arzt wählen.</mat-error>
           </mat-form-field>
       </div>
 
       <div class="form-group">
           <mat-form-field>
             <mat-label>Nachricht</mat-label>
-            <textarea formControlName="appointmentNotes" required type="text" matInput #messageObj maxlength="1000" placeholder="Bitte teilen Sie uns Details zu Ihrer Anfrage mit."></textarea>
+            <textarea formControlName="appointmentNotes" required type="text" matInput #messageObj maxlength="1000" placeholder="Bitte teilen Sie uns Details zu Ihrer Anfrage mit, z.B. Hintergrund oder Beschreibung Ihrer Beschwerden."></textarea>
             <mat-hint class="hint" align="end">{{baseInfoForm.value.appointmentNotes.length}} / 1000</mat-hint>
           </mat-form-field>
       </div>
@@ -70,14 +70,14 @@
                 [(viewDate)]="viewDate"
                 (viewDateChange)="fetchEvents()"
               >
-                Previous
+                Vorheriger
               </div>
               <div
                 class="btn btn-outline-secondary"
                 mwlCalendarToday
                 [(viewDate)]="viewDate"
               >
-                Today
+                Heute
               </div>
               <div
                 class="btn btn-primary"
@@ -86,7 +86,7 @@
                 [(viewDate)]="viewDate"
                 (viewDateChange)="fetchEvents()"
               >
-                Next
+                Nächster
               </div>
             </div>
           </div>
@@ -223,7 +223,7 @@
 
     <div class="" *ngIf="finalForm.get('initiated').value != 'success'" >
 
-        <p>Etwas ist leider schief gelaufen - bitte gehen Sie zurück und wählen einen alternativen Termin aus.</p>
+        <p>Etwas ist leider schief gelaufen - bitte gehen Sie zurück und wählen einen alternativen Termin aus oder rufen Sie uns an.</p>
 
         <div>
           <button mat-button matStepperPrevious>Zurück</button>

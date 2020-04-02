@@ -15,6 +15,7 @@ import { ImprintComponent } from './pages/imprint/imprint.component';
 
 const routes: Routes = [
   { path: 'home', component: HomeComponent},
+ 
   { path: 'privacy', component: PrivacyComponent},
   { path: 'impressum', component: ImprintComponent},
   { path: 'login', component: AuthComponent},
@@ -25,7 +26,7 @@ const routes: Routes = [
   
   { path: '', redirectTo: '/home', pathMatch: 'full' },
   // otherwise redirect to home
-  { path: '**', redirectTo: '' }
+  { path: '**', redirectTo: '', pathMatch: 'full' }
 ];
 
 @NgModule({

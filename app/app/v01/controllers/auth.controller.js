@@ -348,8 +348,6 @@ async function validateUserScope(userId, scope){
             scope.forEach(element => {
                 if (user.scopes.indexOf(element) != -1){
                     flagHasScope = true;
-                }else{
-                    flagHasScope = false;
                 }
             });
             return flagHasScope; 

@@ -212,7 +212,7 @@ export class AdminComponent implements OnInit, AfterViewInit {
 
   getNews(refresher?){
     let params = {"unpublished" : true}
-    this.api.get("/news", {params : params}).then((result : any) => {
+    this.api.get("/news", params).then((result : any) => {
       this.news = result;
 
       if (refresher){
@@ -227,7 +227,7 @@ export class AdminComponent implements OnInit, AfterViewInit {
   
   getTeam(refresher?){
     let params = {"includeInactive" : true}
-    this.api.get("/team", {params : params}).then((data : any) => {
+    this.api.get("/team", params).then((data : any) => {
 
       this.teamMembers = [];
 
@@ -521,11 +521,16 @@ export class AdminComponent implements OnInit, AfterViewInit {
     }else{
       endPoint = "/news"
 
-      this.api.post(endPoint, formData, true).then(res => {
+      this.api.post(endPoint, formData, true).then((res : any) => {
+
+        if (res._id){
+          newsObj["_id"] = res._id;
+        }
         
          this.snackBar.open("Hinzugefügt", "", {
           duration: 1500
         });
+
         this.newNewsImageFile = null;
       }).catch(err=>{
         console.warn(err);

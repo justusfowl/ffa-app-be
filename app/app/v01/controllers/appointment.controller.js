@@ -310,7 +310,7 @@ async function getAvailableSlots(req, res){
 
     try{
 
-        let firstAvailableDate = moment(moment().add(2, 'day').format("MM-DD-YYYY"), "MM-DD-YYYY")
+        let firstAvailableDate = moment(moment().add(1, 'day').format("MM-DD-YYYY"), "MM-DD-YYYY")
        
         let userId = req.userId;
 
@@ -583,6 +583,7 @@ async function getMyAppointments(req, res){
     try{
         let userId = req.userId;
         let startDate, endDate; 
+        let flagIncludePast = req.query.flagIncludePast;
 
         if (!userId){
             return res.send(401, "No userId provided.")
@@ -592,7 +593,12 @@ async function getMyAppointments(req, res){
             startDate = req.query.startDate;
             endDate = req.query.endDate;
         }else{
-            startDate = new Date('01-01-1900');
+            if (flagIncludePast){
+                startDate = new Date('01-01-1900');
+            }else{
+                startDate = new Date();
+            }
+            
             endDate = new Date('01-01-2099');
         }
     

@@ -188,7 +188,7 @@ export class HomeComponent implements OnInit {
     if (this.settingsObj.popup){
       if (this.settingsObj.popup.flagActive){
         setTimeout(function(){
-          self.openNews(self.settingsObj.popup);
+          self.openNews(self.settingsObj.popup, true);
         }, 1500)
       }
     }
@@ -429,12 +429,14 @@ export class HomeComponent implements OnInit {
 
   }
 
-  openNews(newsObject) : void {
+  openNews(newsObject, flagAutomatedOpen=false) : void {
 
-    this.googleAnalytics.sendEvent("open",{
-      category: "news", 
-      label : newsObject._id
-    });
+    if (!flagAutomatedOpen){
+      this.googleAnalytics.sendEvent("open",{
+        category: "news", 
+        label : newsObject._id
+      });
+    }
 
     const dialogRef = this.dialog.open(NewsdetailComponent, {
       data: {newsObj : newsObject},

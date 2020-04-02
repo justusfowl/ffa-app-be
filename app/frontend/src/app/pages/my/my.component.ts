@@ -16,6 +16,7 @@ export class MyComponent implements OnInit {
 
   currentUser : any;
   myAppointments : any;
+  flagIncludePast : boolean = false;
 
   constructor(
     private auth : AuthenticationService, 
@@ -30,7 +31,14 @@ export class MyComponent implements OnInit {
   }
 
   getMyAppointments(){
-    this.api.get("/appointment/my").then(result => {
+
+    let params = {};
+
+    if (this.flagIncludePast){
+      params["flagIncludePast"] = true;
+    }
+
+    this.api.get("/appointment/my", params).then(result => {
       this.myAppointments = result;
     }).catch(err => {
       this._snackBar.open("Uups - es scheint etwas schief gelaufen zu sein.", "", {

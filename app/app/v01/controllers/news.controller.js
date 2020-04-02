@@ -2,7 +2,7 @@
 const config = require('../../config/config');
 var MongoClient = require('mongodb').MongoClient;
 var ObjectID = require('mongodb').ObjectID;
-
+var moment = require('moment');
 var MongoUrl = config.getMongoUrl();
 
 var fs = require('fs');
@@ -95,9 +95,12 @@ function updateNews(req, res){
         if (!newsId){
           res.send(500, "Please provide newsId");
           return;
+        }else{
+            delete newsObj._id;
         }
 
         newsObj["dateSaved"] = dateSaved;
+        newsObj["date"] = new Date(newsObj["date"]);
     
         MongoClient.connect(MongoUrl, function(err, db) {
     
@@ -107,17 +110,19 @@ function updateNews(req, res){
   
           // Get the documents collection
           const collection = dbo.collection('news');
-  
-          if (newsObj._id){
-            delete newsObj._id
-        }
-  
+   
           collection.replaceOne(
             {"_id" : ObjectID(newsId)},
             newsObj,
             function(err, docs){
               if (err) throw err;
-              res.json(docs);
+
+              if (docs.ops.length > 0){
+                res.json(docs.ops[0]);
+              }else{
+                res.json({})
+              }
+              
             });
   
         });
@@ -132,17 +137,19 @@ function newNews(req, res){
 
     try{
 
-
         var file = req.file;
         var newsObj = req.body;
-        try{
-            var fqdn_file = config.getPubExposedDirUrl() + "/n/" + file.originalname;
+        
 
+
+        try{
+            newsObj["date"] = new Date(newsObj["date"]);
+            var fqdn_file = config.getPubExposedDirUrl() + "/n/" + file.originalname;
             newsObj["image"] = fqdn_file;
+
         }catch(err){
 
         }
-       
 
         MongoClient.connect(MongoUrl, function(err, db) {
     
@@ -154,9 +161,14 @@ function newNews(req, res){
     
             collection.insertOne(
                 newsObj,
-              function(err, result){
+              function(err, docs){
                 if (err) throw err;
-                res.json(result);
+
+                if (docs.ops.length > 0){
+                    res.json(docs.ops[0]);
+                  }else{
+                    res.json({})
+                  }
               });
           });
 

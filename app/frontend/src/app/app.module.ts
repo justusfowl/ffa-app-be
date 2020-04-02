@@ -92,7 +92,7 @@ const cookieConfig:NgcCookieConsentConfig = {
   imports: [
     HttpClientModule,
     BrowserModule,
-    AppRoutingModule,
+    
     BrowserAnimationsModule, 
     FormsModule, ReactiveFormsModule,
     MaterialModule,
@@ -102,7 +102,8 @@ const cookieConfig:NgcCookieConsentConfig = {
       provide: DateAdapter,
       useFactory: adapterFactory
     }),
-    NgcCookieConsentModule.forRoot(cookieConfig)
+    NgcCookieConsentModule.forRoot(cookieConfig), 
+    AppRoutingModule
   ], 
   providers: [
     { provide: LOCALE_ID, useValue: "de-DE" },

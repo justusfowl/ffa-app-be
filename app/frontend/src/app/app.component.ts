@@ -74,12 +74,14 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
     });
 
     if (this.ccService.hasConsented()){
+      this.googleAnalytics.setStatus(true);
       this.googleAnalytics.initGA()
     }
 
     this.statusChangeSubscription = this.ccService.statusChange$.subscribe(
       (event: NgcStatusChangeEvent) => {
-        if (event.status == "allow"){
+        if (event.status == "allow"){ 
+          this.googleAnalytics.setStatus(true);
           this.googleAnalytics.initGA()
         }
       });
@@ -175,7 +177,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
  
           $('html, body').animate({
               scrollTop: ($('#'+tagId).offset().top)-$('nav').height()-$('#global-announcement').height()
-          },500);
+          },300);
 
           self.googleAnalytics.sendEvent(navSrc, {
             category: "nav", 

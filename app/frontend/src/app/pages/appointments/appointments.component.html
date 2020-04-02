@@ -41,7 +41,7 @@
                     [(viewDate)]="viewDate"
                     (viewDateChange)="closeOpenMonthViewDay()"
                   >
-                    Previous
+                    Vorheriger
                   </div>
                   <div
                     class="btn btn-outline-secondary"
@@ -49,7 +49,7 @@
                     [(viewDate)]="viewDate"
                     (click)="fetchEvents()"
                   >
-                    Today
+                    Heute
                   </div>
                   <div
                     class="btn btn-primary"
@@ -58,7 +58,7 @@
                     [(viewDate)]="viewDate"
                     (viewDateChange)="closeOpenMonthViewDay()"
                   >
-                    Next
+                    Nächster
                   </div>
                 </div>
               </div>
@@ -72,21 +72,21 @@
                     (click)="setView(CalendarView.Month)"
                     [class.active]="view === CalendarView.Month"
                   >
-                    Month
+                    Monat
                   </div>
                   <div
                     class="btn btn-primary"
                     (click)="setView(CalendarView.Week)"
                     [class.active]="view === CalendarView.Week"
                   >
-                    Week
+                    Woche
                   </div>
                   <div
                     class="btn btn-primary"
                     (click)="setView(CalendarView.Day)"
                     [class.active]="view === CalendarView.Day"
                   >
-                    Day
+                    Tag
                   </div>
                 </div>
               </div>
