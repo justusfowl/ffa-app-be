@@ -171,10 +171,8 @@ nav{
 
 }
 
-nav.top-nav-collapse{
-    .hint-bar{
-        opacity: 1;
-    }
+.hint-bar.show{
+    opacity: 1 !important;
 }
 
 

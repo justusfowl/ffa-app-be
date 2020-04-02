@@ -27,6 +27,14 @@
             }
         });
 
+        $(window).on('scroll load', function() {
+            if ($(".navbar").offset().top > $('#header .opening-statement').offset().top+$('#header .opening-statement').height()) {
+                $(".hint-bar").addClass("show");
+            } else {
+                $(".hint-bar").removeClass("show");
+            }
+        });
+
         // closes the responsive menu on menu item click
         $(".navbar-nav li a").on("click", function(event) {
         if (!$(this).parent().hasClass('dropdown'))

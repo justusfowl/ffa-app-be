@@ -10,7 +10,7 @@ export const environment = {
   apiPort: "8000", 
   apiEnd : "/api/v01", 
   socketPort: "8000", 
-  gaId : "UA-72119245-1",
+  gaId : "UA-72119245-2",
   domain: "localhost"
 };
 

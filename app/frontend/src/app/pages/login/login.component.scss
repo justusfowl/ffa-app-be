@@ -118,6 +118,19 @@
 
 .login-form{
 
+    .form-control:disabled, .form-control[readonly] {
+        background-color: $background_nav;
+        opacity: 0.8;
+    }
+
+    .mat-datepicker-toggle-default-icon{
+        color: $primary;
+    }
+
+    .mat-stroked-button:not([disabled]) {
+        border-color: rgb(255, 255, 255);
+    }
+
     a{
         color: $primary;
     }

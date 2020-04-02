@@ -135,6 +135,9 @@ export class HomeComponent implements OnInit {
 
   ngOnInit() {
 
+    let self = this;
+    let initNewsPopup = "5e4c51c6692c502ff3c3cb2d";
+
     let command = this.route.snapshot.queryParamMap.get('c');
 
     if (command == 'cancel-appointment'){
@@ -166,6 +169,17 @@ export class HomeComponent implements OnInit {
       } 
         
     })
+
+    setTimeout(function(){
+      if (initNewsPopup){
+        let idx = self.news.findIndex(x => x._id == initNewsPopup);
+        if (idx > -1){
+          self.openNews(self.news[idx])
+        }
+        
+      }
+      
+    }, 1500)
   }
 
   getInnerText(innerHtmlCode){
