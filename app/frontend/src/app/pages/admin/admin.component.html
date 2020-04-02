@@ -439,28 +439,142 @@
         
         </mat-tab>
 
-        <mat-tab label="Allgemein"  style="margin:10px" *ngIf="settingsObj">
-            <div class="general">
-                <div class="field">
-                    <h4>Impressum</h4>
+        <mat-tab label="Allgemein"  *ngIf="settingsObj">
+            <div class="general settings-tab">
+
+                <mat-accordion>
+                    <mat-expansion-panel>
+                        <mat-expansion-panel-header>
+                            <mat-panel-title>
+                                    Popup bei Seitenöffnung
+                            </mat-panel-title>
+                            <mat-panel-description>
+                                
+                                <mat-icon>settings_overscan</mat-icon>
+
+                            </mat-panel-description>
+                        </mat-expansion-panel-header>
+
+                            <div class="settings-content">
+                                <div class="popup-settings">
+                                    <div>
+                                        <mat-form-field>
+                                            <input matInput placeholder="Datum" [matDatepicker]="popupDatePicker" [(ngModel)]="settingsObj.popup.date" readonly>
+                                            <mat-datepicker-toggle matSuffix [for]="popupDatePicker"></mat-datepicker-toggle>
+                                            <mat-datepicker touchUi #popupDatePicker ></mat-datepicker>
+                                        </mat-form-field>
+            
+                                        <mat-form-field class="field">
+                                            <mat-label>Header</mat-label>
+                                            <input [(ngModel)]="settingsObj.popup.header" matInput type="text">
+                                        </mat-form-field>
+                                    </div>
+                                
+                                    <div>
+                                        <mat-form-field  class="popup-text">
+                                            <textarea [(ngModel)]="settingsObj.popup.text" matInput type="text" placeholder="Beschreibung" ></textarea>
+                                        </mat-form-field>
+                                    </div>
+
+                                    <p>
+                                        <mat-checkbox [(ngModel)]="settingsObj.popup.flagActive" >Aktiv?</mat-checkbox>
+                                    </p>
+
+                                </div>
+                            </div>
+                    </mat-expansion-panel>
+
+                    <mat-expansion-panel>
+                        <mat-expansion-panel-header>
+                            <mat-panel-title>
+                                    Globales Announcement (Pre-Header)
+                            </mat-panel-title>
+                            <mat-panel-description>
+                                
+                                <mat-icon>settings_overscan</mat-icon>
+
+                            </mat-panel-description>
+                        </mat-expansion-panel-header>
     
-                    <ejs-richtexteditor [toolbarSettings]='tools' [(value)]="settingsObj.imprint"  [(ngModel)]="settingsObj.imprint">
-                    </ejs-richtexteditor>
+                        <div class="settings-content">
+                            <div class="global-announcement-settings">
+                                <div>
+                                   
+                                    <mat-form-field class="field">
+                                        <mat-label>Icon (z.B. videocam)</mat-label>
+                                        <input [(ngModel)]="settingsObj.globalAnnouncement.icon" matInput type="text">
+                                        <mat-hint><a href="https://material.io/resources/icons/?icon=settings_overscan&style=baseline">Iconlist</a></mat-hint>
+                                    </mat-form-field>
+
+                                    
+
+                                    <mat-icon>{{settingsObj.globalAnnouncement.icon}}</mat-icon>
+                                </div>
+                               
+                                <div>
+                                    <mat-form-field  class="global-announcement-text">
+                                        <textarea [(ngModel)]="settingsObj.globalAnnouncement.text" matInput type="text" placeholder="Beschreibung"></textarea>
+                                    </mat-form-field>
+                                </div>
+    
+                                <p>
+                                    <mat-checkbox [(ngModel)]="settingsObj.globalAnnouncement.flagActive" >Aktiv?</mat-checkbox>
+                                </p>
+    
+                            </div>
+                        </div>
+    
+                    </mat-expansion-panel>
+                
+                    <mat-expansion-panel >
+                        <mat-expansion-panel-header>
+                            <mat-panel-title>
+                                Impressum
+                            </mat-panel-title>
+                            <mat-panel-description>
+                                
+                                <mat-icon>info</mat-icon>
+
+                            </mat-panel-description>
+                        </mat-expansion-panel-header>
+
+                        <div class="field">
+                            <ejs-richtexteditor [toolbarSettings]='tools' [(value)]="settingsObj.imprint"  [(ngModel)]="settingsObj.imprint">
+                            </ejs-richtexteditor>
+                        </div>
+
+                    </mat-expansion-panel>
+
+                    <mat-expansion-panel>
+                            <mat-expansion-panel-header>
+                                <mat-panel-title>
+                                        Datenschutz
+                                </mat-panel-title>
+                                <mat-panel-description>
+                                    
+                                    <mat-icon>lock</mat-icon>
+
+                                </mat-panel-description>
+                            </mat-expansion-panel-header>
+
+                        <div class="settings-content">
+                            <ejs-richtexteditor [toolbarSettings]='tools' [(value)]="settingsObj.datapriv"  [(ngModel)]="settingsObj.datapriv">
+                                </ejs-richtexteditor>
+                        </div>
+
+                    </mat-expansion-panel>
+
+                </mat-accordion>
+
+                <div class="foot">
+                    <button class="btn" (click)="saveSettings()" mat-stroked-button aria-label="Store the settings object">
+                        Speichern
+                    </button>
                 </div>
-    
-                <div class="field">
-                    <h4>Datenschutz</h4>
-    
-                    <ejs-richtexteditor [toolbarSettings]='tools' [(value)]="settingsObj.datapriv"  [(ngModel)]="settingsObj.datapriv">
-                    </ejs-richtexteditor>
-                </div>
+
             </div>
 
-            <div class="foot">
-                <button class="btn" (click)="saveSettings()" mat-icon color="accent" aria-label="Store the settings object">
-                    Speichern
-                </button>
-            </div>
+            
           </mat-tab>
     </mat-tab-group>               
 </div>

@@ -8,7 +8,8 @@ import localeDe from '@angular/common/locales/de';
 import { NgcCookieConsentService, NgcInitializeEvent, NgcStatusChangeEvent, NgcNoCookieLawEvent } from 'ngx-cookieconsent';
 import { Subscription } from 'rxjs';
 import { GoogleAnalyticsService } from './services/google-analytics.service';
-import { Title } from '@angular/platform-browser';
+import { Title, DomSanitizer } from '@angular/platform-browser';
+import { SettingsService } from './services/settings.service';
 
 
 declare var $: any;
@@ -34,6 +35,9 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
   globalAnnouncement : string = "";
 
   private statusChangeSubscription: Subscription;
+  private settingsSubscription : Subscription;
+
+  settingsObj : any = {};
 
   constructor(
     public auth: AuthenticationService, 
@@ -42,12 +46,21 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
     private api : ApiService,
     private ccService: NgcCookieConsentService, 
     private googleAnalytics : GoogleAnalyticsService,
-    private titleService: Title
+    private titleService: Title, 
+    private settingsSrv : SettingsService,
+    private sanitizer : DomSanitizer
   ){  
     this.globalAnnouncement = "Bitte beachten Sie - wir bieten Ihnen ab sofort Video-Konsultationen."
+
+    this.settingsSrv.initSettings();
+
+    this.settingsSubscription = this.settingsSrv.settingsObjObservable.subscribe(result => {
+      this.settingsObj = result;
+      this.executeSettings();
+    })
   }
 
-  ngOnInit(){
+ ngOnInit(){
 
     registerLocaleData(localeDe);
 
@@ -66,7 +79,6 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
 
     this.statusChangeSubscription = this.ccService.statusChange$.subscribe(
       (event: NgcStatusChangeEvent) => {
-        // you can use this.ccService.getConfig() to do stuff...
         if (event.status == "allow"){
           this.googleAnalytics.initGA()
         }
@@ -76,8 +88,8 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    // unsubscribe to cookieconsent observables to prevent memory leaks
     this.statusChangeSubscription.unsubscribe();
+    this.settingsSubscription.unsubscribe();
   }
 
   public setTitle( newTitle: string) {
@@ -92,18 +104,28 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
     this.getTimes();
 
     this.loaderSrv.setMsgLoading(false);
-    this.showGlobalAnnouncement();
+    
 
+  }
+
+  executeSettings(){
+    if (this.settingsObj.globalAnnouncement){
+      if (this.settingsObj.globalAnnouncement.flagActive){
+        this.settingsObj.globalAnnouncement.text = this.sanitizer.bypassSecurityTrustHtml(this.settingsObj.globalAnnouncement.text);
+        this.showGlobalAnnouncement(true);
+      }
+    }
+    
   }
 
   closeGlobalAnnouncement(){
     this.flagShowGlobalAnnouncement = false;
   }
 
-  showGlobalAnnouncement(){
+  showGlobalAnnouncement(status=true){
     let self = this; 
     setTimeout(function(){
-      self.flagShowGlobalAnnouncement = true;
+      self.flagShowGlobalAnnouncement = status;
     }, 1500)
   }
 

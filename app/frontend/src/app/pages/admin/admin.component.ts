@@ -43,7 +43,7 @@ export class MyErrorStateMatcher implements ErrorStateMatcher {
 @Component({
   selector: 'app-admin',
   templateUrl: './admin.component.html',
-  styleUrls: ['./admin.component.scss'],
+  styleUrls: ['./admin.component.scss', '../../app.component.scss'],
   encapsulation: ViewEncapsulation.None,
   providers: [ToolbarService, LinkService, ImageService, HtmlEditorService]
 })
@@ -160,15 +160,12 @@ export class AdminComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-
     this.getTeam();
     this.getTimes();
     this.getNews();
     this.getUsers();
     this.getGeneralSettings();
     this.getAdminSlots();
-   
-
   }
 
 
@@ -177,6 +174,15 @@ export class AdminComponent implements OnInit, AfterViewInit {
     this.api.get("/general/settings").then((result : any) => {
       if (result && result.length > 0){
         this.settingsObj = result[0];
+
+        if (!this.settingsObj.popup){
+          this.settingsObj.popup = {};
+        }
+
+        if (!this.settingsObj.globalAnnouncement){
+          this.settingsObj.globalAnnouncement = {};
+        }
+
       }else{
         this.settingsObj = { }
       }

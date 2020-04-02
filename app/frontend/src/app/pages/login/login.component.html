@@ -145,7 +145,7 @@
                     <form id="forgotPassword" class="login-form" [class.show]="viewState=='forgotPass'" [formGroup]="forgotPasswordForm" data-toggle="validator" data-focus="false">
                         <div class="form-group">
                             <mat-form-field class="login-forms">
-                                <input matInput type="text" placeholder="User" formControlName="username" class="form-control">
+                                <input matInput type="text" placeholder="User-Email" formControlName="username" class="form-control">
                                 <mat-error *ngIf="forgotPasswordForm.get('username').invalid">Bitte User-Email eintragen.</mat-error>
                             </mat-form-field>
                         </div>

@@ -41,6 +41,7 @@ import { ImprintComponent } from './pages/imprint/imprint.component';
 import { GoogleAnalyticsService } from './services/google-analytics.service';
 import { environment } from '../environments/environment';
 import { CancelappointmentComponent } from './components/cancelappointment/cancelappointment.component';
+import { SettingsService } from './services/settings.service';
 
 const cookieConfig:NgcCookieConsentConfig = {
   cookie: {
@@ -111,7 +112,8 @@ const cookieConfig:NgcCookieConsentConfig = {
     ErrorInterceptor, 
     JwtInterceptor,
     DatePipe,
-    GoogleAnalyticsService
+    GoogleAnalyticsService, 
+    SettingsService
   ],
   bootstrap: [AppComponent], 
   entryComponents : [

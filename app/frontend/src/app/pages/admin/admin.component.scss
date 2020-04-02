@@ -244,9 +244,20 @@
     min-height: 200px;
 }
 
+.popup-settings, 
+.global-announcement-settings{
+    .popup-text, 
+    .global-announcement-text{
+        width: 100%; 
+    }
+}
+
 .general{
     .field{
         margin-bottom: 20px;
+    }
+    .foot{
+        margin-top: 20px;
     }
 }
 
@@ -259,4 +270,10 @@
         padding-right: 3px;
     }
     
+}
+
+.settings-tab{
+    .mat-expansion-panel-header-description {
+        flex-grow: 0;
+    }
 }

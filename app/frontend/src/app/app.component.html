@@ -21,19 +21,19 @@
 </div>
 
 
-<div id="global-announcement" [class.show]="flagShowGlobalAnnouncement">
+<div id="global-announcement" [class.show]="flagShowGlobalAnnouncement" *ngIf="settingsObj.globalAnnouncement">
 
     <div class="ga-row">
             <button mat-icon-button  (click)="closeGlobalAnnouncement()">
                     <mat-icon>close</mat-icon>
             </button>
         
-            <div class="message" (click)="goToTag('contact')">
-                    Bitte beachten Sie - wir bieten Ihnen ab sofort ausgewählte Video-Sprechstunden an. Klicken Sie <a (click)="goToTag('contact')">hier</a>, um einen Termin zu vereinbaren.
+            <div class="message" (click)="goToTag('contact')" [innerHtml]="settingsObj.globalAnnouncement.text">
+                    <!-- Bitte beachten Sie - wir bieten Ihnen ab sofort ausgewählte Video-Sprechstunden an. Klicken Sie <a (click)="goToTag('contact')">hier</a>, um einen Termin zu vereinbaren. -->
             </div>
     </div>
 
-    <mat-icon class="camera-icn" (click)="goToTag('contact')">videocam</mat-icon>
+    <mat-icon class="camera-icn" (click)="goToTag('contact')">{{settingsObj.globalAnnouncement.icon}}</mat-icon>
    
 
 </div>

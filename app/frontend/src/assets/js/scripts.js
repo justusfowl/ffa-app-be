@@ -28,11 +28,16 @@
         });
 
         $(window).on('scroll load', function() {
-            if ($(".navbar").offset().top > $('#header .opening-statement').offset().top+$('#header .opening-statement').height()) {
-                $(".hint-bar").addClass("show");
-            } else {
-                $(".hint-bar").removeClass("show");
+            try{
+                if ($(".navbar").offset().top > $('#header .opening-statement').offset().top+$('#header .opening-statement').height()) {
+                    $(".hint-bar").addClass("show");
+                } else {
+                    $(".hint-bar").removeClass("show");
+                }
+            }catch(err){
+
             }
+            
         });
 
         // closes the responsive menu on menu item click

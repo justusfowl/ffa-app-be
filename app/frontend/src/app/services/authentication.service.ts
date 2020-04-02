@@ -132,8 +132,9 @@ export class AuthenticationService {
     }
 
     /**
-     * Function to return if the current user has any of the requested scopes
+     * Function to return if the current user has any of the requested scopes. At least one of the provided scopes must apply
      * @param reqScope String or Array of strings containing different scopes to be checked for
+     * 
      */
     checkUIForRole(reqScope){
 
@@ -150,8 +151,6 @@ export class AuthenticationService {
                 reqScope.forEach(element => {
                     if (scopes.indexOf(element) != -1){
                         flagHasScope = true;
-                    }else{
-                        flagHasScope = false;
                     }
                 });
                 return flagHasScope; 

@@ -101,7 +101,7 @@
         </div>
         <div>
 
-          <div *ngIf="flagHasSlots" >
+          <div *ngIf="flagHasSlots && !dateTimeForm.get('appointmentDateStart').value" >
               <mwl-calendar-month-view
                 class="appointment-cal"
                 [viewDate]="viewDate"
@@ -123,7 +123,7 @@
       <ng-template matStepLabel>Termin</ng-template>
 
       <div class="selected-slot" *ngIf="!dateTimeForm.invalid" >
-          {{dateTimeForm.get('appointmentDateStart').value | date:'medium':'de'}} 
+          {{dateTimeForm.get('appointmentDateStart').value | date:'longDate':'de'}} {{dateTimeForm.get('appointmentDateStart').value | date:'shortTime':'de'}} 
           
           <button mat-icon-button (click)="removeSlotSelection()">
             <mat-icon class="remove-slot" >delete</mat-icon>
@@ -149,7 +149,7 @@
         Sie sind fast fertig:
 
         <p class="datetime-slot">
-            {{dateTimeForm.get('appointmentDateStart').value | date:'medium':'de'}} 
+            {{dateTimeForm.get('appointmentDateStart').value | date:'longDate':'de'}} {{dateTimeForm.get('appointmentDateStart').value | date:'shortTime':'de'}} 
         </p>
 
         <div class="form-group">

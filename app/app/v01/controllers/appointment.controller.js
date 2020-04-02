@@ -537,14 +537,14 @@ async function _insertTeleAppointment(appointmentObj){
                     
                             let tokenUrl = encodeURI(urlBase + token); 
     
-                            let displayStartDate = startDate.locale("de");
+                            let displayStartDate = startDate.tz(config.timeZone).locale("de");
     
                             let emailContext = {
                                 userEmail : userObj.userName,
                                 userName : userObj.name || userObj.userName,
                                 patientCode : videoAppointmentObj.patientCode, 
                                 dialInUrlPatient : videoAppointmentObj["dialInUrlPatient"], 
-                                appointmentDate : displayStartDate.format("LLLL"), 
+                                appointmentDate : displayStartDate.format("LLL"), 
                                 appointmentType : appointmentObject.appointmentType.name, 
                                 docName : appointmentObject.doc.userName, 
                                 startDate : startDate, 

@@ -1,15 +1,16 @@
 <div class="news-item">
     <div class="head">
-        <img [src]="getImageUrl()">
+        <img [src]="getImageUrl()" *ngIf="newsObj.image">
 
         <div class="">
-                <h3 class="card-title">{{newsObj.header}}</h3>
-                <p class="date">{{newsObj.date | date:'MMM d, y'}}</p>
+            <h3 class="card-title">{{newsObj.header}}</h3>
+            <p class="date">{{newsObj.date | date:'MMM d, y'}}</p>
         </div>
+
     </div>
     
     <p [innerHtml]="sanText(newsObj.text)"></p>  
    
-
     <button class="more-news" (click)="close()" color="accent" mat-raised-button >OK</button>
+
 </div>

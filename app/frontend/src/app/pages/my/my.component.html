@@ -74,7 +74,7 @@
                                 <mat-expansion-panel *ngFor="let app of myAppointments; let i=index;" class="appointment-item" [class.removed]="app.inactive" [expanded]="i==0">
                                     <mat-expansion-panel-header>
                                         <mat-panel-title>
-                                            {{app.appointmentObj.start  | date:'medium':'de'}}
+                                            {{app.appointmentObj.start  | date:'longDate':'de'}} {{app.appointmentObj.start  | date:'shortTime':'de'}}
                                         </mat-panel-title>
                                         <mat-panel-description>
                                             {{app.appointmentType.name}} 
@@ -137,8 +137,26 @@
             </mat-tab>
             <mat-tab label="Einstellungen" *ngIf="false" >
 
-                    <mat-accordion>
-                        <mat-expansion-panel >
+                <mat-accordion>
+                    <mat-expansion-panel >
+                        <mat-expansion-panel-header>
+                            <mat-panel-title>
+                                Benachrichtigungen
+                            </mat-panel-title>
+                            <mat-panel-description>
+                                
+                                <mat-icon>notification_important</mat-icon>
+
+                            </mat-panel-description>
+                        </mat-expansion-panel-header>
+
+                        <div class="settings-content">
+
+                        </div>
+
+                    </mat-expansion-panel>
+
+                    <mat-expansion-panel>
                             <mat-expansion-panel-header>
                                 <mat-panel-title>
                                     Benachrichtigungen
@@ -150,31 +168,13 @@
                                 </mat-panel-description>
                             </mat-expansion-panel-header>
 
-                            <div class="settings-content">
+                        <div class="settings-content">
 
-                            </div>
+                        </div>
 
-                        </mat-expansion-panel>
+                    </mat-expansion-panel>
 
-                        <mat-expansion-panel>
-                                <mat-expansion-panel-header>
-                                    <mat-panel-title>
-                                        Benachrichtigungen
-                                    </mat-panel-title>
-                                    <mat-panel-description>
-                                        
-                                        <mat-icon>notification_important</mat-icon>
-
-                                    </mat-panel-description>
-                                </mat-expansion-panel-header>
-
-                            <div class="settings-content">
-
-                            </div>
-
-                        </mat-expansion-panel>
-
-                    </mat-accordion>
+                </mat-accordion>
 
             </mat-tab>
 

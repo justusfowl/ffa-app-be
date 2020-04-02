@@ -34,9 +34,8 @@ app-newsdetail{
     max-height : 100vh !important;
 }
 
-@media (max-width: 1100px){
-    .news-item{
+@media (max-width: 1100px) {
+    .news-item .head{
         flex-direction: column;
-        align-items: center;
     }
 }

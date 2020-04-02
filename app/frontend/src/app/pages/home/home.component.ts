@@ -13,6 +13,8 @@ import { GoogleAnalyticsService } from 'src/app/services/google-analytics.servic
 import { ActivatedRoute } from '@angular/router';
 import { CancelappointmentComponent } from 'src/app/components/cancelappointment/cancelappointment.component';
 import { LoaderService } from 'src/app/services/loader.service';
+import { Subscription } from 'rxjs';
+import { SettingsService } from 'src/app/services/settings.service';
 declare var $: any;
 
 @Component({
@@ -118,7 +120,8 @@ export class HomeComponent implements OnInit {
   medicationsRequest : any[];
   requestForm : any;
   contactForm : any;
-
+  settingsSubscription : Subscription
+  settingsObj : any;
 
   constructor(
     private api: ApiService,
@@ -128,15 +131,22 @@ export class HomeComponent implements OnInit {
     protected sanitizer: DomSanitizer, 
     private googleAnalytics : GoogleAnalyticsService, 
     private route : ActivatedRoute,
-    private loaderSrv : LoaderService
+    private loaderSrv : LoaderService, 
+    private settingsSrv : SettingsService
   ) {
+
+    this.settingsSubscription = this.settingsSrv.settingsObjObservable.subscribe(result => {
+      this.settingsObj = result;
+
+      this.executeSettings();
+
+    });
+
+
 
   }
 
   ngOnInit() {
-
-    let self = this;
-    let initNewsPopup = "5e4c51c6692c502ff3c3cb2d";
 
     let command = this.route.snapshot.queryParamMap.get('c');
 
@@ -170,16 +180,18 @@ export class HomeComponent implements OnInit {
         
     })
 
-    setTimeout(function(){
-      if (initNewsPopup){
-        let idx = self.news.findIndex(x => x._id == initNewsPopup);
-        if (idx > -1){
-          self.openNews(self.news[idx])
-        }
-        
+
+  }
+
+  executeSettings(){
+    let self = this; 
+    if (this.settingsObj.popup){
+      if (this.settingsObj.popup.flagActive){
+        setTimeout(function(){
+          self.openNews(self.settingsObj.popup);
+        }, 1500)
       }
-      
-    }, 1500)
+    }
   }
 
   getInnerText(innerHtmlCode){
