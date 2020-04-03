@@ -2,7 +2,7 @@
 
 <mat-vertical-stepper [linear]="isLinear" #stepper  [class.submitted]="flagSubmitted">
   <mat-step [stepControl]="baseInfoForm">
-    <form [formGroup]="baseInfoForm">
+    <form [formGroup]="baseInfoForm" class="baseForm">
       <ng-template matStepLabel>Ihr Anliegen</ng-template>
 
       <div class="form-group">
@@ -38,15 +38,15 @@
 
       <div class="form-group">
           <mat-form-field>
-            <mat-label>Nachricht</mat-label>
-            <textarea formControlName="appointmentNotes" required type="text" matInput #messageObj maxlength="1000" placeholder="Bitte teilen Sie uns Details zu Ihrer Anfrage mit, z.B. Hintergrund oder Beschreibung Ihrer Beschwerden."></textarea>
+            <mat-label>Anfrage-Details</mat-label>
+            <textarea  class="appointmentNotes" formControlName="appointmentNotes" required type="text" matInput #messageObj maxlength="1000" placeholder="Bitte teilen Sie uns Details zu Ihrer Anfrage mit, z.B. Hintergrund oder Beschreibung Ihrer Beschwerden."></textarea>
             <mat-hint class="hint" align="end">{{baseInfoForm.value.appointmentNotes.length}} / 1000</mat-hint>
           </mat-form-field>
       </div>
      
       <div>
         <button mat-button (click)="abort()">Abbrechen</button>
-        <button mat-button matStepperNext (click)="fetchEvents()">Weiter</button>
+        <button mat-stroked-button matStepperNext (click)="fetchEvents()">Weiter</button>
       </div>
     </form>
   </mat-step>
@@ -59,13 +59,14 @@
 
     <div class="cal-container" *ngIf="!evtLoading">
 
-      <div class="row text-center"  >
+      <div class="row text-center" >
 
           <div class="col-md-4">
             <div class="btn-group">
               <div
                 class="btn btn-primary"
                 mwlCalendarPreviousView
+                [daysInWeek]="daysInWeek"
                 [view]="view"
                 [(viewDate)]="viewDate"
                 (viewDateChange)="fetchEvents()"
@@ -82,6 +83,7 @@
               <div
                 class="btn btn-primary"
                 mwlCalendarNextView
+                [daysInWeek]="daysInWeek"
                 [view]="view"
                 [(viewDate)]="viewDate"
                 (viewDateChange)="fetchEvents()"
@@ -91,8 +93,8 @@
             </div>
           </div>
           <div class="col-md-4">
-            <h3>{{ viewDate | calendarDate:(view + 'ViewTitle'):locale }}</h3>
-            <p class="no-slots" *ngIf="!flagHasSlots">Für diesen Zeitraum sind leider keine Termine verfügbar, bitte wählen Sie einen anderen Monat aus.</p>
+            <h3 class="cal-title-dateframe" >{{ viewDate | calendarDate:(view + 'ViewTitle'):locale }}</h3>
+            <p class="no-slots" *ngIf="!flagHasSlots">Für diesen Zeitraum sind leider keine Termine verfügbar, bitte wählen Sie einen anderen Zeitraum aus.</p>
           </div>
           <div class="col-md-4">
             
@@ -101,8 +103,10 @@
         </div>
         <div>
 
-          <div *ngIf="flagHasSlots && !dateTimeForm.get('appointmentDateStart').value" >
-              <mwl-calendar-month-view
+          <div *ngIf="flagHasSlots" >
+            <ng-container [ngSwitch]="view">
+                <mwl-calendar-month-view
+                *ngSwitchCase="CalendarView.Month"
                 class="appointment-cal"
                 [viewDate]="viewDate"
                 [events]="events$"
@@ -114,6 +118,23 @@
                 (eventClicked)="handleEvent('Clicked', $event.event)"
               >
               </mwl-calendar-month-view>
+
+              <mwl-calendar-week-view
+                *ngSwitchCase="CalendarView.Week"
+                [viewDate]="viewDate"
+                [daysInWeek]="daysInWeek"
+                
+               
+                [hourSegments]="6"
+                [hourSegmentHeight]="50"
+                [locale]="locale"
+                [events]="events$"
+                [refresh]="refresh"
+                (eventClicked)="handleEvent('Clicked', $event.event)"
+              >
+              </mwl-calendar-week-view>
+            </ng-container>
+              
             </div>
         </div>
       
@@ -123,18 +144,28 @@
       <ng-template matStepLabel>Termin</ng-template>
 
       <div class="selected-slot" *ngIf="!dateTimeForm.invalid" >
-          {{dateTimeForm.get('appointmentDateStart').value | date:'longDate':'de'}} {{dateTimeForm.get('appointmentDateStart').value | date:'shortTime':'de'}} 
-          
-          <button mat-icon-button (click)="removeSlotSelection()">
-            <mat-icon class="remove-slot" >delete</mat-icon>
-          </button>
-          
+
+         
+
+          <div class="subtitle">
+           
+            <button mat-icon-button (click)="removeSlotSelection()">
+              <mat-icon class="remove-slot" >delete</mat-icon>
+            </button>
+
+            Ihr ausgewählter Terminslot:
+          </div>
+
+          <div>
+              {{dateTimeForm.get('appointmentDateStart').value | date:'longDate':'de'}} {{dateTimeForm.get('appointmentDateStart').value | date:'shortTime':'de'}}
+          </div>
+
       </div>
       
       <div>
           <button mat-button (click)="abort()">Abbrechen</button>
         <button mat-button matStepperPrevious>Zurück</button>
-        <button mat-button matStepperNext [disabled]="dateTimeForm.invalid">Weiter</button>
+        <button mat-stroked-button matStepperNext [disabled]="dateTimeForm.invalid">Weiter</button>
       </div>
     </form>
 
@@ -155,6 +186,7 @@
         <div class="form-group">
             <mat-form-field >
                 <input required matInput type="text" placeholder="Name" class="form-control" [ngModel]="baseInfoForm.value.patientName" readonly>
+                <mat-hint class="hint" >{{baseInfoForm.value.patientEmail}}</mat-hint>
             </mat-form-field>
         </div>
 
@@ -172,8 +204,8 @@
         </div>
 
         <div class="form-group">
-            <mat-form-field >
-                <textarea required matInput type="text" placeholder="Details" class="form-control" [ngModel]="baseInfoForm.value.appointmentNotes" readonly></textarea>
+            <mat-form-field>
+                <textarea required matInput type="text" placeholder="Details" class="form-control " [ngModel]="baseInfoForm.value.appointmentNotes" readonly></textarea>
             </mat-form-field>
         </div>
         
@@ -183,7 +215,9 @@
     
             <div class="form-group">
               <div class="form-group">
-                  <mat-checkbox  formControlName="acceptTerms"  >Ich akzeptiere die <a  target="_blank"  routerLink="/privacy" routerLinkActive="active" >Nutzungsbedingungen</a></mat-checkbox>
+                  <mat-checkbox  formControlName="acceptTerms" class="acceptTerms" >
+                    Ich akzeptiere die <a  target="_blank"  routerLink="/privacy" routerLinkActive="active" >Nutzungsbedingungen</a>
+                  </mat-checkbox>
               </div>
             </div>
     
@@ -195,15 +229,16 @@
     <div>
       <button mat-button (click)="abort()">Abbrechen</button>
       <button mat-button matStepperPrevious>Zurück</button>
-      <button mat-button [disabled]="!finalForm.get('acceptTerms').value" (click)="initiateAppointment()">Termin vereinbaren</button>
+      <button mat-stroked-button color="accent" [disabled]="!finalForm.get('acceptTerms').value" (click)="initiateAppointment()">Termin vereinbaren</button>
 
     </div>
   </mat-step>
 
-  <mat-step >
+  <mat-step *ngIf="flagSubmitted">
 
     <ng-template *ngIf="finalForm.get('initiated').value == 'success'" matStepLabel>Bestätigung</ng-template>
-    <ng-template *ngIf="finalForm.get('initiated').value != 'success'" matStepLabel>Fehler</ng-template>
+    <ng-template *ngIf="finalForm.get('initiated').value != 'success' && flagSubmitted" matStepLabel>Fehler</ng-template>
+    
 
     <div class="success-new-appointment"  *ngIf="finalForm.get('initiated').value == 'success'" >
       <div class="success-icon">
@@ -217,7 +252,7 @@
         </p>
 
         <div>
-          <button mat-button (click)="closeModal()">Schließen</button>
+          <button mat-stroked-button (click)="closeModal()">Schließen</button>
         </div>
     </div>
 
@@ -226,8 +261,8 @@
         <p>Etwas ist leider schief gelaufen - bitte gehen Sie zurück und wählen einen alternativen Termin aus oder rufen Sie uns an.</p>
 
         <div>
-          <button mat-button matStepperPrevious>Zurück</button>
-          <button mat-button (click)="closeModal()">Abbrechen</button>
+          <button mat-stroked-button matStepperPrevious>Zurück</button>
+          <button mat-stroked-button (click)="closeModal()">Abbrechen</button>
         </div>
     </div>
 

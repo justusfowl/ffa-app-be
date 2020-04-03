@@ -1,5 +1,4 @@
-import { Component, OnInit, ChangeDetectionStrategy, ViewChild,   TemplateRef, ViewEncapsulation, Inject } from '@angular/core';
-
+import { Component, OnInit, ViewChild,   TemplateRef, ViewEncapsulation, Inject, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import {
   subDays,
   addDays,
@@ -15,7 +14,6 @@ import {
   format
 } from 'date-fns';
 import { Subject, Observable } from 'rxjs';
-
 import {
   CalendarEvent,
   CalendarEventAction,
@@ -25,12 +23,14 @@ import {
 
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import { HttpParams } from '@angular/common/http';
-import { MatStepper, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import { MatStepper, MatDialogRef, MAT_DIALOG_DATA, MatSnackBar } from '@angular/material';
 import { LoaderService } from 'src/app/services/loader.service';
 import { ApiService } from 'src/app/services/api.service';
 import { DatePipe } from '@angular/common';
 import { AuthenticationService } from 'src/app/services/authentication.service';
 import { GoogleAnalyticsService } from 'src/app/services/google-analytics.service';
+
+declare var $: any;
 
 const colors: any = {
   red: {
@@ -47,16 +47,6 @@ const colors: any = {
   }
 };
 
-function getTimezoneOffsetString(date: Date): string {
-  const timezoneOffset = date.getTimezoneOffset();
-  const hoursOffset = String(
-    Math.floor(Math.abs(timezoneOffset / 60))
-  ).padStart(2, '0');
-  const minutesOffset = String(Math.abs(timezoneOffset % 60)).padEnd(2, '0');
-  const direction = timezoneOffset > 0 ? '-' : '+';
-
-  return `T00:00:00${direction}${hoursOffset}:${minutesOffset}`;
-}
 
 @Component({
   selector: 'app-newappointment',
@@ -64,7 +54,7 @@ function getTimezoneOffsetString(date: Date): string {
   styleUrls: ['./newappointment.component.scss'],
   encapsulation: ViewEncapsulation.None
 })
-export class NewappointmentComponent implements OnInit {
+export class NewappointmentComponent implements OnInit, OnDestroy {
 
 
 
@@ -73,6 +63,9 @@ export class NewappointmentComponent implements OnInit {
 
   availableDocs : any[] = [];
   
+  excludeDays : number[] = [];
+  dayStartHour : number = 0; 
+  dayEndHour : number = 23;
 
   view: CalendarView = CalendarView.Month;
 
@@ -81,6 +74,8 @@ export class NewappointmentComponent implements OnInit {
   locale : string = 'de';
 
   viewDate: Date = new Date();
+
+  daysInWeek = 7;
 
   modalData: {
     action: string;
@@ -128,6 +123,7 @@ export class NewappointmentComponent implements OnInit {
     
   ];
 
+
   constructor(
     private _formBuilder: FormBuilder,
     public dialogRef: MatDialogRef<NewappointmentComponent>, 
@@ -136,24 +132,28 @@ export class NewappointmentComponent implements OnInit {
     private api : ApiService, 
     private datePipe : DatePipe, 
     private auth: AuthenticationService, 
-    private googleAnalytics : GoogleAnalyticsService
+    private googleAnalytics : GoogleAnalyticsService,
+    private _snackBar : MatSnackBar
     ) {
-
 
   }
 
   ngOnInit() {
-    let patientName;
+
+    let patientName, patientEmail;
 
     if (this.auth.isAuthorized()){
       patientName = this.auth.currentUserValue.name || this.auth.currentUserValue.userName;
+      patientEmail = this.auth.currentUserValue.userName;
     }else if (this.auth.isGuest()){
       let guestObject = this.auth.guestObjectValue;
       patientName = guestObject.name;
+      patientEmail = guestObject.userEmail;
     }
     
     this.baseInfoForm = this._formBuilder.group({
       patientName: [patientName, Validators.required],
+      patientEmail : [patientEmail, Validators.required],
       appointmentType: ['', Validators.required],
       doc : ['', Validators.required],
       appointmentNotes: ['', Validators.required],
@@ -171,6 +171,10 @@ export class NewappointmentComponent implements OnInit {
 
     this.getAvailableDocs();
 
+  }
+
+  ngOnDestroy() {
+    
   }
 
   fetchEvents(): void {
@@ -214,8 +218,7 @@ export class NewappointmentComponent implements OnInit {
           result.forEach(element => {
             element.start = new Date(element.start);
             element.end = new Date(element.end);
-
-           element.title = this.datePipe.transform( element.start, "shortTime") + " | " + element.title;
+            element.title = this.datePipe.transform( element.start, "shortTime") + " | " + element.title;
           }); 
 
           this.events$ = result;
@@ -235,6 +238,7 @@ export class NewappointmentComponent implements OnInit {
         "userName" : "Egal"
       })
       this.availableDocs = docs;
+
     }).catch(err => {
       console.error(err);
     })
@@ -251,6 +255,7 @@ export class NewappointmentComponent implements OnInit {
         this.activeDayIsOpen = true;
       }
       this.viewDate = date;
+
     }
   }
 
@@ -260,7 +265,12 @@ export class NewappointmentComponent implements OnInit {
    this.dateTimeForm.patchValue({
      appointmentObj : event, 
      appointmentDateStart : event.start
-   })
+   });
+
+   $('.mat-dialog-container').animate({
+        scrollTop: $('.mat-dialog-container').height()
+    },300);
+
   }
 
   removeSlotSelection(){
@@ -286,19 +296,26 @@ export class NewappointmentComponent implements OnInit {
     appointmentRequest.doc = appointmentRequest["appointmentObj"]["doc"];
 
     let self = this;
-
+    
     this.loaderSrv.setMsgLoading(true, "Bitte warten Sie - wir stellen den Termin ein.");
+    self.flagSubmitted = true;
 
-    this.api.post("/appointment/new", appointmentRequest).then(response => {
+    this.api.post("/appointment/new", appointmentRequest).then((response : any) => {
 
-      self.flagSubmitted = true;
-
-      self.finalForm.patchValue({
-        acceptTerms : true,
-        initiated : "success"
-      });
-      self.stepper.next();
       self.loaderSrv.setMsgLoading(false);
+
+      if (response.success){
+        self.finalForm.patchValue({
+          acceptTerms : true,
+          initiated : "success"
+        });
+        self.stepper.next();
+        
+      }else{
+
+        this._snackBar.open("Wir können Ihren Termin zur Zeit nicht einstellen, da Sie bereits 2 offene Termine registriert haben. Sollten Sie diese nicht wahrnehmen können, so sagen Sie diese bitte vorher ab, bevor Sie neue Termine vereinbaren können. Melden Sie sich an und sehen Sie unter 'myFFA > Profil' Ihre Terminhistorie", "OK");
+
+      }
 
     }).catch(err => {
       self.finalForm.patchValue({

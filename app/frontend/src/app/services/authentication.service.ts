@@ -30,7 +30,8 @@ export class AuthenticationService {
         ) {
         this.currentUserSubject = new BehaviorSubject<any>(JSON.parse(localStorage.getItem('userData')));
         this.currentUser = this.currentUserSubject.asObservable();
-
+        
+        // guestData is not put into localstorage as of now
         this.guestObjectSubject = new BehaviorSubject<any>(JSON.parse(localStorage.getItem('guestData')));
         this.guestObject = this.guestObjectSubject.asObservable();
     }

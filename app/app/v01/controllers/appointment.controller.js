@@ -4,14 +4,11 @@ var MongoClient = require('mongodb').MongoClient;
 var ObjectID = require('mongodb').ObjectID;
 var jwt = require('jsonwebtoken'); 
 var MongoUrl = config.getMongoUrl();
+var moment = require('moment-timezone');
 
 var authCtrl = require('./auth.controller');
 var teleMedCtrl = require('./telemed.controller');
 var emailCtrl = require('./emailer.controller');
-
-var util = require('../util');
-
-var moment = require('moment-timezone');
 
 // @TODO: Add those meta config data into the database 
 
@@ -37,30 +34,6 @@ var appointmentMeta = [{
     "name" : "Reise-Impf-Beratung",
     "durationInSeconds" : 600
   }]
-
-  /**
-   * Deprecated function
-   * @param {*} start 
-   * @param {*} end 
-   * @param {*} flagIncludeWeekends 
-   */
-function _getDaysArray_dep(start, end, flagIncludeWeekends=false) {
-    start = new Date(start); 
-    end = new Date(end); 
-
-    for(var arr=[],dt=start; dt<=end; dt.setDate(dt.getDate()+1)){
-
-        let newDate = new Date(dt); 
-
-        if((newDate.getDay() == 0 || newDate.getDay() == 6) && flagIncludeWeekends){
-            arr.push(newDate);
-        }else if (newDate.getDay() < 6 && newDate.getDay() > 0){
-            arr.push(newDate);
-        }
-        
-    }
-    return arr;
-};
 
 /**
  * Function to return an array of moments/dates between two input dates. Input dates are included.
@@ -117,6 +90,61 @@ async function getAppointmentById(_id){
                     }
                     if (u){
                         resolve(u);
+                    }else{
+                        resolve(false);
+                    }
+                
+                });
+                
+            });
+        }catch(err){
+            reject(err);
+        }
+    })
+}
+
+/**
+ * Validate if a user / user-email has open appointments
+ * @param {*} userId id of a user BSON ready string
+ * @param {*} userEmail string of a user's email address
+ */
+async function hasUserOpenAppointments(userId, userEmail){
+    return new Promise ((resolve, reject) => {
+        try{
+
+            let userIdentifierArray = []
+
+            if (userId){
+                userIdentifierArray.push(userId);
+            }
+
+            if (userEmail){
+                userIdentifierArray.push(userEmail);
+            }
+
+            let filterArray = [
+                {"appointmentObj.start":  {$gte: new Date()} },
+                {"inactive":  {$exists: false}},
+                { "userId": { $in:  userIdentifierArray} }
+            ]
+
+            MongoClient.connect(MongoUrl, function(err, db) {
+        
+                if (err) throw err;
+                
+                let dbo = db.db(config.mongodb.database);
+
+                const collection = dbo.collection('appointments');
+                
+                collection.find(
+                    {$and : filterArray}
+                ).toArray(
+                function(err, results){
+                    if (err){
+                        reject(err);
+                    }
+                    if (results){
+                        resolve(results);
                     }else{
                         resolve(false);
                     }
@@ -468,11 +496,11 @@ async function _insertTeleAppointment(appointmentObj){
 
 }
 
- function addTeleAppointment(req, res){
+ async function addTeleAppointment(req, res){
 
     try{
 
-        let userId = req.userId;
+        let userId = req.userId || null;
         let appointmentObject = req.body;
         
         if (req.flagGuest){
@@ -483,6 +511,23 @@ async function _insertTeleAppointment(appointmentObj){
         }else{
             appointmentObject["userId"] = userId;
         }
+
+        let userObj, userEmail; 
+        if (req.flagGuest){
+            userObj = req.guestObject;
+            userEmail = userObj.userEmail;
+        }else{
+            userObj = await authCtrl.getUserById(userId);
+            userEmail = userObj.userName;
+        }
+
+       let openAppointments = await hasUserOpenAppointments(userId, userEmail).catch(err => {
+           throw new Error(err);
+       })
+
+       if (openAppointments.length > 2){
+            return res.json({"success" : false, "message" : "Too many outstanding existing appointments for this user."})
+       }
 
        let startDate = moment(appointmentObject.appointmentObj.start);
        let endDate = moment(appointmentObject.appointmentObj.end);
@@ -522,13 +567,6 @@ async function _insertTeleAppointment(appointmentObj){
 
                             let appointmentId = insertRes.insertedId.toString();
 
-                            let userObj; 
-                            if (req.flagGuest){
-                                userObj = req.guestObject;
-                            }else{
-                                userObj = await authCtrl.getUserById(userId);
-                            }
-    
                             let data = {
                                 "_id" : appointmentObject["userId"], 
                                 "appointmentId" : appointmentId
@@ -569,7 +607,7 @@ async function _insertTeleAppointment(appointmentObj){
                                 console.error(err);
                             })
 
-                            res.json(response);
+                            res.json({"success" : true});
                         }
                         
 
@@ -862,5 +900,6 @@ module.exports = {
     adminGetTeleSlots, 
     adminAddTeleSlot, 
     adminUpdateTeleSlot,
-    removeAdminTeleSlot
+    removeAdminTeleSlot, 
+    testHasUser
 }

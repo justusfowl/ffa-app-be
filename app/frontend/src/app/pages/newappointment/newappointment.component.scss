@@ -67,6 +67,19 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    line-height: 40px;
+    flex-direction: column;
+
+    .subtitle{
+        font-size: 12px;
+        line-height: normal;
+    }
+}
+
+.baseForm{
+    .appointmentNotes{
+        min-height: 100px;
+    }
 }
 
 .summary{
@@ -75,11 +88,14 @@
         color: black;
         margin-top: 20px;
         margin-bottom: 20px;
+        line-height: 40px;
     }
 
     .form-group{
         margin-bottom: 0 !important ;
     }
+
+    .mat-checkbox-layout { white-space: normal !important; }
 }
 
 .cal-container{
@@ -88,6 +104,55 @@
     .btn-primary{
         border-color: $background_nav;
         background-color: $background_nav;
+    }
+
+    .cal-events{
+        .cal-event{
+            display:none;
+        }
+    }
+
+    .cal-cell:not(.cal-has-events){
+        .cal-cell-top{
+            opacity: 0.2;
+        }
+    }
+
+    .cal-month-view .cal-day-cell {
+        min-height: 50px;
+    }
+}
+
+@media (max-width: 1100px){
+    .cal-container{
+        
+        .cal-month-view{
+            font-size: 12px;
+            padding: 0;
+        }
+
+        .cal-month-view .cal-header{
+            font-size: 10px;
+        }
+
+        .cal-month-view .cal-header .cal-cell {
+            padding: 5px 2px;
+        }
+
+        .cal-cell.cal-has-events{
+            border: 1px solid #aaaaaa;
+            font-weight: 600;
+            
+            .cal-day-badge{
+                display: none;
+            }
+
+            .cal-day-number{
+                font-weight: 600;
+                color: #000000;
+                text-decoration: underline;
+            }
+        }
     }
 }
 
@@ -133,5 +198,21 @@ mat-vertical-stepper.submitted{
         background-color: $background_nav;
         color: white;
         border-radius: 4px;
+    }
+
+    .cal-open-day-events{
+        max-height: 250px;
+        overflow-y: scroll !important;
+    }
+
+}
+
+@media (max-width: 1100px) {
+    .cal-container{   
+        .cal-title-dateframe{
+            letter-spacing: 1px;
+            font-size: 12px; 
+            margin-top: 10px;
+        }
     }
 }
