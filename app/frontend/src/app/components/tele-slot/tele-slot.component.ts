@@ -109,6 +109,8 @@ export class TeleSlotComponent implements OnInit {
     }
   }
 
+  get exceptions() { return <FormArray>this.slotForm.get('exceptions'); }
+
   getAvailableDocs(){
     return new Promise ((resolve, reject) => {
       this.api.get("/appointment/docs").then((docs : any) => {

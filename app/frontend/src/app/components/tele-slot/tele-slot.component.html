@@ -57,7 +57,7 @@
     
                 <div class="exceptions" *ngIf="slotForm.get('exceptions').value.length > 0">
                     <ng-container formArrayName="exceptions">
-                        <div class="exception-item" *ngFor="let excp of slotForm.get('exceptions').controls; let i = index;">
+                        <div class="exception-item" *ngFor="let excp of exceptions.controls; let i = index;">
                             <ng-container [formGroupName]="i">
                                 <button  class="removeBtn" mat-icon-button (click)="removeException(i)">
                                     <mat-icon>delete</mat-icon>
