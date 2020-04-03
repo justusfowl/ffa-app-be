@@ -9,3 +9,5 @@ export const environment = {
   gaId : "UA-72119245-2",
   domain: "facharztpraxis-fuer-allgemeinmedizin.de"
 };
+
+export const JEN_BUILD_NUMBER = "%%BUILD_NUMBER%%";

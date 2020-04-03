@@ -23,4 +23,4 @@ export const environment = {
  */
 // import 'zone.js/dist/zone-error';  // Included with Angular CLI.
 
-export const BUILD_NUMBER = -1;
+export const JEN_BUILD_NUMBER = "%%BUILD_NUMBER%%";

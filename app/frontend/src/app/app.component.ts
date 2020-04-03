@@ -10,7 +10,7 @@ import { Subscription } from 'rxjs';
 import { GoogleAnalyticsService } from './services/google-analytics.service';
 import { Title, DomSanitizer } from '@angular/platform-browser';
 import { SettingsService } from './services/settings.service';
-import { BUILD_NUMBER } from '../environments/environment';
+import { JEN_BUILD_NUMBER } from '../environments/environment';
 
 declare var $: any;
 
@@ -40,7 +40,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
   settingsObj : any = {};
 
   constructor(
-    public auth: AuthenticationService, 
+    public auth: AuthenticationService,
     private router:Router, 
     public loaderSrv : LoaderService, 
     private api : ApiService,
@@ -50,8 +50,8 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
     private settingsSrv : SettingsService,
     private sanitizer : DomSanitizer
   ){  
-    
-    console.log("Loading version from BUILD ---> " + BUILD_NUMBER);
+
+    console.log("Loading version from BUILD ---> " + JEN_BUILD_NUMBER);
 
     this.globalAnnouncement = "Bitte beachten Sie - wir bieten Ihnen ab sofort Video-Konsultationen."
 
