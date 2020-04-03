@@ -46,6 +46,6 @@ cd ..
 echo "Within directory:"
 pwd
 
-sed -i -e "s/%%BUILD_NUMBER%%/$BUILD_NUMBER/g" ./app/frontend/src/environment.prod.ts
+sed -i -e "s/%%BUILD_NUMBER%%/$BUILD_NUMBER/g" ./app/frontend/src/environments/environment.prod.ts
 
 ls init
