@@ -84,13 +84,18 @@
     position: relative;
     height: 150px;
     margin: 10px;
-    width: 220px;
+    max-width: 250px;
     border-radius: 4px;
     box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
 
     .card-title{
         border-bottom: 1px solid #e4e4e4;
         padding-bottom: 10px;
+        text-align: center;
+    }
+    
+    p{
+        text-align: center;
     }
 
     .tag{

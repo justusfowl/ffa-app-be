@@ -46,4 +46,6 @@ cd ..
 echo "Within directory:"
 pwd
 
+echo "export const BUILD_NUMBER = $BUILD_NUMBER;" | tee -a ./app/frontend/src/environment.prod.ts
+
 ls init
