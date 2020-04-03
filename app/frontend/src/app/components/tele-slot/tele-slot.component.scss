@@ -1,0 +1,24 @@
+.exceptions-container{
+    margin-top: 20px;
+
+    .exceptions-header{
+        margin-bottom: 20px;
+
+        p{
+            font-size: 10px;
+            margin-bottom: 5px;
+        }
+    }
+
+    .exceptions{
+        margin: 10px;
+        background-color: #f4f4f4;
+        padding: 10px;
+    }
+
+    .removeBtn{
+        margin-right: 10px;
+        color: #818181;
+    }
+    
+}

@@ -367,6 +367,19 @@ async function getAvailableSlots(req, res){
         datesInBetween.forEach(t_date => {
             slots.forEach(slot => {
 
+                let flagIsWithinException = false;
+
+                slot.exceptions.forEach(element => {
+
+                    let excpStart = moment(element.start);
+                    let excpEnd = moment(element.end);
+
+                    if (excpStart.unix() <= t_date.unix() && excpEnd.unix() >= t_date.unix()){
+                        flagIsWithinException = true;
+                    }
+                    
+                });
+
                 // first possible time based on the slot provided 
                 let startingEvent = moment.tz(t_date.format("MM-DD-YYYY") + " " + slot.startTime, "MM-DD-YYYY HH:ss", config.timeZone);
 
@@ -375,7 +388,7 @@ async function getAvailableSlots(req, res){
 
                 let eventEnd;
 
-                if (t_date.day() == slot.dayId){
+                if (t_date.day() == slot.dayId && !flagIsWithinException){
 
                     do {
 
@@ -725,7 +738,8 @@ function adminAddTeleSlot(req, res){
             userId : body.userId, 
             dayId : body.dayId, 
             startTime : body.startTime, 
-            endTime : body.endTime
+            endTime : body.endTime, 
+            exceptions : body.exceptions
         }
 
         MongoClient.connect(MongoUrl, function(err, db) {
@@ -755,7 +769,7 @@ function adminUpdateTeleSlot(req, res){
 
         let slot = req.body;
         let slotId = slot._id; 
-        let allowedAttributes = ["dayId" , "startTime", "endTime", "userId"];
+        let allowedAttributes = ["dayId" , "startTime", "endTime", "userId", "exceptions"];
 
         if (!slotId){
             return res.send(500, "Please provide an Id")
@@ -767,6 +781,11 @@ function adminUpdateTeleSlot(req, res){
                 delete slot[key];
             }
         }
+
+        slot.exceptions.forEach(element => {
+            element["start"] = new Date( element["start"])
+            element["end"] = new Date( element["end"])
+        });
 
         MongoClient.connect(MongoUrl, function(err, db) {
   

@@ -40,8 +40,64 @@
             <mat-form-field  class="time">
                 <input   matInput type="time" placeholder="Ende"  formControlName="endTime">
             </mat-form-field>
+
+            <div class="exceptions-container">
+
+                <div class="exceptions-header">
+    
+                    <p>
+                        Ausnahmen - für folgende Zeiträume ist dieser Slot nicht verfügbar (gilt nicht rückwirkend für bestehende Termine)
+                    </p>
+    
+                    <button  class="addBtn" mat-button mat-stroked-button (click)="createException()">
+                        <mat-icon>add</mat-icon> Neue Ausnahme
+                    </button>
+    
+                </div>
+    
+                <div class="exceptions" *ngIf="slotForm.get('exceptions').value.length > 0">
+                    <ng-container formArrayName="exceptions">
+                        <div class="exception-item" *ngFor="let excp of slotForm.get('exceptions').controls; let i = index;">
+                            <ng-container [formGroupName]="i">
+                                <button  class="removeBtn" mat-icon-button (click)="removeException(i)">
+                                    <mat-icon>delete</mat-icon>
+                                </button>
+                            
+                                <mat-form-field>
+                                    <input matInput 
+                                        [min]="todayDate" [max]="slotForm.get('exceptions').value[i].end || null"
+                                        placeholder="Start-Datum" 
+                                        [matDatepicker]="pickerStart" 
+                                        formControlName="start" 
+                                        class="form-control" 
+                                        readonly>
+                                    <mat-datepicker-toggle matSuffix [for]="pickerStart"></mat-datepicker-toggle>
+                                    <mat-datepicker touchUi #pickerStart ></mat-datepicker>
+                                </mat-form-field>
+                                -
+                                <mat-form-field>
+                                    <input 
+                                        matInput 
+                                        [min]="slotForm.get('exceptions').value[i].start || todayDate"
+                                        placeholder="End-Datum" 
+                                        [matDatepicker]="pickerEnd" 
+                                        formControlName="end" 
+                                        class="form-control" 
+                                        readonly>
+                                    <mat-datepicker-toggle matSuffix [for]="pickerEnd"></mat-datepicker-toggle>
+                                    <mat-datepicker touchUi #pickerEnd ></mat-datepicker>
+                                </mat-form-field>
+                            </ng-container>
+                        </div>
+                    </ng-container>
+                </div>
+    
+            </div>
           
         </form>
+
+       
+
 
         <div class="menu-row">
     

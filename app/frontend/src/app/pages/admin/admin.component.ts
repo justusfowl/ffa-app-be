@@ -248,18 +248,32 @@ export class AdminComponent implements OnInit, AfterViewInit {
   }
 
   deleteMember(teamMember){
-    this.api.delete("/team/" + teamMember._id).then(res => {
-      let idx = this.teamMembers.findIndex(x => x._id == teamMember._id);
-      this.teamMembers.splice(idx, 1);
-      this.snackBar.open("Gelöscht", "", {
-        duration: 1500
-      })
-    }).catch(err =>{
-      console.warn(err);
-        this.snackBar.open("Etwas hat nicht geklappt", "", {
-        duration: 1500
-      })
-    })
+
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      data: {meta : {"type" : "confirm", "title" : "Team-Member löschen", "messageText" : "Sind Sie sicher, dass Sie den Eintrag löschen möchten?"}}
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result.answerConfirm){
+       
+        this.api.delete("/team/" + teamMember._id).then(res => {
+          let idx = this.teamMembers.findIndex(x => x._id == teamMember._id);
+          this.teamMembers.splice(idx, 1);
+          this.snackBar.open("Gelöscht", "", {
+            duration: 1500
+          })
+        }).catch(err =>{
+          console.warn(err);
+            this.snackBar.open("Etwas hat nicht geklappt", "", {
+            duration: 1500
+          })
+        })
+
+      }
+      console.log('The dialog was closed');
+    });
+
+
   }
 
   async handleTeamFileInput(files: FileList, teamMember){
@@ -462,18 +476,33 @@ export class AdminComponent implements OnInit, AfterViewInit {
       return;
     }
 
-    this.api.delete("/news/"+ newsObj._id, true).then(result => {
-      let idx = this.news.findIndex(x => x._id == newsObj._id);
-      this.news.splice(idx, 1);
-      this.snackBar.open("Gelöscht", "", {
-        duration: 1500
-      })
-    }).catch(err => {
-      console.warn(err);
-      this.snackBar.open("Etwas hat nicht geklappt", "", {
-        duration: 1500
-      })
-    })
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      data: {meta : {"type" : "confirm", "title" : "News-Eintrag löschen", "messageText" : "Sind Sie sicher, dass Sie den Eintrag löschen möchten?"}}
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result.answerConfirm){
+       
+        this.api.delete("/news/"+ newsObj._id, true).then(result => {
+          let idx = this.news.findIndex(x => x._id == newsObj._id);
+          this.news.splice(idx, 1);
+          this.snackBar.open("Gelöscht", "", {
+            duration: 1500
+          })
+        }).catch(err => {
+          console.warn(err);
+          this.snackBar.open("Etwas hat nicht geklappt", "", {
+            duration: 1500
+          })
+        })
+
+      }
+      console.log('The dialog was closed');
+    });
+
+   
+
+   
 
   }
 
@@ -588,18 +617,31 @@ export class AdminComponent implements OnInit, AfterViewInit {
       return;
     }
 
-    this.api.delete("/times/vacation/"+ vacationObj._id, true).then(result => {
-      let idx = this.vacation.findIndex(x => x._id == vacationObj._id);
-      this.vacation.splice(idx, 1);
-      this.snackBar.open("Gelöscht", "", {
-        duration: 1500
-      })
-    }).catch(err => {
-      console.warn(err);
-      this.snackBar.open("Etwas hat nicht geklappt", "", {
-        duration: 1500
-      })
-    })
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      data: {meta : {"type" : "confirm", "title" : "News-Eintrag löschen", "messageText" : "Sind Sie sicher, dass Sie den Eintrag löschen möchten?"}}
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result.answerConfirm){
+       
+        this.api.delete("/times/vacation/"+ vacationObj._id, true).then(result => {
+          let idx = this.vacation.findIndex(x => x._id == vacationObj._id);
+          this.vacation.splice(idx, 1);
+          this.snackBar.open("Gelöscht", "", {
+            duration: 1500
+          })
+        }).catch(err => {
+          console.warn(err);
+          this.snackBar.open("Etwas hat nicht geklappt", "", {
+            duration: 1500
+          })
+        })
+
+      }
+      console.log('The dialog was closed');
+    });
+
+   
   }
 
   addSubstitute(vacationObj){
