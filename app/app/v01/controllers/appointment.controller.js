@@ -900,6 +900,5 @@ module.exports = {
     adminGetTeleSlots, 
     adminAddTeleSlot, 
     adminUpdateTeleSlot,
-    removeAdminTeleSlot, 
-    testHasUser
+    removeAdminTeleSlot
 }
