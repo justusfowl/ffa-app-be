@@ -697,6 +697,7 @@ async function removeAppointment(req, res){
 
         var appointmentId = req.params.appointmentId;
         let userId = req.userId;
+        let now = new Date();
 
         // When a URL is provided to cancel a meeting, the parameter provided in the DELETE 
         // request must match the decoded information from the token
@@ -714,6 +715,10 @@ async function removeAppointment(req, res){
 
         if (appointmentObj.userId != userId){
             return res.send(403, "Modifications allowed only for individual appointments.")
+        }
+
+        if (new Date(appointmentObj.appointmentObj.start).getTime() < now.getTime()){
+            return res.json({"success" : false, "message" : "Appointments can only be removed when they are outstanding in the future."});
         }
 
         teleMedCtrl.removeAppointment(appointmentObj.tele.head_id).then(result => {
@@ -740,7 +745,7 @@ async function removeAppointment(req, res){
                         if (err){
                             res.send(500, err);
                         }else{
-                            res.json({"message" : "ok"});
+                            res.json({"success" : true});
                         }
                     }
                 );

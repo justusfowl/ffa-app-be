@@ -71,12 +71,18 @@ export class MyComponent implements OnInit {
     dialogRef.afterClosed().subscribe(result => {
       if (result.answerConfirm){
        
-        this.api.delete("/appointment/my/"+appointmentObj._id).then(result => {
-          console.log("removed..")
-          appointmentObj.inactive = true;
-          this._snackBar.open("Termin wurde gelöscht.", "", {
-            duration: 2000,
-          });
+        this.api.delete("/appointment/my/"+appointmentObj._id).then((result : any) => {
+          if (result.success){
+            appointmentObj.inactive = true;
+            this._snackBar.open("Termin wurde gelöscht.", "", {
+              duration: 2000,
+            });
+          }else{
+            this._snackBar.open("Konnte nicht gelöscht werden, da der Start in der Vergangenheit liegt.", "", {
+              duration: 2000,
+            });
+          }
+          
         }).catch(err => {
           console.error(err);
         });
@@ -84,9 +90,16 @@ export class MyComponent implements OnInit {
       }
       console.log('The dialog was closed');
     });
+  }
 
-   
-    
+  canDelete(appointmentObj){
+    let now = new Date(); 
+
+    if (new Date(appointmentObj.appointmentObj.start).getTime() > now.getTime()){
+      return true;
+    }else{
+      return false;
+    }
   }
 
   openTeleAppointment(appointmentObj){

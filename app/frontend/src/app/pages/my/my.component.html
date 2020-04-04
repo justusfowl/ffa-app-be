@@ -56,7 +56,7 @@
             <mat-tab label="Termine" >
                 <div class="appointments">
                         <div class="content-header ">
-                            <button class="saveBtn" mat-button matSuffix mat-stroked-button (click)="newTeleAppointment()" >
+                            <button class="newBtn" mat-button matSuffix mat-stroked-button (click)="newTeleAppointment()" >
                                 Neuer Video-Termin
                             </button>
         
@@ -112,7 +112,7 @@
                                                 gelöscht
                                             </button>
     
-                                            <button *ngIf="!app.inactive" class="saveBtn" mat-button matSuffix mat-stroked-button color="warn" (click)="removeTeleAppointment(app)" >
+                                            <button *ngIf="!app.inactive" [disabled]="!canDelete(app)" class="saveBtn" mat-button matSuffix mat-stroked-button color="warn" (click)="removeTeleAppointment(app)" >
                                                 Termin löschen
                                             </button>
     

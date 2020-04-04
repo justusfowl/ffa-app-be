@@ -175,7 +175,7 @@
 
     <ng-template matStepLabel>Zusammenfassung</ng-template>
 
-    <div class="summary">
+    <div class="summary" *ngIf="dateTimeForm.get('appointmentObj').value.doc">
 
         Sie sind fast fertig:
 
@@ -199,7 +199,7 @@
         
         <div class="form-group">
             <mat-form-field >
-                <input required matInput type="text" placeholder="Arzt" class="form-control" [ngModel]="baseInfoForm.value.doc.userName" readonly>
+                <input required matInput type="text" placeholder="Arzt" class="form-control" [ngModel]="dateTimeForm.get('appointmentObj').value.doc.userName" readonly>
             </mat-form-field>
         </div>
 

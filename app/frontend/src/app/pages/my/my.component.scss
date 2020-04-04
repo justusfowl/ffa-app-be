@@ -29,6 +29,28 @@
     }
 }
 
+@media(max-width: 1100px){
+    .appointments{
+        .content-header{
+            display: inline-block;
+            margin-bottom: 20px;
+
+            .newBtn{
+                margin-bottom: 10px;
+            }
+
+
+            .toggle-previous-app{
+                float: left;
+            }
+        }
+
+        .mat-expansion-panel-header-description{
+            display: none;
+        }
+    }
+}
+
 .appointments{
 
     .toggle-previous-app{
