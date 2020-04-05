@@ -36,6 +36,7 @@
           </mat-form-field>
       </div>
 
+      <!--
       <div class="form-group">
           <mat-form-field>
             <mat-label>Anfrage-Details</mat-label>
@@ -43,6 +44,7 @@
             <mat-hint class="hint" align="end">{{baseInfoForm.value.appointmentNotes.length}} / 1000</mat-hint>
           </mat-form-field>
       </div>
+      -->
      
       <div>
         <button mat-button (click)="abort()">Abbrechen</button>
@@ -202,12 +204,13 @@
                 <input required matInput type="text" placeholder="Arzt" class="form-control" [ngModel]="dateTimeForm.get('appointmentObj').value.doc.userName" readonly>
             </mat-form-field>
         </div>
-
+        <!--
         <div class="form-group">
             <mat-form-field>
                 <textarea required matInput type="text" placeholder="Details" class="form-control " [ngModel]="baseInfoForm.value.appointmentNotes" readonly></textarea>
             </mat-form-field>
         </div>
+        -->
         
        
         <br/>    

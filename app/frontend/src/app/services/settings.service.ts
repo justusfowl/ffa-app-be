@@ -9,6 +9,7 @@ export class SettingsService {
 
 
     _settingsObj : Subject<any>;
+    _settings : any;
 
   constructor(
       private api : ApiService
@@ -29,6 +30,7 @@ export class SettingsService {
             _set = { }
           }
           this._settingsObj.next(_set);
+          this._settings = _set;
        
       }).catch(err => {
         console.error(err);
@@ -42,6 +44,10 @@ export class SettingsService {
 
   _setSettingsObj(result){
     
+  }
+
+  getSettings(){
+    return this._settings;
   }
 
 

@@ -39,6 +39,8 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
 
   settingsObj : any = {};
 
+  buildNum : string = "";
+
   constructor(
     public auth: AuthenticationService,
     private router:Router, 
@@ -50,8 +52,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
     private settingsSrv : SettingsService,
     private sanitizer : DomSanitizer
   ){  
-
-    console.log("Loading version from BUILD ---> " + JEN_BUILD_NUMBER);
+    this.buildNum = JEN_BUILD_NUMBER;
 
     this.globalAnnouncement = "Bitte beachten Sie - wir bieten Ihnen ab sofort Video-Konsultationen."
 

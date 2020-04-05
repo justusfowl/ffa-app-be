@@ -2618,16 +2618,26 @@ input {
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		flex-direction: column;
+		flex-direction: column !important;
 		
 		.cc-deny{
-			display: none;
+			// display: none;
+		}
+
+		.cc-message{
+			flex: 0 !important;
 		}
 	
 		.cc-allow{
 			background-color: $background_nav;
 			padding: 30px 40px 30px 40px;
 		}
+	}
+
+	.cc-theme-edgeless.cc-window {
+		padding: 0;
+		display: flex;
+		flex-direction: column;
 	}
 	
 	.cc-banner.cc-theme-edgeless .cc-message {
@@ -2659,7 +2669,7 @@ input {
 		flex-direction: column;
 		
 		.cc-deny{
-			display: none;
+			// display: none;
 		}
 	
 		.cc-allow{

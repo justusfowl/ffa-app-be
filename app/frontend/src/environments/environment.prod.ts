@@ -6,7 +6,7 @@ export const environment = {
   apiPort : "",
   apiEnd : "/api/v01", 
   socketPort: "", 
-  gaId : "UA-72119245-2",
+  gaId : "UA-72119245-1",
   domain: "facharztpraxis-fuer-allgemeinmedizin.de"
 };
 

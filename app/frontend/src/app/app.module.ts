@@ -60,8 +60,8 @@ const cookieConfig:NgcCookieConsentConfig = {
   content : {
     "message": "Wir möchten Ihnen das bestmögliche Nutzererlebnis bei unseren digitalen Gesundheitsdiensten bieten und nutzen dafür Cookies.",
     "dismiss": "OK!",
-    "allow": "OK!",
-    "deny": "Ablehnen",
+    "allow": "OK - ich bin einverstanden!",
+    "deny": "Lieber nicht.",
     "link": "mehr Infos",
     "href": "/privacy",
     "policy": "Datenschutz"

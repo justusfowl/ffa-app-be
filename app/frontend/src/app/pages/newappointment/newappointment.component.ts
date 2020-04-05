@@ -156,7 +156,7 @@ export class NewappointmentComponent implements OnInit, OnDestroy {
       patientEmail : [patientEmail, Validators.required],
       appointmentType: ['', Validators.required],
       doc : ['', Validators.required],
-      appointmentNotes: ['', Validators.required],
+      // appointmentNotes: ['', Validators.required],
     });
 
     this.dateTimeForm = this._formBuilder.group({

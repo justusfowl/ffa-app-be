@@ -45,7 +45,7 @@ export class GoogleAnalyticsService {
       return;
     }
     gtag('js', new Date());
-    console.log("Initiatilizing GA with...#" + this.gaId)
+    console.log("Initiatilizing GA with...#" + this.gaId);
     gtag('config', this.gaId);
 
     this.active = true;

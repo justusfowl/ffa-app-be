@@ -18,6 +18,8 @@ export class PrivacyComponent implements OnInit, OnDestroy  {
     private sanitizer : DomSanitizer, 
     private settingsSrv : SettingsService
   ) {
+
+    this.settingsObj = this.settingsSrv.getSettings();
     
     this.settingsSubscription = this.settingsSrv.settingsObjObservable.subscribe(result => {
       this.settingsObj = result;

@@ -400,7 +400,9 @@ async function getAvailableSlots(req, res){
                 slot.exceptions.forEach(element => {
 
                     let excpStart = moment(element.start);
-                    let excpEnd = moment(element.end);
+                    // add 1 day to the end of the exception, so that 
+                    // it includes the exception-end-date 
+                    let excpEnd = moment(element.end).add(1, 'days');
 
                     if (excpStart.unix() <= t_date.unix() && excpEnd.unix() >= t_date.unix()){
                         flagIsWithinException = true;
