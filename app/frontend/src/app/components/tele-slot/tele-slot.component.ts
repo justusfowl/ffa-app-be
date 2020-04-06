@@ -1,7 +1,8 @@
 import { Component, OnInit, Inject } from '@angular/core';
-import { FormGroup, FormControl, Validators, FormArray, FormBuilder } from '@angular/forms';
+import { FormGroup, FormControl, Validators, FormArray, FormBuilder, ValidatorFn, AbstractControl, ValidationErrors } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { ApiService } from 'src/app/services/api.service';
+
 
 @Component({
   selector: 'app-tele-slot',
@@ -10,7 +11,8 @@ import { ApiService } from 'src/app/services/api.service';
 })
 export class TeleSlotComponent implements OnInit {
 
-  todayDate: Date = new Date()
+  todayDate: Date = new Date();
+  maxDate : Date = new Date('12-31-2099');
 
   slotForm : FormGroup = new FormGroup({
     userId : new FormControl("", Validators.required),
@@ -57,8 +59,6 @@ export class TeleSlotComponent implements OnInit {
     private fb: FormBuilder
   ) { 
 
-
-
    }
 
   async ngOnInit() {
@@ -69,32 +69,28 @@ export class TeleSlotComponent implements OnInit {
 
     if (this.data.teleslotObj){
 
-      let exceptionsArray = [];
+      this.slotForm =  new FormGroup({
+        userId : new FormControl(this.data.teleslotObj.userId, Validators.required),
+        dayId : new FormControl(this.data.teleslotObj.dayId, Validators.required),
+        startTime : new FormControl(this.data.teleslotObj.start.getHours().toFixed().padStart(2,"0") + ":" + this.data.teleslotObj.start.getMinutes().toFixed().padStart(2,"0"), Validators.required),
+        endTime : new FormControl(this.data.teleslotObj.end.getHours().toFixed().padStart(2,"0") + ":" + this.data.teleslotObj.end.getMinutes().toFixed().padStart(2,"0"), Validators.required), 
+        exceptions : new FormArray([])
+      });
 
       if (this.data.teleslotObj.exceptions){
 
         this.data.teleslotObj.exceptions.forEach(element => {
 
           if (this.todayDate.getTime()<=new Date(element["end"]).getTime()){
-            exceptionsArray.push(
+            this.exceptions.push(
               new FormGroup({
-                start: new FormControl(element.start || ''),
-                end: new FormControl(element.end || '')
+                start: new FormControl(new Date(element.start) || '',Validators.required),
+                end: new FormControl(new Date(element.end) || '',Validators.required)
               })
             )
           }
-         
         });
-
       }
-
-      this.slotForm =  new FormGroup({
-        userId : new FormControl(this.data.teleslotObj.userId, Validators.required),
-        dayId : new FormControl(this.data.teleslotObj.dayId, Validators.required),
-        startTime : new FormControl(this.data.teleslotObj.start.getHours().toFixed().padStart(2,"0") + ":" + this.data.teleslotObj.start.getMinutes().toFixed().padStart(2,"0"), Validators.required),
-        endTime : new FormControl(this.data.teleslotObj.end.getHours().toFixed().padStart(2,"0") + ":" + this.data.teleslotObj.end.getMinutes().toFixed().padStart(2,"0"), Validators.required), 
-        exceptions : new FormArray(exceptionsArray)
-      });
 
     }else{
 
@@ -130,6 +126,11 @@ export class TeleSlotComponent implements OnInit {
   }
 
   confirm(){
+
+    if (!this.validateSlotTimes()){
+      return;
+    }
+
     let result; 
 
     if (this.data.teleslotObj){
@@ -158,8 +159,8 @@ export class TeleSlotComponent implements OnInit {
     let exceptions = this.slotForm.get('exceptions') as any;
 
     const control = new FormGroup({
-      start: new FormControl(''),
-      end: new FormControl('')
+      start: new FormControl('',Validators.required),
+      end: new FormControl('',Validators.required)
     });
 
     exceptions.push(control);
@@ -174,4 +175,29 @@ export class TeleSlotComponent implements OnInit {
 
   }
 
+  public findInvalidControls() {
+    const invalid = [];
+    const controls = this.slotForm.controls;
+    for (const name in controls) {
+        if (controls[name].invalid) {
+            invalid.push(name);
+        }
+    }
+    console.log(invalid);
+  } 
+  
+  validateSlotTimes(){
+    let startTimeControl = this.slotForm.get("startTime");
+    let endTimeControl = this.slotForm.get("endTime");
+  
+    if (parseFloat(startTimeControl.value.replace(":", ""))  > parseFloat(endTimeControl.value.replace(":", ""))){
+      return false;
+    }else{
+      return true;
+    }
+  }
+
 }
+
+
+

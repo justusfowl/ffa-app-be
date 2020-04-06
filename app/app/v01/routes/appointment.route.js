@@ -33,5 +33,8 @@ router.route('/slots')
 router.route('/slots/:slotId')
     .delete([tokenValidator.detectToken, middlware_hasScopeAdmin], appointmentCtrl.removeAdminTeleSlot)
 
+router.route("/calendar")
+    .get([tokenValidator.verifyToken, middlware_hasScopeAdminDoc], appointmentCtrl.serveAdminCal)
+    .post(appointmentCtrl.addEvent)
  // [tokenValidator.verifyToken, [tokenValidator.detectToken, tokenValidator.HasUserVerifiedEmail]
 module.exports = router;

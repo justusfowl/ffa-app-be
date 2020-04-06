@@ -312,9 +312,14 @@ export class NewappointmentComponent implements OnInit, OnDestroy {
         self.stepper.next();
         
       }else{
-
-        this._snackBar.open("Wir können Ihren Termin zur Zeit nicht einstellen, da Sie bereits 2 offene Termine registriert haben. Sollten Sie diese nicht wahrnehmen können, so sagen Sie diese bitte vorher ab, bevor Sie neue Termine vereinbaren können. Melden Sie sich an und sehen Sie unter 'myFFA > Profil' Ihre Terminhistorie", "OK");
-
+        if (response.key == 'TOO_MANY_OUTSTANDING'){
+          this._snackBar.open("Wir können Ihren Termin zur Zeit nicht einstellen, da Sie bereits 2 offene Termine registriert haben. Sollten Sie diese nicht wahrnehmen können, so sagen Sie diese bitte vorher ab, bevor Sie neue Termine vereinbaren können. Melden Sie sich an und sehen Sie unter 'myFFA > Profil > Termine'", "OK");
+        }else if (response.key == 'SLOT_NOT_AVAILABLE'){
+          this._snackBar.open("Leider hat das nicht geklappt - möglicherweise wurde Ihr Slot soeben vergeben. Bitte gehen Sie zum vorherigen Schritt zurück und wählen Sie einen anderen aus.", "OK");
+        }else{
+          this._snackBar.open("Etwas hat leider nicht geklappt - bitte versuchen Sie es erneut oder mit einem anderen Slot.", "OK");
+        }
+       
       }
 
     }).catch(err => {

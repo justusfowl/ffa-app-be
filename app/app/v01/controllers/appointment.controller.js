@@ -9,6 +9,9 @@ var moment = require('moment-timezone');
 var authCtrl = require('./auth.controller');
 var teleMedCtrl = require('./telemed.controller');
 var emailCtrl = require('./emailer.controller');
+var timesCtrl = require('./times.controller');
+
+const ical = require('ical-generator');
 
 // @TODO: Add those meta config data into the database 
 
@@ -263,7 +266,8 @@ function _validateSlotAgainstAppointments(slot, appointments){
     let confictIdx = appointments.findIndex(x => 
         (x.appointmentObj.end > slot.start && x.appointmentObj.end < slot.end) || 
         (x.appointmentObj.start > slot.start && x.appointmentObj.start < slot.end) || 
-        (x.appointmentObj.start <= slot.start && x.appointmentObj.end >= slot.end)
+        (x.appointmentObj.start <= slot.start && x.appointmentObj.end >= slot.end) || 
+        (x.appointmentObj.start >= slot.start && x.appointmentObj.end <= slot.end)
         )
     if (confictIdx > -1){
         return false;
@@ -376,16 +380,26 @@ async function getAvailableSlots(req, res){
             return res.send(500, "Please limit date ranges to 35 days.");
         }
 
-        // no further planning > 50 days
+        // no further planning > X days
         if (moment(endDate, "MM-DD-YYYY").diff(firstAvailableDate, 'days') > 62){
             return res.json([])
         }
 
-        let slots = await _getSlots(docId);
+        let slots = await _getSlots(docId).catch(err => {
+            throw err;
+        });
 
-        slots = await _enrichSlotsWithUserInfo(slots);
+        slots = await _enrichSlotsWithUserInfo(slots).catch(err => {
+            throw err;
+        });
 
-        let existingAppointments = await _getAppointmentsFromDateRange(startDate, endDate);
+        let vacation = await timesCtrl.getVacationBetweenDates(startDate, endDate).catch(err => {
+            throw err;
+        });
+
+        let existingAppointments = await _getAppointmentsFromDateRange(startDate, endDate).catch(err => {
+            throw err;
+        });
 
         // create all theoretical slots for that type of appointment
 
@@ -409,6 +423,17 @@ async function getAvailableSlots(req, res){
                     }
                     
                 });
+
+                vacation.forEach(element => {
+                    let vacStart = moment(element.vacationStart);
+                    // add 1 day to the end of the exception, so that 
+                    // it includes the exception-end-date 
+                    let vacEnd = moment(element.vacationEnd);
+
+                    if (vacStart.unix() <= t_date.unix() && vacEnd.unix() >= t_date.unix()){
+                        flagIsWithinException = true;
+                    }
+                })
 
                 // first possible time based on the slot provided 
                 let startingEvent = moment.tz(t_date.format("MM-DD-YYYY") + " " + slot.startTime, "MM-DD-YYYY HH:ss", config.timeZone);
@@ -493,9 +518,58 @@ async function _insertTeleAppointment(appointmentObj){
             reject(err);
         }
     })
+}
 
 
+async function _checkIfSlotIsFree(startDate, endDate, docUserId){
 
+    startDate = new Date(startDate);
+    endDate = new Date(endDate);
+
+    return new Promise((resolve, reject) => {
+
+        let filterObj = {
+            "doc._id" : docUserId, 
+            "inactive":  {$exists: false},
+            $or : [ 
+                { $and : [ {"appointmentObj.end":  {$gt: startDate}}, {"appointmentObj.end":  {$lt: endDate}}]},
+                { $and : [ {"appointmentObj.start":  {$gt: startDate}}, {"appointmentObj.start":  {$lt: endDate}}]},
+                { $and : [ {"appointmentObj.start":  {$gte: startDate}}, {"appointmentObj.end":  {$lte: endDate}}]},
+                { $and : [ {"appointmentObj.start":  {$lte: startDate}}, {"appointmentObj.end":  {$gte: endDate}}]}
+            ]
+        };
+
+        try{
+
+            MongoClient.connect(MongoUrl, function(err, db) {
+      
+                if (err) throw err;
+                
+                let dbo = db.db(config.mongodb.database);
+     
+                const collection = dbo.collection('appointments');
+    
+                collection.find(filterObj).sort({"appointmentObj.start": -1}).toArray(function(error, result){
+
+                    if (error){
+                        reject(error);
+                    }else{
+                        if (result.length == 0){
+                            resolve(true);
+                        }else{
+                            resolve(false);
+                        }
+                    }
+    
+                });
+    
+            });
+    
+        }catch(err){
+            reject(err);
+        }
+
+    })
 }
 
  async function addTeleAppointment(req, res){
@@ -514,6 +588,10 @@ async function _insertTeleAppointment(appointmentObj){
             appointmentObject["userId"] = userId;
         }
 
+        if (!appointmentObject.doc._id){
+            return res.send(500, "No docId provided");
+        }
+
         let userObj, userEmail; 
         if (req.flagGuest){
             userObj = req.guestObject;
@@ -523,16 +601,23 @@ async function _insertTeleAppointment(appointmentObj){
             userEmail = userObj.userName;
         }
 
-       let openAppointments = await hasUserOpenAppointments(userId, userEmail).catch(err => {
-           throw new Error(err);
-       })
+        let openAppointments = await hasUserOpenAppointments(userId, userEmail).catch(err => {
+            throw new Error(err);
+        })
 
-       if (openAppointments.length > 2){
-            return res.json({"success" : false, "message" : "Too many outstanding existing appointments for this user."})
-       }
+        // at time of entry, allow only up until 2 inserted, outstanding appointments
+        if (openAppointments.length > 1){
+            return res.json({"success" : false, "key" : "TOO_MANY_OUTSTANDING", "message" : "Too many outstanding existing appointments for this user."})
+        }
 
-       let startDate = moment(appointmentObject.appointmentObj.start);
-       let endDate = moment(appointmentObject.appointmentObj.end);
+        let startDate = moment(appointmentObject.appointmentObj.start);
+        let endDate = moment(appointmentObject.appointmentObj.end);
+
+        let slotIsFree = await _checkIfSlotIsFree(startDate, endDate, appointmentObject.doc._id);
+
+        if (!slotIsFree){
+            return res.json({"success" : false, "key" : "SLOT_NOT_AVAILABLE", "message" : "Sorry - this slot is no longer available."})
+        }
 
         // get duration in seconds
         let durationInSec = (endDate.unix() - startDate.unix());
@@ -956,6 +1041,37 @@ function removeAdminTeleSlot(req, res){
     }
 }
 
+const cal = ical({
+    domain: 'example.com',
+    prodId: '//superman-industries.com//ical-generator//EN',
+    events: [
+        {
+            start: moment(),
+            end: moment().add(1, 'hour'),
+            summary: 'Example Event',
+            description: 'It works ;)',
+            url: 'https://example.com'
+        }
+    ]
+});
+
+function serveAdminCal(req, res){
+    cal.serve(res);
+}
+
+function addEvent(req, res){
+    let meeting = {
+        start: moment().add(3, 'hour'),
+        end: moment().add(4, 'hour'),
+        summary: 'Blubb',
+        description: 'BlubbBlubbBlubb It works ;)',
+        url: 'https://example.com'
+    };
+    cal.createEvent(meeting)
+
+    res.json({"success" : true})
+}
+
 module.exports = {
     getAvailableSlots, 
     getAvailableDocs, 
@@ -970,5 +1086,8 @@ module.exports = {
     adminGetTeleSlots, 
     adminAddTeleSlot, 
     adminUpdateTeleSlot,
-    removeAdminTeleSlot
+    removeAdminTeleSlot,
+
+    serveAdminCal,
+    addEvent
 }

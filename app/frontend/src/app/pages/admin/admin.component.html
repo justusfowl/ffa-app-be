@@ -276,16 +276,16 @@
                     </div>
                     <div>
                         <button  class="saveBtn" mat-button matSuffix mat-stroked-button (click)="saveVacation(vac)">
-                            <mat-icon>save</mat-icon>
+                            <mat-icon>save</mat-icon> Speichern
                         </button>
 
                         <button  class="saveBtn" mat-button matSuffix mat-stroked-button (click)="copyVacation(vac)">
-                            <mat-icon>file_copy</mat-icon>
+                            <mat-icon>file_copy</mat-icon> Kopieren
                         </button>
 
                         
                         <button (click)="deleteVacation(vac)"  mat-button matSuffix mat-stroked-button >
-                            <mat-icon>delete</mat-icon>
+                            <mat-icon>delete</mat-icon> Löschen
                         </button>
                     </div>
 
@@ -438,6 +438,7 @@
                 [dayEndHour]="19"
                 [hourSegments]="2"
                 (click)="openTeleSlot()"
+                (eventClicked)="openTeleSlot($event.event)"
             >
             </mwl-calendar-week-view>
         

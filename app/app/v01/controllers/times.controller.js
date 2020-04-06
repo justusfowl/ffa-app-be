@@ -68,7 +68,7 @@ function _getVacationTimes(){
  
             collection.find(
                 {vacationEnd:  {$gte: new Date()}}
-            ).toArray(function(error, result){
+            ).sort( { vacationEnd: 1 } ).toArray(function(error, result){
                 if (error){
                     reject(err);
                 }else{
@@ -109,6 +109,50 @@ function getIsCurrentlyVacation(){
                         responseObj.vacationObj = result[0];
                     }
                     resolve(responseObj);
+                }
+
+            });
+                
+          });
+
+    })
+}
+
+/**
+ * Function to return vacation slots that are falling within a given timeframe
+ * @param {*} startDate 
+ * @param {*} endDate 
+ */
+function getVacationBetweenDates(startDate, endDate){
+
+    startDate = new Date(startDate);
+    endDate = new Date(endDate);
+
+    let filterObj = {
+        $or : [
+            { $and : [ {"vacationEnd":  {$gt: startDate}}, {"vacationEnd":  {$lt: endDate}}]},
+            { $and : [ {"vacationStart":  {$gt: startDate}}, {"vacationStart":  {$lt: endDate}}]},
+            { $and : [ {"vacationStart":  {$gte: startDate}}, {"vacationEnd":  {$lte: endDate}}]},
+            { $and : [ {"vacationStart":  {$lte: startDate}}, {"vacationEnd":  {$gte: endDate}}]}
+        ]
+    };
+
+    return new Promise((resolve, reject) => {
+
+        MongoClient.connect(MongoUrl, function(err, db) {
+  
+            if (err) throw err;
+            
+            let dbo = db.db(config.mongodb.database);
+ 
+            const collection = dbo.collection('vacation');
+ 
+            collection.find(filterObj).toArray(function(error, result){
+
+                if (error){
+                    reject(err);
+                }else{
+                   resolve(result);
                 }
 
             });
@@ -238,5 +282,6 @@ module.exports = {
     updateOpenDay,
     upsertVacation,
     removeVacation,
-    getIsCurrentlyVacation
+    getIsCurrentlyVacation,
+    getVacationBetweenDates
 }

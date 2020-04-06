@@ -46,7 +46,7 @@ async function _getCoachMeta(){
 (async() => {
 
   questions = await _getCoachMeta().catch(err => {
-    throw err;
+    console.error(err);
   });
 
 })();

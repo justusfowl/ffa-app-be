@@ -35,10 +35,10 @@
             </mat-form-field>
 
             <mat-form-field  class="time">
-                <input  matInput type="time" placeholder="Start" formControlName="startTime" >
+                <input required matInput type="time" placeholder="Start" formControlName="startTime" >
             </mat-form-field>
             <mat-form-field  class="time">
-                <input   matInput type="time" placeholder="Ende"  formControlName="endTime">
+                <input  required matInput type="time" placeholder="Ende"  formControlName="endTime">
             </mat-form-field>
 
             <div class="exceptions-container">
@@ -65,7 +65,7 @@
                             
                                 <mat-form-field>
                                     <input matInput 
-                                        [min]="todayDate" [max]="slotForm.get('exceptions').value[i].end || null"
+                                        [max]="slotForm.get('exceptions').value[i].end || maxDate"
                                         placeholder="Start-Datum" 
                                         [matDatepicker]="pickerStart" 
                                         formControlName="start" 
@@ -105,7 +105,7 @@
                 Abbruch
             </button>
 
-            <button  class="saveBtn" mat-button (click)="confirm()" [disabled]="slotForm.invalid">
+            <button  class="saveBtn" mat-button (click)="confirm()" [disabled]="slotForm.invalid || !validateSlotTimes()">
                 OK
             </button>
 

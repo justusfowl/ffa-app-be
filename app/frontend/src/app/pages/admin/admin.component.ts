@@ -760,10 +760,6 @@ export class AdminComponent implements OnInit, AfterViewInit {
   getUsers(refresher?){
     this.api.get("/auth/users", {params : {}}, true).then((result : any) => {
       this.users = result;
-
-      if (refresher){
-        refresher.target.complete();
-      }
     }).catch(err => {
       console.error(err);
     })
