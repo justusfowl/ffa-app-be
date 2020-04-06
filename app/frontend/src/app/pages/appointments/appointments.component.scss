@@ -4,8 +4,29 @@
 .page-appointments{
     padding: 20px;
     
-    .btn-primary{
+    .btn-primary.active,
+    .btn-primary:not(:disabled):not(.disabled):active, .btn-primary:not(:disabled):not(.disabled).active, .show > .btn-primary.dropdown-toggle{
         border-color: $background_nav;
         background-color: $background_nav;
+        color: white;
     }
+
+    .btn-primary{
+        border-color: $background_dark;
+        background-color: $gray;
+        color: $background_dark;
+    }
+
+    .btn-primary:hover{
+        cursor: pointer;
+        background-color: $background_nav;
+        color: white;
+    }
+
+
+    .cal-time-events{
+        max-height: 70vh;
+        overflow-y: scroll;
+    }
+    
 }

@@ -1,0 +1,50 @@
+<div class="appointment-details" *ngIf="appointmentObj">
+
+        <h4>Termindetails:</h4>
+
+        <p class="datetime-slot">
+            {{appointmentObj.start | date:'longDate':'de'}} <br/><br/>
+            
+            {{appointmentObj.start | date:'shortTime':'de'}} - {{appointmentObj.end | date:'shortTime':'de'}}
+        </p>
+
+        <div class="form-group">
+            <mat-form-field >
+                <input  matInput type="text" placeholder="Name" class="form-control" [ngModel]="appointmentObj.patientName" readonly>
+                <mat-hint class="hint" >{{appointmentObj.patientEmail}}</mat-hint>
+            </mat-form-field>
+        </div>
+
+        <div class="form-group">
+            <mat-form-field >
+                <input  matInput type="text" placeholder="Anfrageart" class="form-control" [ngModel]="appointmentObj.appointmentType.name" readonly>
+            </mat-form-field>
+        </div>
+
+        
+        <div class="form-group">
+            <mat-form-field >
+                <input  matInput type="text" placeholder="Arzt" class="form-control" [ngModel]="appointmentObj.doc.userName" readonly>
+            </mat-form-field>
+        </div>
+        <!--
+        <div class="form-group">
+            <mat-form-field>
+                <textarea required matInput type="text" placeholder="Details" class="form-control " [ngModel]="baseInfoForm.value.appointmentNotes" readonly></textarea>
+            </mat-form-field>
+        </div>
+        -->
+        
+        <br/>    
+
+
+        <div class="actions">
+            <button mat-stroked-button (click)="close()">Schließen</button>
+            <button mat-stroked-button color="accent" [disabled]="appointmentObj.inactive || isHistoricAppointment" (click)="deleteAppointment()"><mat-icon>delete</mat-icon>Termin absagen</button>
+            <button layout-align="end-start" [disabled]="appointmentObj.inactive || isHistoricAppointment" matSuffix mat-stroked-button (click)="handleInitTeleDialIn()" *ngIf="appointmentObj.tele">
+                <mat-icon>videocam</mat-icon>Video-Termin öffnen
+            </button>
+        </div>
+            
+
+    </div>

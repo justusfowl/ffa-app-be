@@ -3,6 +3,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
 import { ApiService } from 'src/app/services/api.service';
 import { LoaderService } from 'src/app/services/loader.service';
 import { AuthenticationService } from 'src/app/services/authentication.service';
+import { GoogleAnalyticsService } from 'src/app/services/google-analytics.service';
 
 @Component({
   selector: 'app-cancelappointment',
@@ -20,7 +21,8 @@ export class CancelappointmentComponent implements OnInit, AfterViewInit {
     @Inject(MAT_DIALOG_DATA) public data: any, 
     private api : ApiService,
     private loaderSrv : LoaderService, 
-    private auth : AuthenticationService
+    private auth : AuthenticationService,
+    private googleAnalytics : GoogleAnalyticsService
   ) {
 
     if (data.token){
@@ -47,9 +49,16 @@ export class CancelappointmentComponent implements OnInit, AfterViewInit {
   }
 
   removeAppointment(){
+
     this.api.delete("/appointment/my/"+this.appointmentId).then(result => {
       this.loaderSrv.setMsgLoading(false);
       this.auth.setTmpToken(null);
+
+      this.googleAnalytics.sendEvent("user-delete",{
+        category: "video-dialog", 
+        label : ""
+      });
+      
     }).catch(err => {
       this.flagError = true;
       this.loaderSrv.setMsgLoading(false);

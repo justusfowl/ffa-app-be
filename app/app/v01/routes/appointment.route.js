@@ -9,6 +9,9 @@ var middlware_hasScopeAdminDoc = tokenValidator.HasScope(['admin', 'doc']);
 router.route("/")
     .get([tokenValidator.verifyToken, middlware_hasScopeAdminDoc], appointmentCtrl.getAppointments)
 
+router.route("/:appointmentId")
+    .delete([tokenValidator.detectToken, middlware_hasScopeAdmin], appointmentCtrl.adminRemoveAppointment)
+
 router.route('/new')
     .get([tokenValidator.detectToken, tokenValidator.HasUserVerifiedEmail], appointmentCtrl.getAvailableSlots)
     .post([tokenValidator.detectToken, tokenValidator.HasUserVerifiedEmail], appointmentCtrl.addTeleAppointment)

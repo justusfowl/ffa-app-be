@@ -3,7 +3,7 @@
   <head>
     <meta name="viewport" content="width=device-width" />
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <title>Konto-Aktivierung</title>
+    <title>Video-Konsultation</title>
     <style>
       /* -------------------------------------
           GLOBAL RESETS
@@ -282,7 +282,7 @@
           <div class="content">
 
             <!-- START CENTERED WHITE CONTAINER -->
-            <span class="preheader">Bitte aktivieren Sie Ihr Konto.</span>
+            <span class="preheader">Ihr Online-Termin</span>
             <table class="main">
 
               <!-- START MAIN CONTENT AREA -->
@@ -292,9 +292,16 @@
                     <tr>
                       <td>
                         <h2>Hallo {{userName}},</h2>
-                        <p>vielen Dank für Ihre Anmeldung - bitte verifizieren Sie Ihr Konto. Dadurch erhalten Sie Zugriff auf erweiterte digitale Dienste unserer Praxis, bspw. Terminbuchungen. 
-                          Durch die Aktivierung des Kontos stimmen Sie unseren <a href="https://facharztpraxis-fuer-allgemeinmedizin.de/privacy">Nutzungs- und Datenschutzbestimmungen</a> zu.
-                        </p>
+                        <p>bedauerlicherweise können wir folgenden Video-Termin mit Ihnen leider nicht wahrnehmen:</p>
+
+                        <h2>
+                          {{appointmentType}} mit {{docName}} am {{appointmentDate}}
+                        </h2>
+
+                        <p>
+                          Bitte nutzen Sie unsere Webbuchung, um einen neuen Termin zu vereinbaren.
+                        </p>                       
+
                         <table border="0" cellpadding="0" cellspacing="0" class="btn btn-primary">
                           <tbody>
                             <tr>
@@ -302,7 +309,7 @@
                                 <table border="0" cellpadding="0" cellspacing="0">
                                   <tbody>
                                     <tr>
-                                      <td> <a href="{{activateUrl}}" target="_blank">Aktivieren</a> </td>
+                                      <td> <a href="https://facharztpraxis-fuer-allgemeinmedizin.de/termin" target="_blank">Neuer Termin</a> </td>
                                     </tr>
                                   </tbody>
                                 </table>
@@ -310,11 +317,7 @@
                             </tr>
                           </tbody>
                         </table>
-                        <p>
-							Falls der Link über den Button nicht funktioniert, fügen Sie bitte folgenden Link in die Adresszeile Ihres Browsers ein: <br/> <br/>
-
-	 						 {{activateUrl}}
-						</p>
+                        <p>Wir entschuldigen uns für etwaige Unannehmlichkeiten!</p>
                         <p>Ihr Praxis-Team.</p>
                       </td>
                     </tr>

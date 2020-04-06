@@ -7,8 +7,6 @@ const path = require('path');
 var moment = require("moment");
 const ical = require('ical-generator');
 
-
-
 var nodeMailer = require("nodemailer");
 var hbs = require('nodemailer-express-handlebars');
 
@@ -283,6 +281,31 @@ function sendTeleAppointment (contextObj) {
    
 };
 
+function sendAdminRemoveTeleAppointment (contextObj) {
+
+    return new Promise((resolve, reject) => {
+
+        let options = {
+            from : '"' + config.email.smtpEmailSenderName + '" ' + config.email.smtpEmail, 
+            to : contextObj.userEmail, 
+            subject : "myFFA | Absage Termin Video-Sprechstunde" , 
+            template: 'adminCancelTeleAppointment',
+            context: contextObj
+        }
+
+        transporter.sendMail(options, function (err, info){
+            if (err){
+                reject(err); 
+
+            }else{
+                resolve(info);
+            }
+        })
+
+    });
+   
+};
+
 function testEmail (req, res){
     let email = req.query.email;
     if (!email){
@@ -359,6 +382,7 @@ module.exports = {
     sendPasswordWasResetEmail, 
     sendPreRegistrationEmail,
     sendTeleAppointment,
+    sendAdminRemoveTeleAppointment,
 
     testEmail
 }

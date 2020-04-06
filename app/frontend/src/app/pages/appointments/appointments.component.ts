@@ -3,7 +3,8 @@ import {
   ChangeDetectionStrategy,
   ViewChild,
   TemplateRef,
-  OnInit
+  OnInit,
+  ViewEncapsulation
 } from '@angular/core';
 import {
   subDays,
@@ -32,11 +33,13 @@ import { HttpParams } from '@angular/common/http';
 import { DatePipe } from '@angular/common';
 import { ConfirmDialogComponent } from 'src/app/components/confirm-dialog/confirm-dialog.component';
 import { MatDialog } from '@angular/material';
+import { AppointmentDetailsComponent } from 'src/app/components/appointment-details/appointment-details.component';
 
 
 @Component({
   selector: 'app-appointments',
   templateUrl: './appointments.component.html',
+  encapsulation: ViewEncapsulation.None,
   styleUrls: ['./appointments.component.scss', '../../app.component.scss']
 })
 export class AppointmentsComponent implements OnInit {
@@ -183,29 +186,20 @@ export class AppointmentsComponent implements OnInit {
 
     if (action == 'Clicked'){
       
-    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
-      data: {meta : {"type" : "confirm", "title" : "Einwählen", "messageText" : "Video-Termin öffnen?"}}
-    });
+      const dialogRef = this.dialog.open(AppointmentDetailsComponent, {
+        data: {appointmentObj : event}
+      });
 
-    dialogRef.afterClosed().subscribe(result => {
-      if (result.answerConfirm){
-        this.openTeleAppointment(event); 
-      }
-      console.log('The dialog was closed');
-    });
+      dialogRef.afterClosed().subscribe((resultData : any) => {
+        if (resultData){
+          if (resultData.changed){
+              this.fetchEvents();
+          }
+        }
+      });
+
     }
     
-  }
-
-
-  openTeleAppointment(appointmentObj){
-
-    if (!appointmentObj){
-      return;
-    }
-
-    var win = window.open(appointmentObj.tele.dialInUrlDoc, '_blank');
-    win.focus();
   }
 
   setView(view: CalendarView) {

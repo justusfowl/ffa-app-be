@@ -1,0 +1,17 @@
+.appointment-details{
+    .actions{
+        button{
+            margin-right: 10px;
+        }
+    }
+
+    mat-form-field{
+        width: 100%;
+    }
+
+    .datetime-slot{
+        font-size: 20px;
+        margin-top: 1rem;
+        color: black;
+    }
+}

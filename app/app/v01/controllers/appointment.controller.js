@@ -15,7 +15,7 @@ var emailCtrl = require('./emailer.controller');
 var appointmentMeta = [{
     "type" : "general", 
     "name" : "Generelle Konsultation",
-    "durationInSeconds" : 300
+    "durationInSeconds" : 600
   },
   {
     "type" : "lab", 
@@ -32,7 +32,7 @@ var appointmentMeta = [{
   {
     "type" : "travel-vac", 
     "name" : "Reise-Impf-Beratung",
-    "durationInSeconds" : 600
+    "durationInSeconds" : 900
   }]
 
 /**
@@ -693,6 +693,45 @@ async function getAppointments(req, res){
     }
 }
 
+function _setAppointmentInactive(appointmentId, userId=null){
+
+    let filterObj = {
+        "_id" : ObjectID(appointmentId)
+    }
+
+    if (userId){
+        filterObj["userId"] = userId
+    }
+
+    return new Promise ((resolve, reject) => {
+        MongoClient.connect(MongoUrl, function(err, db) {
+    
+            if (err) throw err;
+            
+            let dbo = db.db(config.mongodb.database);
+    
+            const collection = dbo.collection('appointments');
+    
+              collection.updateOne(
+                filterObj,
+                {
+                    $set: {
+                        "inactive" : true
+                    }
+                },
+                function(err, docs){
+                    if (err){
+                        reject(err);
+                    }else{
+                        resolve(docs);
+                    }
+                }
+            );
+
+          });
+    })
+}
+
 async function removeAppointment(req, res){
 
     try{
@@ -725,34 +764,10 @@ async function removeAppointment(req, res){
 
         teleMedCtrl.removeAppointment(appointmentObj.tele.head_id).then(result => {
 
-            MongoClient.connect(MongoUrl, function(err, db) {
-    
-                if (err) throw err;
-                
-                let dbo = db.db(config.mongodb.database);
-        
-                const collection = dbo.collection('appointments');
-        
-                  collection.updateOne(
-                    {
-                        "_id" : ObjectID(appointmentId), 
-                        "userId" : userId
-                    },
-                    {
-                        $set: {
-                            "inactive" : true
-                        }
-                    },
-                    function(err, docs){
-                        if (err){
-                            res.send(500, err);
-                        }else{
-                            res.json({"success" : true});
-                        }
-                    }
-                );
-    
-              });
+            _setAppointmentInactive(appointmentId, userId).then(result => {
+                res.json({"success" : true})
+            })
+            
         }).catch(err => {
             res.send(500, err);
         })
@@ -761,6 +776,53 @@ async function removeAppointment(req, res){
         res.sen(500, err);
     }
 
+}
+
+async function adminRemoveAppointment(req, res){
+    try{
+
+        var appointmentId = req.params.appointmentId;
+        let now = new Date();
+
+        if (!appointmentId){
+            return res.json({"success" : false, "message" : "Please provide an appointmentId"})
+        }
+        
+        let appointmentObj = await getAppointmentById(appointmentId);
+
+        if (new Date(appointmentObj.appointmentObj.start).getTime() < now.getTime()){
+            return res.json({"success" : false, "message" : "Appointments can only be removed when they are outstanding in the future."});
+        }
+
+        let startDate = moment(appointmentObj.appointmentObj.start);
+
+        let displayStartDate = startDate.tz(config.timeZone).locale("de");
+
+        let emailContext = {
+            userEmail : appointmentObj.patientEmail,
+            userName : appointmentObj.patientName,
+            appointmentDate : displayStartDate.format("LLL"), 
+            appointmentType : appointmentObj.appointmentType.name, 
+            docName : appointmentObj.doc.userName
+        }
+
+        await teleMedCtrl.removeAppointment(appointmentObj.tele.head_id).catch(err => {
+            res.send(500, err);
+        })
+
+        await _setAppointmentInactive(appointmentId).catch(err => {
+            res.send(500, err);
+        })
+
+        await emailCtrl.sendAdminRemoveTeleAppointment(emailContext).then( result => {
+            res.json({"success" : true})
+        }).catch(err => {
+            res.json({"success" : false})
+        })
+        
+    }catch(err){
+        res.send(500, err);
+    }
 }
 
 async function adminGetTeleSlots(req, res){
@@ -904,6 +966,7 @@ module.exports = {
 
     removeAppointment, 
 
+    adminRemoveAppointment,
     adminGetTeleSlots, 
     adminAddTeleSlot, 
     adminUpdateTeleSlot,

@@ -11,11 +11,12 @@ import { AuthComponent } from './pages/auth/auth.component';
 
 import { AuthGuard } from './services/authguard';
 import { ImprintComponent } from './pages/imprint/imprint.component';
+import { NotfoundComponent } from './pages/notfound/notfound.component';
 
 
 const routes: Routes = [
   { path: 'home', component: HomeComponent},
- 
+  { path: 'termin', component: HomeComponent},
   { path: 'privacy', component: PrivacyComponent},
   { path: 'impressum', component: ImprintComponent},
   { path: 'login', component: AuthComponent},
@@ -26,7 +27,7 @@ const routes: Routes = [
   
   { path: '', redirectTo: '/home', pathMatch: 'full' },
   // otherwise redirect to home
-  { path: '**', redirectTo: '', pathMatch: 'full' }
+  { path: '**', component: NotfoundComponent }
 ];
 
 @NgModule({

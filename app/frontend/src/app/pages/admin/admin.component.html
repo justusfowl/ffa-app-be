@@ -199,7 +199,7 @@
 
             <div class="addBtn-row">
                 <button  class="addBtn" mat-button mat-stroked-button (click)="addNewVacation()">
-                    <mat-icon>add</mat-icon>
+                    <mat-icon>add</mat-icon> Neu
                 </button>
             </div>
 
@@ -302,7 +302,7 @@
         <mat-tab label="Praxisnews"> 
             <div class="addBtn-row">
                 <button class="addBtn" mat-button mat-stroked-button (click)="addNewNews()">
-                    <mat-icon>add</mat-icon>
+                    <mat-icon>add</mat-icon> Neu
                 </button>
             </div>
 
@@ -321,7 +321,11 @@
 
                         <img *ngIf="n.image" [src]="n.image">
 
-                        <input class="newsimage-pic-upload" type="file" placeholder="Bild hochladen" (change)="handleNewsFileUpload(n, $event.target.files)">
+                        <button *ngIf="newNewsImageFile || n.image" class="remove-newsimage-btn" mat-stroked-button color="primary" (click)="removeUploadImage(n)">
+                            <mat-icon>delete</mat-icon> Bild löschen
+                        </button>
+                       
+                        <input  *ngIf="!newNewsImageFile && !n.image" class="newsimage-pic-upload" type="file" placeholder="Bild hochladen" (change)="handleNewsFileUpload(n, $event.target.files)">
                         
 
                         
@@ -348,12 +352,12 @@
                        
                     </div>
                     <div>
-                        <button  class="saveBtn" mat-button matSuffix mat-stroked-button (click)="saveNews(n)">
-                            <mat-icon>save</mat-icon>
+                        <button  class="saveBtn" matSuffix mat-stroked-button (click)="saveNews(n)">
+                            <mat-icon>save</mat-icon> Speichern
                         </button>
 
-                        <button (click)="deleteNews(n)"  mat-button matSuffix mat-stroked-button >
-                            <mat-icon>delete</mat-icon>
+                        <button (click)="deleteNews(n, i)"   matSuffix mat-stroked-button >
+                            <mat-icon>delete</mat-icon> Löschen
                         </button>
                     </div>
 
@@ -407,7 +411,7 @@
                         [matAutocomplete]="auto"
                         [matChipInputFor]="chipList"
                         [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
-                        (matChipInputTokenEnd)="addScope($event, user)">
+                        (matChipInputTokenEnd)="initAddScope($event, user)">
                 </mat-chip-list>
                 <mat-autocomplete #auto="matAutocomplete" (optionSelected)="handleScopeSelected($event, user, scopeInput)">
                     <mat-option *ngFor="let s of _filteredScopes | async" [value]="s">
@@ -420,8 +424,8 @@
         <mat-tab label="Telemedizin"  style="margin:10px" >
 
             <div class="addBtn-row">
-                <button  class="addBtn" mat-button mat-stroked-button (click)="openTeleSlot()">
-                    <mat-icon>add</mat-icon>
+                <button  class="addBtn" mat-stroked-button (click)="openTeleSlot()">
+                    <mat-icon>add</mat-icon> Neu
                 </button>
             </div>
             
@@ -471,9 +475,8 @@
                                     </div>
                                 
                                     <div>
-                                        <mat-form-field  class="popup-text">
-                                            <textarea [(ngModel)]="settingsObj.popup.text" matInput type="text" placeholder="Beschreibung" ></textarea>
-                                        </mat-form-field>
+                                        <ejs-richtexteditor class="popup-text" [toolbarSettings]='tools' [(value)]="settingsObj.popup.text"  [(ngModel)]="settingsObj.popup.text">
+                                            </ejs-richtexteditor>
                                     </div>
 
                                     <p>
@@ -512,9 +515,8 @@
                                 </div>
                                
                                 <div>
-                                    <mat-form-field  class="global-announcement-text">
-                                        <textarea [(ngModel)]="settingsObj.globalAnnouncement.text" matInput type="text" placeholder="Beschreibung"></textarea>
-                                    </mat-form-field>
+                                    <ejs-richtexteditor class="global-announcement-text" [toolbarSettings]='tools' [(value)]="settingsObj.globalAnnouncement.text"  [(ngModel)]="settingsObj.globalAnnouncement.text">
+                                        </ejs-richtexteditor>
                                 </div>
     
                                 <p>
@@ -568,7 +570,7 @@
 
                 <div class="foot">
                     <button class="btn" (click)="saveSettings()" mat-stroked-button aria-label="Store the settings object">
-                        Speichern
+                        <mat-icon>save</mat-icon> Speichern
                     </button>
                 </div>
 

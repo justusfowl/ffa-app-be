@@ -42,6 +42,8 @@ import { GoogleAnalyticsService } from './services/google-analytics.service';
 import { environment } from '../environments/environment';
 import { CancelappointmentComponent } from './components/cancelappointment/cancelappointment.component';
 import { SettingsService } from './services/settings.service';
+import { NotfoundComponent } from './pages/notfound/notfound.component';
+import { AppointmentDetailsComponent } from './components/appointment-details/appointment-details.component';
 
 const cookieConfig:NgcCookieConsentConfig = {
   cookie: {
@@ -87,7 +89,9 @@ const cookieConfig:NgcCookieConsentConfig = {
     TeleSlotComponent,
     ConfirmDialogComponent, 
     ImprintComponent, 
-    CancelappointmentComponent
+    CancelappointmentComponent, 
+    NotfoundComponent, 
+    AppointmentDetailsComponent
   ],
   imports: [
     HttpClientModule,
@@ -124,7 +128,8 @@ const cookieConfig:NgcCookieConsentConfig = {
     TeleSlotComponent, 
     ConfirmDialogComponent, 
     NewappointmentComponent, 
-    CancelappointmentComponent
+    CancelappointmentComponent,
+    AppointmentDetailsComponent
   ]
 })
 export class AppModule { }

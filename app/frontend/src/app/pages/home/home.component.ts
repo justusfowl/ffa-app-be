@@ -15,6 +15,7 @@ import { CancelappointmentComponent } from 'src/app/components/cancelappointment
 import { LoaderService } from 'src/app/services/loader.service';
 import { Subscription } from 'rxjs';
 import { SettingsService } from 'src/app/services/settings.service';
+import { Location } from '@angular/common';
 declare var $: any;
 
 @Component({
@@ -132,7 +133,8 @@ export class HomeComponent implements OnInit {
     private googleAnalytics : GoogleAnalyticsService, 
     private route : ActivatedRoute,
     private loaderSrv : LoaderService, 
-    private settingsSrv : SettingsService
+    private settingsSrv : SettingsService, 
+    private location : Location
   ) {
 
     this.settingsSubscription = this.settingsSrv.settingsObjObservable.subscribe(result => {
@@ -156,10 +158,12 @@ export class HomeComponent implements OnInit {
       if (token && appointmentId){
         this.openCancelAppointment(token, appointmentId);
       }
+    }else if (command == 'appointment' || this.location.path(false).indexOf("termin") > -1){
+      this.goToTag("contact")
     }
     
     this.getTimes();
-    this.getNews();
+    this.getNews(); 
     this.getTeam();
     this.initMap();
 

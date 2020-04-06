@@ -315,6 +315,11 @@ export class AdminComponent implements OnInit, AfterViewInit {
     const fileStr = await this.convertToBase64(files.item(0));
     newsObj.image = fileStr;
   }
+
+  removeUploadImage(newsObj){
+    this.newNewsImageFile = null;
+    delete newsObj.image;
+  }
   
 
   convertToBase64(file) {
@@ -470,9 +475,10 @@ export class AdminComponent implements OnInit, AfterViewInit {
     })
   }
 
-  deleteNews(newsObj){
+  deleteNews(newsObj, index){
 
     if (!newsObj._id){
+      this.news.splice(index, 1);
       return;
     }
 
@@ -668,7 +674,22 @@ export class AdminComponent implements OnInit, AfterViewInit {
     })
   }
 
-  addScope(event: MatChipInputEvent, user): void {
+  initAddScope(event: MatChipInputEvent, user, callback?){
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      data: {meta : {"type" : "confirm", "title" : "Scope ändern", "messageText" : `Sind Sie sicher, dass Sie ${user.userName} die Rolle [${event.value}] zufügen möchten?`}}
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result.answerConfirm){
+       
+       this.addScope(event, user, callback);
+
+      }
+      console.log('The dialog was closed');
+    });
+  }
+
+  addScope(event: MatChipInputEvent, user, callback?): void {
 
     if (typeof(user.scopes) == "undefined"){
       user.scopes = [];
@@ -698,6 +719,10 @@ export class AdminComponent implements OnInit, AfterViewInit {
     this.scopeCtrl.setValue(null);
 
     this.updateUser(user);
+
+    if (callback){
+      callback();
+    }
   }
 
   removeScope(user, scopeIdx): void {
@@ -717,8 +742,11 @@ export class AdminComponent implements OnInit, AfterViewInit {
       "value" : scope
     };
 
-    this.addScope(evt, user);
-    input.nativeElement.value = '';
+    let cb = function(){
+      input.nativeElement.value = '';
+    }
+
+    this.initAddScope(evt, user, cb);   
 
   }
 
@@ -859,7 +887,8 @@ export class AdminComponent implements OnInit, AfterViewInit {
       ];
     }
 
-    return element
+    return element;
+
   }
 
   _getDaysArray(start, end, flagIncludeWeekends=false) {
