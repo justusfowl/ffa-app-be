@@ -816,6 +816,8 @@ export class AdminComponent implements OnInit, AfterViewInit {
 
     this.api.get("/appointment/slots").then((result : any) => {
 
+      console.log(result);
+
       result.forEach(element => {
 
         element = this._formatTeleSlotEvent(daysArray, element);
@@ -888,8 +890,9 @@ export class AdminComponent implements OnInit, AfterViewInit {
   }
 
   _getDaysArray(start, end, flagIncludeWeekends=false) {
-      start = new Date(start); 
-      end = new Date(end); 
+    
+      start = new Date(start.replace(/-/g, "/")); 
+      end = new Date(end.replace(/-/g, "/")); 
 
       for(var arr=[],dt=start; dt<=end; dt.setDate(dt.getDate()+1)){
 
