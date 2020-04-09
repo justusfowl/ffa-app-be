@@ -35,10 +35,32 @@
             </mat-form-field>
 
             <mat-form-field  class="time">
-                <input required matInput type="time" placeholder="Start" formControlName="startTime" >
+                <!-- <input required matInput type="time" placeholder="Start" formControlName="startTime" > -->
+
+                <mat-label>Startzeit</mat-label>
+                <mat-select  required 
+                formControlName="startTime"
+                fxLayout="row">
+                    <mat-option *ngFor="let time of timeSelection" [value]="time"  >
+                    {{time}}
+                    </mat-option>
+                </mat-select>
+                <mat-error *ngIf="slotForm.get('startTime').hasError('required')"  >Bitte wählen Sie eine Startzeit</mat-error>
+
             </mat-form-field>
             <mat-form-field  class="time">
-                <input  required matInput type="time" placeholder="Ende"  formControlName="endTime">
+                <!-- <input  required matInput type="time" placeholder="Ende"  formControlName="endTime"> -->
+
+                <mat-label>Endzeit</mat-label>
+                <mat-select  required 
+                formControlName="endTime"
+                fxLayout="row">
+                    <mat-option *ngFor="let time of timeSelection" [value]="time"  >
+                    {{time}}
+                    </mat-option>
+                </mat-select>
+                <mat-error *ngIf="slotForm.get('startTime').hasError('required')"  >Bitte wählen Sie eine Endzeit</mat-error>
+
             </mat-form-field>
 
             <div class="exceptions-container">

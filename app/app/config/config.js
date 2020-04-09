@@ -1,4 +1,5 @@
 require('dotenv').config();
+var MongoClient = require('mongodb').MongoClient;
 
 let env = (process.env.NODE_ENV).toLowerCase() || 'development'; 
 
@@ -98,8 +99,52 @@ const config = {
 
 
   config["getMongoUrl"] = getMongoUrl;
-  config["getPubExposedDirUrl"] = getPubExposedDirUrl
+  config["getPubExposedDirUrl"] = getPubExposedDirUrl;
+
+/**
+ * Retrieve backend configuration object
+ */
+async function getBackendConfig(){
+  return new Promise ((resolve, reject) => {
+      try{
+
+        var url = "mongodb://" + 
+          config.mongodb.username + ":" + 
+          config.mongodb.password + "@" + 
+          config.mongodb.host + ":" + config.mongodb.port +"/" + 
+          config.mongodb.database + "?authSource=" + config.mongodb.database + "&w=1" ;
+              
+          MongoClient.connect(url, function(err, db) {
+      
+              if (err) throw err;
+              
+              let dbo = db.db(config.mongodb.database);
+
+              const collection = dbo.collection('config');
+              
+              collection.findOne(
+                  {},
+              function(err, u){
+                  if (err){
+                      reject(err);
+                  }
+                  if (u){
+                      resolve(u);
+                  }else{
+                      resolve(false);
+                  }
+              
+              });
+              
+          });
+      }catch(err){
+          reject(err);
+      }
+  })
+}
+
+config["getBackendConfig"] = getBackendConfig;
 
 
   
-  module.exports = config;
+module.exports = config;

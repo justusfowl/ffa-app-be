@@ -52,12 +52,22 @@ export class TeleSlotComponent implements OnInit {
     }
   ]
 
+  timeSelection : any[] = [];
+
   constructor(
     public dialogRef: MatDialogRef<TeleSlotComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any, 
     private api : ApiService,
     private fb: FormBuilder
   ) { 
+
+
+    for (var h=0; h<24; h++){
+        for (var min=0; min<12; min++){
+          let slot = h.toFixed().padStart(2, "0") + ":" +  (min*5).toFixed().padStart(2, "0")
+          this.timeSelection.push(slot)
+        }
+    }
 
    }
 

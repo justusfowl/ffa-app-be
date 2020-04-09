@@ -342,7 +342,11 @@ async function getAvailableSlots(req, res){
 
     try{
 
-        let firstAvailableDate = moment(moment().add(1, 'day').format("MM-DD-YYYY"), "MM-DD-YYYY")
+        let backendConfig = await config.getBackendConfig();
+
+        let daysInAdvance = backendConfig.tele.daysInAdvance || 0;
+
+        let firstAvailableDate = moment(moment().add(daysInAdvance, 'day').format("MM-DD-YYYY"), "MM-DD-YYYY")
        
         let userId = req.userId;
 
