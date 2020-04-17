@@ -457,7 +457,7 @@ export class HomeComponent implements OnInit {
     if (doc.picture){
       return doc.picture;
     }else{
-      return "https://www.facharztpraxis-fuer-allgemeinmedizin.de/images/landing_img.png";
+      return "https://www.facharztpraxis-fuer-allgemeinmedizin.de/assets/images/header-background.jpg";
     }
   }
 
@@ -465,7 +465,7 @@ export class HomeComponent implements OnInit {
     if (img.image){
       return img.image;
     }else{
-      return "https://www.facharztpraxis-fuer-allgemeinmedizin.de/images/landing_img.png";
+      return "https://www.facharztpraxis-fuer-allgemeinmedizin.de/assets/images/header-background.jpg";
     }
   }
 
