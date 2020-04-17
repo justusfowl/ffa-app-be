@@ -187,7 +187,8 @@ export class AppointmentsComponent implements OnInit {
     if (action == 'Clicked'){
       
       const dialogRef = this.dialog.open(AppointmentDetailsComponent, {
-        data: {appointmentObj : event}
+        data: {appointmentObj : event},
+        panelClass : "dialog-popup"
       });
 
       dialogRef.afterClosed().subscribe((resultData : any) => {

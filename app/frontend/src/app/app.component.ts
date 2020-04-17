@@ -121,7 +121,6 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
         this.showGlobalAnnouncement(true);
       }
     }
-    
   }
 
   closeGlobalAnnouncement(){

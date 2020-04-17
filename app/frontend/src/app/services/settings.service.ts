@@ -11,11 +11,15 @@ export class SettingsService {
     _settingsObj : Subject<any>;
     _settings : any;
 
+    _configObj : Subject<any>;
+    _config : any;
+
   constructor(
       private api : ApiService
   ) { 
 
     this._settingsObj = new Subject<any>();
+    this._configObj = new Subject<any>();
     
   }
 
@@ -36,18 +40,68 @@ export class SettingsService {
         console.error(err);
       })
 
+      this.api.get("/general/config").then((result : any) => {
+        let _cfg;
+        if (result){
+          _cfg = result;
+            
+          }else{
+            _cfg = { }
+          }
+          this._configObj.next(_cfg);
+          this._config = _cfg;
+       
+      }).catch(err => {
+        console.error(err);
+      })
+
   }
 
   get settingsObjObservable() {
     return this._settingsObj.asObservable();
   }
 
-  _setSettingsObj(result){
-    
+  get configObjObservable() {
+    return this._configObj.asObservable();
+  }
+
+  setSettingsObj(result){
+    this._settingsObj.next(result);
+    this._settings = result;
+  }
+
+  setConfigObj(result){
+    this._configObj.next(result);
+    this._config = result;
+  }
+
+  getConfig(){
+    return this._config;
   }
 
   getSettings(){
     return this._settings;
+  }
+
+  getBrowserName() {
+      const agent = window.navigator.userAgent.toLowerCase();
+
+      switch (true) {
+        case agent.indexOf('edge') > -1:
+          return 'edge';
+        case agent.indexOf('opr') > -1 && !!(<any>window).opr:
+          return 'opera';
+        case agent.indexOf('chrome') > -1 && !!(<any>window).chrome:
+          return 'chrome';
+        case agent.indexOf('trident') > -1:
+          return 'ie';
+        case agent.indexOf('firefox') > -1:
+          return 'firefox';
+        case agent.indexOf('safari') > -1:
+          return 'safari';
+        default:
+          return 'other';
+      }
   }
 
 

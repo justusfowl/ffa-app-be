@@ -11,12 +11,12 @@
     </div> 
 </header> 
 
-<div class="container">
+<div class="admin-container container">
     <h1>
         Wartung der Website
     </h1>
 
-    <mat-tab-group>
+    <mat-tab-group (selectedTabChange)="handleTabClick($event)">
 
         <mat-tab label="Leistungen" *ngIf="false"> 
             <div class="service">
@@ -27,108 +27,109 @@
             </div>
         </mat-tab>
         
-        <mat-tab label="Team" > 
+        <mat-tab label="Team"  > 
+            <ng-template matTabContent>
 
-            <div class="teamList">
+                <div class="teamList">
 
-                <div class="member" *ngFor="let m of teamMembers;">
-                    
-                    <div class="avatar">
-                        <div class="pic">
-                            <img [src]="m.picture">
-                            <label>
-                                <mat-icon>edit</mat-icon>
-                                <input class="teammember-pic-upload" type="file"  (change)="handleTeamFileInput($event.target.files, m)">
-                            </label>
+                    <div class="member" *ngFor="let m of teamMembers;">
+                        
+                        <div class="avatar">
+                            <div class="pic">
+                                <img [src]="m.picture">
+                                <label>
+                                    <mat-icon>edit</mat-icon>
+                                    <input class="teammember-pic-upload" type="file"  (change)="handleTeamFileInput($event.target.files, m)">
+                                </label>
+                                
+                            </div> 
+
+                        
                             
+
+                            <p>
+                                <mat-checkbox [(ngModel)]="m.flagActive" (ngModelChange)="updateTeamMember(m)" >Aktiv?</mat-checkbox>
+                            </p>
+                            <p>
+                                <button (click)="deleteMember(m)" mat-icon-button color="accent" aria-label="Example icon-button with a heart icon">
+                                    <mat-icon>delete</mat-icon>
+                                </button>
+                            </p>
+                            
+                        </div>
+                        <div class="text">
+                            <mat-form-field >
+                                <input [(ngModel)]="m.name"  (ngModelChange)="handleUpdateTeamMember(m, $event)" matInput type="text" placeholder="Name"  required>
+                            </mat-form-field>
+
+                            <mat-form-field>
+                                <mat-label>Gattung</mat-label>
+                                <mat-select [(ngModel)]="m.type"  required (ngModelChange)="handleUpdateTeamMember(m, $event)">
+                                    <mat-option value="doc">
+                                        doc
+                                    </mat-option>
+                                    <mat-option value="mfa">
+                                        mfa
+                                    </mat-option>
+                                </mat-select>
+                            </mat-form-field>
+
+                            <mat-form-field >
+                                <input [(ngModel)]="m.role" (ngModelChange)="handleUpdateTeamMember(m, $event)"  matInput type="text" placeholder="Rolle"  >
+                            </mat-form-field>
+
+                            <mat-form-field >
+                                <textarea [(ngModel)]="m.description" (ngModelChange)="handleUpdateTeamMember(m, $event)"  matInput type="text" placeholder="Beschreibung"  ></textarea>
+                            </mat-form-field>
                         </div> 
+                    </div>
+                    <div class="headline">
+                        <h2>
+                            Neues Team-Mitglied
+                        </h2>
+                    </div>
+                    <div class="new member">
 
-                       
-                        
+                        <div  class="avatar">
+                            <img [src]="newTeamMemberFileStr" *ngIf="newTeamMemberFileStr">
+                            
+                        </div>
+                        <div class="text">
+                            <mat-form-field >
+                                <input [(ngModel)]="newTeamMember.name"   matInput type="text" placeholder="Name"  required>
+                            </mat-form-field>
 
-                        <p>
-                            <mat-checkbox [(ngModel)]="m.flagActive" (ngModelChange)="updateTeamMember(m)" >Aktiv?</mat-checkbox>
-                        </p>
-                        <p>
-                            <button (click)="deleteMember(m)" mat-icon-button color="accent" aria-label="Example icon-button with a heart icon">
-                                <mat-icon>delete</mat-icon>
+                            <mat-form-field>
+                                <mat-label>Gattung</mat-label>
+                                <mat-select [(ngModel)]="newTeamMember.type" required >
+                                    <mat-option value="doc">
+                                        doc
+                                    </mat-option>
+                                    <mat-option value="mfa">
+                                        mfa
+                                    </mat-option>
+                                </mat-select>    
+                            </mat-form-field>
+
+                            <mat-form-field >
+                                <input [(ngModel)]="newTeamMember.role"  matInput type="text" placeholder="Rolle"  >
+                            </mat-form-field>
+
+                            <mat-form-field >
+                                <textarea [(ngModel)]="newTeamMember.description" matInput type="text" placeholder="Beschreibung"  ></textarea>
+                            </mat-form-field>
+                            
+                            <input class="teammember-pic-upload" type="file" placeholder="Bild hochladen" (change)="handleFileInput($event.target.files)">
+                            
+                            <button (click)="addMember()" mat-button color="secondary">
+                                <mat-icon>add</mat-icon>
                             </button>
-                        </p>
                         
+                        </div>
+
                     </div>
-                    <div class="text">
-                        <mat-form-field >
-                            <input [(ngModel)]="m.name"  (ngModelChange)="handleUpdateTeamMember(m, $event)" matInput type="text" placeholder="Name"  required>
-                        </mat-form-field>
-
-                        <mat-form-field>
-                            <mat-label>Gattung</mat-label>
-                            <mat-select [(ngModel)]="m.type"  required (ngModelChange)="handleUpdateTeamMember(m, $event)">
-                                <mat-option value="doc">
-                                    doc
-                                </mat-option>
-                                <mat-option value="mfa">
-                                    mfa
-                                </mat-option>
-                            </mat-select>
-                        </mat-form-field>
-
-                        <mat-form-field >
-                            <input [(ngModel)]="m.role" (ngModelChange)="handleUpdateTeamMember(m, $event)"  matInput type="text" placeholder="Rolle"  >
-                        </mat-form-field>
-
-                        <mat-form-field >
-                            <textarea [(ngModel)]="m.description" (ngModelChange)="handleUpdateTeamMember(m, $event)"  matInput type="text" placeholder="Beschreibung"  ></textarea>
-                        </mat-form-field>
-                    </div> 
                 </div>
-                <div class="headline">
-                    <h2>
-                        Neues Team-Mitglied
-                    </h2>
-                </div>
-                <div class="new member">
-
-                    <div  class="avatar">
-                        <img [src]="newTeamMemberFileStr" *ngIf="newTeamMemberFileStr">
-                        
-                    </div>
-                    <div class="text">
-                        <mat-form-field >
-                            <input [(ngModel)]="newTeamMember.name"   matInput type="text" placeholder="Name"  required>
-                        </mat-form-field>
-
-                        <mat-form-field>
-                            <mat-label>Gattung</mat-label>
-                            <mat-select [(ngModel)]="newTeamMember.type" required >
-                                <mat-option value="doc">
-                                    doc
-                                </mat-option>
-                                <mat-option value="mfa">
-                                    mfa
-                                </mat-option>
-                            </mat-select>    
-                        </mat-form-field>
-
-                        <mat-form-field >
-                            <input [(ngModel)]="newTeamMember.role"  matInput type="text" placeholder="Rolle"  >
-                        </mat-form-field>
-
-                        <mat-form-field >
-                            <textarea [(ngModel)]="newTeamMember.description" matInput type="text" placeholder="Beschreibung"  ></textarea>
-                        </mat-form-field>
-                        
-                        <input class="teammember-pic-upload" type="file" placeholder="Bild hochladen" (change)="handleFileInput($event.target.files)">
-                        
-                        <button (click)="addMember()" mat-button color="secondary">
-                            <mat-icon>add</mat-icon>
-                        </button>
-                       
-                    </div>
-
-                </div>
-            </div>
-            
+            </ng-template>
         </mat-tab>
         <mat-tab label="Sprechzeiten"> 
                 <div class="timesList">
@@ -444,8 +445,8 @@
         
         </mat-tab>
 
-        <mat-tab label="Allgemein"  *ngIf="settingsObj">
-            <div class="general settings-tab">
+        <mat-tab label="Allgemein" >
+            <div class="general settings-tab" *ngIf="settingsObj">
 
                 <mat-accordion>
                     <mat-expansion-panel>
@@ -574,10 +575,52 @@
                         <mat-icon>save</mat-icon> Speichern
                     </button>
                 </div>
-
             </div>
-
-            
           </mat-tab>
+
+          <mat-tab label="Konfiguration" >
+              <div class="general config-tab" *ngIf="configObj">
+
+                <mat-accordion>
+                    <mat-expansion-panel>
+                        <mat-expansion-panel-header>
+                            <mat-panel-title>
+                                    Telemedizin
+                            </mat-panel-title>
+                            <mat-panel-description>
+                                
+                                <mat-icon>settings_overscan</mat-icon>
+
+                            </mat-panel-description>
+                        </mat-expansion-panel-header>
+
+                            <div class="config-content">
+                                <div class="config-settings">
+                                    <mat-form-field>
+                                        <mat-label>Anzahl Tage Vorlauf zum ersten freien Termin</mat-label>
+                                        <input [(ngModel)]="configObj.tele.daysInAdvance" matInput type="number" required>
+                                    </mat-form-field>
+                                </div>
+
+                                <div>
+                                    <p>
+                                        <mat-checkbox [(ngModel)]="configObj.tele.flagIncludeWeekends" >Wochenenden inkludieren?</mat-checkbox>
+                                    </p>
+                                </div>
+                            </div>
+                    </mat-expansion-panel>
+
+                </mat-accordion>
+
+                <div class="foot">
+                    <button class="btn" (click)="saveConfig()" mat-stroked-button aria-label="Store the config object">
+                        <mat-icon>save</mat-icon> Speichern
+                    </button>
+                </div>
+
+              </div>
+          </mat-tab>
+
+
     </mat-tab-group>               
 </div>

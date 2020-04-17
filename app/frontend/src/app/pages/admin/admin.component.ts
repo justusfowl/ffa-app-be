@@ -1,6 +1,6 @@
-import { Component, OnInit, AfterViewInit, ViewEncapsulation, ElementRef, ViewChild, ChangeDetectionStrategy} from '@angular/core';
+import { Component, OnInit, OnDestroy, AfterViewInit, ViewEncapsulation, ElementRef, ViewChild, ChangeDetectionStrategy} from '@angular/core';
 import { ApiService } from 'src/app/services/api.service';
-import { Subject } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
 import {debounceTime, distinctUntilChanged} from "rxjs/internal/operators";
 import { MatSnackBar, MatChipInputEvent, MatAutocomplete, MatDialog } from '@angular/material';
 import { FormControl, FormGroupDirective, NgForm, Validators } from '@angular/forms';
@@ -29,6 +29,7 @@ import {
 } from 'date-fns';
 import { TeleSlotComponent } from 'src/app/components/tele-slot/tele-slot.component';
 import { ConfirmDialogComponent } from 'src/app/components/confirm-dialog/confirm-dialog.component';
+import { SettingsService } from 'src/app/services/settings.service';
 
 /** Error when invalid control is dirty, touched, or submitted. */
 export class MyErrorStateMatcher implements ErrorStateMatcher {
@@ -38,8 +39,6 @@ export class MyErrorStateMatcher implements ErrorStateMatcher {
   }
 }
 
-
-
 @Component({
   selector: 'app-admin',
   templateUrl: './admin.component.html',
@@ -47,7 +46,7 @@ export class MyErrorStateMatcher implements ErrorStateMatcher {
   encapsulation: ViewEncapsulation.None,
   providers: [ToolbarService, LinkService, ImageService, HtmlEditorService]
 })
-export class AdminComponent implements OnInit, AfterViewInit {
+export class AdminComponent implements OnInit, AfterViewInit, OnDestroy{
 
   @ViewChild('scopeInput', {static: false}) fruitInput: ElementRef<HTMLInputElement>;
   @ViewChild('auto', {static: false}) matAutocomplete: MatAutocomplete;
@@ -78,7 +77,6 @@ export class AdminComponent implements OnInit, AfterViewInit {
     "doc"
   ];
   scopeCtrl = new FormControl();
-
 
   users = [];
   news = [];
@@ -126,6 +124,8 @@ export class AdminComponent implements OnInit, AfterViewInit {
 
   settingsObj : any;
 
+  configObj : any;
+
   /* Telemedicine area */
 
   teleSlots : any[] = [];
@@ -138,14 +138,36 @@ export class AdminComponent implements OnInit, AfterViewInit {
 
   viewDate: Date = new Date();
 
+  private settingsSubscription : Subscription;
+  settings : any;
+
+  private configSubscription : Subscription;
+  config : any;
+
   constructor(
     private api : ApiService, 
     private snackBar : MatSnackBar,
-    public dialog: MatDialog
+    public dialog: MatDialog,
+    private settingsSrv : SettingsService
   ) {
     this._filteredScopes = this.scopeCtrl.valueChanges.pipe(
       startWith(null),
       map((scope: string | null) => scope ? this._filterScopes(scope) : this.allScopes.slice()));
+
+      this.settings = this.settingsSrv.getSettings();
+
+      this.settingsSubscription = this.settingsSrv.settingsObjObservable.subscribe(result => {
+        this.settings = result; 
+        this.executeSettings();
+      });
+
+      this.config = this.settingsSrv.getConfig();
+
+      this.configSubscription = this.settingsSrv.configObjObservable.subscribe(result => {
+        this.config = result; 
+        this.executeConfig();
+      });
+
    }
 
   ngOnInit() {
@@ -157,17 +179,66 @@ export class AdminComponent implements OnInit, AfterViewInit {
         this.updateTeamMember(this.teamMemberLastChg);
       });
 
+      this.executeConfig();
+      this.executeSettings();
+
   }
 
   ngAfterViewInit(): void {
+    this.getTeam();
+    /*
     this.getTeam();
     this.getTimes();
     this.getNews();
     this.getUsers();
     this.getGeneralSettings();
     this.getAdminSlots();
+    */
   }
 
+  ngOnDestroy() {
+    this.settingsSubscription.unsubscribe();
+    this.configSubscription.unsubscribe();
+  }
+
+  handleTabClick(evt){
+
+      let labelClicked = evt.tab.textLabel;
+
+      if (labelClicked == 'Team'){
+        this.getTeam();
+      }else if (labelClicked == 'Sprechzeiten'){
+        this.getTimes();
+      }else if (labelClicked == 'Urlaubszeiten'){
+        this.getTimes();
+      }else if (labelClicked == 'Praxisnews'){
+        this.getNews();
+      }else if (labelClicked == 'Benutzer'){
+        this.getUsers();
+      }else if (labelClicked == 'Telemedizin'){
+        this.getAdminSlots();
+      }else if (labelClicked == 'Allgemein'){
+        this.getGeneralSettings();
+      }else if (labelClicked == 'Konfiguration'){
+        this.getConfigObject();
+      }
+  }
+
+  executeConfig(){
+    if (this.config.tele){
+      if (typeof(this.config.tele.flagIncludeWeekends) != 'undefined'){
+        if (this.config.tele.flagIncludeWeekends){
+          this.excludeDays = [];
+        }else{
+          this.excludeDays = [0, 6];
+        }
+      }
+    }
+  }
+
+  executeSettings(){
+
+  }
 
   getGeneralSettings(){
 
@@ -193,7 +264,19 @@ export class AdminComponent implements OnInit, AfterViewInit {
 
   }
 
+  getConfigObject(){
+    this.api.get("/general/config").then((result : any) => {
 
+      if (result){
+        this.configObj = result;
+      }else{
+        this.configObj = { }
+      }
+
+    }).catch(err => {
+      console.error(err);
+    })
+  }
 
   getTimes(refresher?){
 
@@ -293,7 +376,7 @@ export class AdminComponent implements OnInit, AfterViewInit {
     const fileStr = await this.convertToBase64(files.item(0));
 
     this.api.put("/team/" + teamMember._id, formData, true).then(res => {
-      console.log("updated.")
+
       this.snackBar.open("Mitglied aktualisiert", "", {
         duration: 1500
       })
@@ -333,7 +416,7 @@ export class AdminComponent implements OnInit, AfterViewInit {
 
   updateTeamMember(member){
     this.api.put("/team/" + member._id, member, true).then(res => {
-      console.log("updated.")
+
       this.snackBar.open("Mitglied aktualisiert", "", {
         duration: 1500
       })
@@ -667,7 +750,7 @@ export class AdminComponent implements OnInit, AfterViewInit {
 
   updateUser(userObj){
     this.api.put("/auth/users", userObj, true).then(res => {
-      console.log("updated.")
+
       this.snackBar.open("Mitglied aktualisiert", "", {
         duration: 1500
       });
@@ -769,7 +852,6 @@ export class AdminComponent implements OnInit, AfterViewInit {
   preregisterUser(){
 
     let userName = this.emailFormControl.value;
-    console.log(userName);
 
     this.api.post("/auth/adminRegisterUser", {userName}, true).then((result : any) => {
       this.users = result;
@@ -803,6 +885,8 @@ export class AdminComponent implements OnInit, AfterViewInit {
         this.getGeneralSettings();
       }
 
+      this.settingsSrv.setSettingsObj(this.settingsObj);
+
     }).catch(err => {
       console.error(err);
     })
@@ -811,12 +895,11 @@ export class AdminComponent implements OnInit, AfterViewInit {
   getAdminSlots(){
         
     let viewPortTeleCal = this._getTeleViewStartEndDates();
-    let daysArray = this._getDaysArray(viewPortTeleCal.start, viewPortTeleCal.end);
+    let flagIncludeWeekends = this.config.tele.flagIncludeWeekends || false;
+    let daysArray = this._getDaysArray(viewPortTeleCal.start, viewPortTeleCal.end, flagIncludeWeekends);
 
 
     this.api.get("/appointment/slots").then((result : any) => {
-
-      console.log(result);
 
       result.forEach(element => {
 
@@ -914,7 +997,6 @@ export class AdminComponent implements OnInit, AfterViewInit {
     newEnd,
   }: CalendarEventTimesChangedEvent): void {
 
-    console.log(event);
     event.start = newStart;
     event.end = newEnd;
     this.updateTeleSlot(event);
@@ -1008,6 +1090,27 @@ export class AdminComponent implements OnInit, AfterViewInit {
       console.log('The dialog was closed');
     });
 
+  }
+
+  saveConfig(){
+   
+    if (!this.configObj._id){
+      return;
+    }
+
+    this.api.put("/general/config/" + this.configObj._id, this.configObj, true).then((result : any) => {
+     
+      this.snackBar.open("Konfiguration aktualisiert.", "", {
+        duration: 1500
+      });
+
+      this.getConfigObject();
+
+      this.settingsSrv.setConfigObj(this.configObj);
+
+    }).catch(err => {
+      console.error(err);
+    })
   }
 
 }

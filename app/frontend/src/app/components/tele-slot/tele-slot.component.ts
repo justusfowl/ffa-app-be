@@ -49,6 +49,14 @@ export class TeleSlotComponent implements OnInit {
     {
       "dayId" : 5, 
       "dayName" : "Freitag",
+    },
+    {
+      "dayId" : 6, 
+      "dayName" : "Samstag",
+    },
+    {
+      "dayId" : 0, 
+      "dayName" : "Sonntag",
     }
   ]
 

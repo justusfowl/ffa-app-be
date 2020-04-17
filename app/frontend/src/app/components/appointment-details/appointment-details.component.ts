@@ -2,6 +2,7 @@ import { Component, OnInit, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef, MatDialog, MatSnackBar } from '@angular/material';
 import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
 import { ApiService } from 'src/app/services/api.service';
+import { SettingsService } from 'src/app/services/settings.service';
 
 @Component({
   selector: 'app-appointment-details',
@@ -20,7 +21,8 @@ export class AppointmentDetailsComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) public data: any, 
     private dialog : MatDialog, 
     private api: ApiService, 
-    private snackBar : MatSnackBar
+    private snackBar : MatSnackBar, 
+    private settingsSrv : SettingsService
     ) { 
       
       this.appointmentObj = data.appointmentObj;
@@ -28,7 +30,7 @@ export class AppointmentDetailsComponent implements OnInit {
 
       let today = new Date(); 
 
-      if (today.getTime() > this.appointmentObj.end.getTime()){
+      if (today.getTime()-15*1000*60 > this.appointmentObj.end.getTime()){
         this.isHistoricAppointment = true;
       }
 
@@ -67,8 +69,16 @@ export class AppointmentDetailsComponent implements OnInit {
       return;
     }
 
-    var win = window.open(this.appointmentObj.tele.dialInUrlDoc, '_blank');
-    win.focus();
+    let browser = this.settingsSrv.getBrowserName();
+
+    if (browser == "safari"){
+     location.replace(this.appointmentObj.tele.dialInUrlDoc);
+    }else{
+      var win = window.open(this.appointmentObj.tele.dialInUrlDoc, '_blank');
+      win.focus();
+    }
+
+
   }
 
   deleteAppointment(){
@@ -96,6 +106,28 @@ export class AppointmentDetailsComponent implements OnInit {
         })
       }
     });
+  }
+
+  copyUrl(text){
+
+    if (!this.appointmentObj){
+      return;
+    }
+
+    var input = document.createElement('textarea');
+    input.innerHTML = text;
+    document.body.appendChild(input);
+    input.select();
+    var result = document.execCommand('copy');
+    document.body.removeChild(input);
+
+
+    this.snackBar.open("URL Kopiert.", "", {
+      duration: 1500
+    })
+
+    return result;
+
   }
 
 }

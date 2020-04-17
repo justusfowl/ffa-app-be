@@ -345,6 +345,7 @@ async function getAvailableSlots(req, res){
         let backendConfig = await config.getBackendConfig();
 
         let daysInAdvance = backendConfig.tele.daysInAdvance || 0;
+        let flagIncludeWeekends = backendConfig.tele.flagIncludeWeekends || false;
 
         let firstAvailableDate = moment(moment().add(daysInAdvance, 'day').format("MM-DD-YYYY"), "MM-DD-YYYY")
        
@@ -378,7 +379,7 @@ async function getAvailableSlots(req, res){
             return res.send(500, "Please provide start / end dates");
         }
 
-        let datesInBetween =  _getDaysArray(startDate, endDate);
+        let datesInBetween =  _getDaysArray(startDate, endDate, flagIncludeWeekends);
 
         if (datesInBetween.length > 35){
             return res.send(500, "Please limit date ranges to 35 days.");

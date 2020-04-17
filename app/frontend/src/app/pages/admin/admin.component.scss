@@ -281,3 +281,11 @@
         flex-grow: 0;
     }
 }
+
+.admin-container{
+
+    .mat-expansion-panel-header-description{
+        justify-content: flex-end;
+    }
+    
+}

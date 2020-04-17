@@ -41,15 +41,21 @@
     padding-bottom: 0rem;
 }
 
+#global-announcement .message{
+    p{
+        padding: 0;
+        margin: 0;
+    }
+}
 
 @media (max-width: 1100px) {
     #global-announcement.show{
-        max-height: 300px;
-        min-height: 300px;
+        max-height: 150px;
+        // min-height: 150px;
     }
 
     #global-announcement{
-        flex-direction: column;
+        flex-direction: row;
         justify-content: center;
         .camera-icn{
             font-size: 30px;
@@ -196,6 +202,7 @@ nav{
     background: rgba($background_nav, 0.8);
 }
 
+.dialog-popup,
 .prescription-dialog,
 .video-dialog{
     max-height: 100vh !important;
