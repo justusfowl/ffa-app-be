@@ -369,56 +369,88 @@
             
         </mat-tab>
 
-        <mat-tab label="Benutzer" class="user-list" style="margin:10px"> 
+        <mat-tab label="Benutzer"  style="margin:10px"> 
 
-            <div class="new-user">
+            <div class="user-list">
 
-                <form class="add">
-                    <mat-form-field >
-                        <mat-label>Nutzername</mat-label>
-                        <input matInput [formControl]="emailFormControl" [errorStateMatcher]="matcher"
-                                placeholder="nutzer@test.de">
-                        <mat-hint>Email-Adresse</mat-hint>
-                        <mat-error *ngIf="emailFormControl.hasError('email') && !emailFormControl.hasError('required')">
-                        ungültige eMail-Adresse
-                        </mat-error>
-                        <mat-error *ngIf="emailFormControl.hasError('required')">
-                        Email wird benötigt
-                        </mat-error>
-                    </mat-form-field>
-                </form>
-
-                <button mat-button (click)="preregisterUser()">Zufügen</button>
-
-            </div>
             
-            <div class="user" *ngFor="let user of users; let i=index;">
+                <div class="new-user">
 
-                {{user.userName}}
+                    <form class="add">
+                        <mat-form-field >
+                            <mat-label>Nutzername</mat-label>
+                            <input matInput [formControl]="emailFormControl" [errorStateMatcher]="matcher"
+                                    placeholder="nutzer@test.de">
+                            <mat-hint>Email-Adresse</mat-hint>
+                            <mat-error *ngIf="emailFormControl.hasError('email') && !emailFormControl.hasError('required')">
+                            ungültige eMail-Adresse
+                            </mat-error>
+                            <mat-error *ngIf="emailFormControl.hasError('required')">
+                            Email wird benötigt
+                            </mat-error>
+                        </mat-form-field>
+                    </form>
 
-                <mat-chip-list #chipList aria-label="Rolle">
-                    <mat-chip
-                        *ngFor="let scope of user.scopes; let i=index;"
-                        [selectable]="selectable"
-                        [removable]="removable"
-                        (removed)="removeScope(user, i)">
-                        {{scope}}
-                        <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
-                    </mat-chip>
-                    <input
-                        placeholder="Neuer Scope..."
-                        #scopeInput
-                        [formControl]="scopeCtrl"
-                        [matAutocomplete]="auto"
-                        [matChipInputFor]="chipList"
-                        [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
-                        (matChipInputTokenEnd)="initAddScope($event, user)">
-                </mat-chip-list>
-                <mat-autocomplete #auto="matAutocomplete" (optionSelected)="handleScopeSelected($event, user, scopeInput)">
-                    <mat-option *ngFor="let s of _filteredScopes | async" [value]="s">
-                        {{s}}
-                    </mat-option>
-                </mat-autocomplete>
+                    <button mat-button (click)="preregisterUser()">Zufügen</button>
+
+                </div>
+
+                <mat-accordion>
+                    <mat-expansion-panel *ngFor="let user of users; let i=index;">
+                        <mat-expansion-panel-header>
+                        <mat-panel-title>
+                                {{user.userName}}
+                        </mat-panel-title>
+                        <mat-panel-description>
+                            <mat-icon color="primary" *ngIf="!user.validated">sync_problem</mat-icon>
+                            <mat-icon class="success-icon"  *ngIf="user.validated">security</mat-icon>
+                        </mat-panel-description>
+                        </mat-expansion-panel-header>
+                        
+                        <div class="user">
+
+                            <div class="">
+
+                            </div>
+
+                            <div class="scopes">
+                                <mat-label>Berechtigungen</mat-label>
+
+                                <mat-chip-list #chipList aria-label="Rolle">
+                                    <mat-chip
+                                        *ngFor="let scope of user.scopes; let i=index;"
+                                        [selectable]="selectable"
+                                        [removable]="removable"
+                                        (removed)="removeScope(user, i)">
+                                        {{scope}}
+                                        <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
+                                    </mat-chip>
+                                    <input
+                                        placeholder="Neuer Scope..."
+                                        #scopeInput
+                                        [formControl]="scopeCtrl"
+                                        [matAutocomplete]="auto"
+                                        [matChipInputFor]="chipList"
+                                        [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+                                        (matChipInputTokenEnd)="initAddScope($event, user)">
+                                </mat-chip-list>
+                                <mat-autocomplete #auto="matAutocomplete" (optionSelected)="handleScopeSelected($event, user, scopeInput)">
+                                    <mat-option *ngFor="let s of _filteredScopes | async" [value]="s">
+                                        {{s}}
+                                    </mat-option>
+                                </mat-autocomplete>
+                            </div>  
+                            
+                            <div class="buttons">
+                                <button mat-flat-button color="warn" (click)="removeUser(user)">
+                                    <mat-icon>delete</mat-icon> Löschen
+                                </button>
+                            </div>
+                        </div>
+                           
+                    </mat-expansion-panel>
+    
+                </mat-accordion> 
             </div>
         </mat-tab>
 

@@ -11,6 +11,8 @@ router.route('/login')
 
 router.route('/register')
     .post(authCtrl.registerUser)
+
+
     
 router.route('/adminRegisterUser')
     .post([tokenValidator.detectToken, middlware_hasScopeAdmin], authCtrl.adminRegisterUser)
@@ -27,5 +29,8 @@ router.route('/passwordReset')
 router.route('/users')
     .get([tokenValidator.detectToken, middlware_hasScopeAdmin], authCtrl.getUsers)
     .put([tokenValidator.detectToken, middlware_hasScopeAdmin], authCtrl.updateUser)
+
+router.route('/users/:targetUserId')
+    .delete([tokenValidator.detectToken, middlware_hasScopeAdmin], authCtrl.removeUser)
 
 module.exports = router;

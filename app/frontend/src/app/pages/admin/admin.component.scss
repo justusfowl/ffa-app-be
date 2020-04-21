@@ -230,11 +230,21 @@
 .user-list{
     padding-top: 20px;   
     padding-bottom: 20px;  
+
+    .success-icon{
+        color: $success_color;
+    }
 }
 
 .user{
     padding-top: 20px; 
     margin: 5px;
+
+    .buttons{
+        margin-top: 20px;
+    }
+
+
 }
 
 .new-user{

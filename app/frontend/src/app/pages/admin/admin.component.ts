@@ -757,6 +757,36 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy{
     })
   }
 
+  removeUser(user){
+    let self = this;
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      data: {meta : {"type" : "confirm", "title" : "Scope ändern", "messageText" : `WARNUNG: Sind Sie sicher, dass Sie ${user.userName} löschen möchten? Diese Aktion ist nicht umkehrbar.`}}
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result.answerConfirm){
+       
+      this.api.delete("/auth/users/"+user._id).then(result => {
+
+        let idx = this.users.findIndex(x => x._id == user._id);
+        this.users.splice(idx, 1);
+
+        this.snackBar.open("Der Nutzer wurde gelöscht.", "", {
+          duration: 2500
+        });
+
+      }).catch(err => {
+        this.snackBar.open("Das hat leider nicht geklappt.", "", {
+          duration: 1500
+        });
+        console.error(err);
+      })
+
+      }
+      console.log('The dialog was closed');
+    });
+  }
+
   initAddScope(event: MatChipInputEvent, user, callback?){
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       data: {meta : {"type" : "confirm", "title" : "Scope ändern", "messageText" : `Sind Sie sicher, dass Sie ${user.userName} die Rolle [${event.value}] zufügen möchten?`}}
@@ -865,6 +895,9 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy{
       });
 
     }).catch(err => {
+      this.snackBar.open("Das hat leider nicht geklappt.", "", {
+        duration: 1500
+      });
       console.error(err);
     })
 

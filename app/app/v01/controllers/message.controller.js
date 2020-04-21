@@ -24,7 +24,7 @@ async function handleGeneralMessage (req, res){
             userName : userName, 
             messageText : message, 
             userEmail : email
-        }
+        };
 
         let isVacationObj = await timesCtrl.getIsCurrentlyVacation();
 
@@ -106,6 +106,8 @@ async function handlePrescriptionMessage(req, res){
         res.send(500, "An error occured sending a message: " + JSON.stringify(req.body) );
     }
 }
+
+
 
 module.exports = {
     handleGeneralMessage,

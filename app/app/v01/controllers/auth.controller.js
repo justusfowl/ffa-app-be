@@ -641,11 +641,43 @@ function updateUser(req, res){
     }
 }
 
+function removeUser(req, res){
+
+    try{
+
+        var targetUserId = req.params.targetUserId;
+        
+        MongoClient.connect(MongoUrl, function(err, db) {
+    
+            if (err) throw err;
+            
+            let dbo = db.db(config.mongodb.database);
+    
+            const collection = dbo.collection('users');
+    
+            collection.deleteOne(
+                {
+                    "_id" : ObjectID(targetUserId)
+                },
+                function(err, result){
+                if (err) throw err;
+                res.json({"success" : true});
+                });
+            });
+
+    }catch(err){
+        console.error(error)
+        res.send(500, "An error occured deleting the user: " + targetUserId );
+    }
+
+}
+
 
 module.exports = { 
     login, 
     registerUser, 
     adminRegisterUser,
+    removeUser,
     executeAccountValidation, 
     userIssueAccountValidationEmail, 
     validateUserScope, 
