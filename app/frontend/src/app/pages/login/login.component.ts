@@ -267,13 +267,14 @@ export class LoginComponent implements OnInit {
       label : "progress as guest user"
     });
 
-    console.log(this.guestform.value);
+    let guestObject = this.guestform.value; 
+    guestObject["flagGuest"] = true;
 
-    this.authenticationService.setGuestStatus(this.guestform.value);
+    this.authenticationService.setGuestStatus(guestObject);
 
     this.dialogRef.close({
       flagGuest : true,
-      data : this.guestform.value
+      data : guestObject
     });
     
   }

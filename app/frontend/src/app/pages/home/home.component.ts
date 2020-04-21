@@ -16,6 +16,7 @@ import { LoaderService } from 'src/app/services/loader.service';
 import { Subscription } from 'rxjs';
 import { SettingsService } from 'src/app/services/settings.service';
 import { Location } from '@angular/common';
+import { GenmessageComponent } from 'src/app/components/genmessage/genmessage.component';
 declare var $: any;
 
 @Component({
@@ -31,6 +32,7 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   currentUser : any;
   currentUserSubscription : any;
+  currentGuestSubscription : any;
 
   news = [];
   times : any[] = [];
@@ -107,23 +109,10 @@ export class HomeComponent implements OnInit, OnDestroy {
     
   ];
 
-  medrequestDelivery : any[] = [
-    {
-      "type" : "collect", 
-      "name" : "Abholung in der Praxis"
-    },
-    {
-      "type" : "drugstore", 
-      "name" : "Apotheke:"
-    }
-    
-  ];
+  requestForm = new FormGroup({
+    type : new FormControl("", Validators.required)
+  });
 
-  @ViewChild(FormGroupDirective, {static : true}) formGroupDirective: FormGroupDirective;
-
-  medicationsRequest : any[];
-  requestForm : any;
-  contactForm : any;
   settingsSubscription : Subscription
   settingsObj : any;
 
@@ -145,10 +134,12 @@ export class HomeComponent implements OnInit, OnDestroy {
       this.executeSettings();
     });
 
-    this.currentUserSubscription = this.auth.currentUser.subscribe(result => {
-      this.currentUser = result;
-      this.initContactForm();
-      this.initRequestForm();
+    this.currentUserSubscription = this.auth.currentUser.subscribe(userObject => {
+      this.currentUser = userObject;      
+    });
+
+    this.currentGuestSubscription = this.auth.guestObject.subscribe(guestObject => {
+      this.currentUser = guestObject; 
     });
 
   }
@@ -174,28 +165,26 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.getTeam();
     this.initMap();
 
-    this.initContactForm();
-    this.initRequestForm();
 
     this.requestForm.get("type").valueChanges.subscribe(selectedValue => {
       
       try{
-        if (selectedValue.type == "prescription"){
-          this.openMedicationDialog();
+        if (selectedValue.type == "prescription" || selectedValue.type == "general"){
+          this.openMessageDialog(selectedValue.type);
         }else if (selectedValue.type == "video"){
           this.openVideoDialog();
         }
       }catch(err){
         console.error(err);
-      } 
+      }
         
     })
-
 
   }
 
   ngOnDestroy() {
     this.currentUserSubscription.unsubscribe();
+    this.currentGuestSubscription.unsubscribe();
   }
 
   executeSettings(){
@@ -213,55 +202,6 @@ export class HomeComponent implements OnInit, OnDestroy {
     let c = document.createElement("div");
     c.innerHTML = innerHtmlCode; 
     return c.innerText;
-  }
-
-  public get requestFormValue() {
-      return this.requestForm.value;
-  }
-
-  public get medications() : FormArray {
-    return this.requestForm.get("medications") as FormArray
-  }
-
-  initContactForm(){
-
-    let userEmail = '';
-    let name = '';
-
-    if (this.currentUser){
-      userEmail = this.currentUser.userName || "";
-      name = this.currentUser.name || "";
-    }
-
-    this.contactForm =  new FormGroup({
-      name : new FormControl(name, Validators.required),
-      email : new FormControl(userEmail, [Validators.required, Validators.pattern("^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$")]),
-      message : new FormControl('', Validators.required),
-      acceptTerms : new FormControl(false, Validators.requiredTrue)
-    });
-  }
-
-  initRequestForm(){
-
-    let userEmail = '';
-    let name = '';
-
-    if (this.currentUser){
-      userEmail = this.currentUser.userName || "";
-      name = this.currentUser.name || "";
-    }
-
-    this.requestForm =  new FormGroup({
-      name : new FormControl(name, Validators.required),
-      email : new FormControl(userEmail, [Validators.required, Validators.pattern("^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$")]),
-      type : new FormControl('', Validators.required),
-      acceptTerms : new FormControl(false, Validators.requiredTrue),
-      deliveryType : new FormControl(""),
-      collectDrugStore : new FormControl(""),
-      message : new FormControl('')
-    });
-
-    this.medicationsRequest = [];
   }
 
   getTimes(){
@@ -304,15 +244,7 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   }
 
-  setMessage(){
-    let self = this;
-    setTimeout(function(){
-      self._snackBar.open("Vielen Dank für Ihre Nachricht. Wir werden uns schnellstmöglich bei Ihnen melden.", "OK", {
-        duration: 2000,
-      });
-      self.initContactForm();
-    },1500)
-  }
+
 
   initMap(){
     var googleMapsDirections = "https://www.google.de/maps/place/Facharztpraxis+f%C3%BCr+Allgemeinmedizin+-+Dr.+Kaulfu%C3%9F+%26+Dr.+G%C3%A4rtner/@50.0231912,8.0905312,17z/data=!3m1!4b1!4m5!3m4!1s0x47bdeb20ec1f8b91:0xde050cd6a5da2599!8m2!3d50.0231912!4d8.0927199"
@@ -530,52 +462,51 @@ export class HomeComponent implements OnInit, OnDestroy {
     }
 
   }
+  
+  openMessageDialog(type) : void {
 
-  editMediRequests(){
-    this.openMedicationDialog(this.medicationsRequest);
-  }
+    if (this.auth.isAuthorized() || this.auth.isGuest()){
 
-  sendMessage2(){
-    console.log(this.requestFormValue)
-  }
-
-  sendMessage(){
-
-    let f = this.requestFormValue;
-    let endPoint = "/message/";
-
-    if (f.type.type == 'general'){
-      endPoint += "general"
-    }else if (f.type.type == 'prescription'){
-      endPoint += "prescription"
-      f.medications = this.medicationsRequest;
-
-      if (f.deliveryType == 'drugstore' && (!f.collectDrugStore || f.collectDrugStore == "")){
-        return;
+      if (this.auth.isAuthorized()){
+        if (!this.auth.currentUserValue.validated){
+          this._snackBar.open("Bitte verifizieren Sie ihr Konto bevor Sie digitale Dienste nutzen können. Prüfen Sie ihr Postfach oder gehen Sie auf 'myFFA'", "OK", {
+            duration: 10000
+          })
+          return;
+        }
       }
-    }
-
-    this.googleAnalytics.sendEvent("contactform",{
-      category: "contact", 
-      label : f.type.type
-    });
-
-    this.api.post(endPoint, f).then(result => {
-      this._snackBar.open("Vielen Dank. Wir haben Ihre Nachricht erhalten.", "OK", {
-        duration: 5000
+      
+      const dialogRef = this.dialog.open(GenmessageComponent, {
+        data: {type : type},
+        panelClass : "generalmessage-dialog"
+      });
+    
+      dialogRef.afterClosed().subscribe((resultObj : any) => {
+        if (resultObj){
+          
+        }
       });
 
-      setTimeout(() => {
-        this.formGroupDirective.resetForm()
-        this.initRequestForm();
-      }, 200);
+    }else{
 
-    }).catch(err=>{
-      console.warn(err);
-      this._snackBar.open("Etwas hat nicht geklappt", "", {
-        duration: 1500
-      })
-    })
+     // close this dialog 
+
+     const dialogRef = this.dialog.open(LoginComponent, {
+        data: {
+            flagDialog : true, 
+            flagEnableGuest : true
+          },
+        panelClass : "login-dialog"
+      });
+
+      dialogRef.afterClosed().subscribe((resultData : any) => {
+        if (resultData){
+          this.openMessageDialog(type);
+        }
+      });
+
+    }
+
   }
 
   openVideoDialog(guestObject?){
@@ -639,20 +570,7 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   }
 
-  openMedicationDialog(medications = []) : void {
-
-    const dialogRef = this.dialog.open(MedrequestComponent, {
-      data: {medications : medications},
-      panelClass : "prescription-dialog"
-    });
-
-    dialogRef.afterClosed().subscribe((medicationsArray : any) => {
-      if (medicationsArray){
-        this.medicationsRequest = medicationsArray;
-      }
-    });
-
-  }
+  
 
   openCancelAppointment(token, appointmentId) : void {
 

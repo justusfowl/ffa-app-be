@@ -204,19 +204,15 @@
     }
 }
 
-#contactForm, 
+#contactForm,
 #requestForm{
+
     mat-form-field{
         width: 100%;
     }
 
     textarea{
         height: 100px;
-        color: white;
-    }
-
-    .hint{
-        color: white;
     }
 
     .form-control:disabled, .form-control[readonly], .form-control:focus{
@@ -226,6 +222,14 @@
 }
 
 .form-dark{
+
+    textarea{
+        color: white;
+    }
+
+    .hint{
+        color: white;
+    }
 
     .mat-checkbox-frame {
         border-color: $background_light;
@@ -262,6 +266,10 @@
             background-color: $secondary;
           }
       }
+
+    .mat-form-field.mat-focused .mat-input-element {
+        color: white;
+    }
     
 }
 
@@ -270,9 +278,7 @@
     color: $background_nav;
 }
 
-.prescription-dialog{
-    max-height: 100vh;
-}
+
 
 @media (min-width: 1100px) {
     .prescription-dialog{
@@ -289,17 +295,7 @@
 
 
 
-.med-requests{
-    margin-bottom: 20px;
-    color: white;
 
-    .med{
-        display: flex; 
-        mat-icon{
-            margin-right: 5px; 
-        }
-    }
-}
 
 .service-list{
     width: 100% !important;

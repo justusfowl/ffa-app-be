@@ -2,7 +2,7 @@
 
 <div class="prescription-request">
 
-    <h1>Rezeptanfrage</h1>
+    <h1>Medikamente</h1>
     <p>
         Bitte tragen Sie hier die Medikamente ein, für die Sie ein Rezept vorbestellen möchten.
     </p>
@@ -65,16 +65,13 @@
     </div>
 
     <div class="menu-row">
+        <button  class="saveBtn" mat-button (click)="abort()">
+            Abbruch
+        </button>
 
-            <button  class="saveBtn" mat-button (click)="abort()">
-               Abbruch
-            </button>
-
-            <button  class="saveBtn" mat-button (click)="confirm()" [disabled]="medications.status == 'INVALID'">
-               OK
-            </button>
-
-
+        <button  class="saveBtn" mat-button (click)="confirm()" [disabled]="medications.status == 'INVALID'">
+            OK
+        </button>
     </div>
 </div>
 

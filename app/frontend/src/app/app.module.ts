@@ -44,6 +44,7 @@ import { CancelappointmentComponent } from './components/cancelappointment/cance
 import { SettingsService } from './services/settings.service';
 import { NotfoundComponent } from './pages/notfound/notfound.component';
 import { AppointmentDetailsComponent } from './components/appointment-details/appointment-details.component';
+import { GenmessageComponent } from './components/genmessage/genmessage.component';
 
 const cookieConfig:NgcCookieConsentConfig = {
   cookie: {
@@ -91,7 +92,8 @@ const cookieConfig:NgcCookieConsentConfig = {
     ImprintComponent, 
     CancelappointmentComponent, 
     NotfoundComponent, 
-    AppointmentDetailsComponent
+    AppointmentDetailsComponent,
+    GenmessageComponent
   ],
   imports: [
     HttpClientModule,
@@ -129,7 +131,8 @@ const cookieConfig:NgcCookieConsentConfig = {
     ConfirmDialogComponent, 
     NewappointmentComponent, 
     CancelappointmentComponent,
-    AppointmentDetailsComponent
+    AppointmentDetailsComponent, 
+    GenmessageComponent
   ]
 })
 export class AppModule { }

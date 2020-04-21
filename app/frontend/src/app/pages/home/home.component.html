@@ -386,7 +386,7 @@
     <div id="contact" class="form-1">
         <div class="container">
             <div class="row">
-                <div class="col-lg-6">
+                <div class="col-lg-12">
                     <div class="text-container">
                         <div class="section-title">ANFRAGE</div>
                         <h2 class="white">Kontaktieren Sie uns</h2>
@@ -412,6 +412,22 @@
                             </li>
                         </ul>
 
+                        <form id="requestForm"  FormGroupDirective  [formGroup]="requestForm"  class="form-dark" data-toggle="validator" data-focus="false">
+
+                            <div class="form-group fullwidth">
+                                <mat-form-field>
+                                    <mat-label>Bitte wählen Sie eine Anfrageart aus:</mat-label>
+                                    <mat-select  formControlName="type" required>
+                                        <mat-option *ngFor="let req of requestTypes" [value]="req">
+                                        {{req.name}}
+                                        </mat-option>
+                                    </mat-select>
+                                    <mat-error *ngIf="requestForm.get('type').hasError('required')"  >Bitte wählen Sie eine Anfrageart</mat-error>
+                                </mat-form-field>
+                            </div>
+    
+                        </form>
+
                         <p class="white">
                             NEU: Nutzen Sie unsere Video-Sprechstunde. Sie benötigen hierzu keine weitere Software.
                         </p>
@@ -423,92 +439,10 @@
 
                     </div>
                 </div> <!-- end of col -->
-                <div class="col-lg-6">
+                <div class="col-lg-12">
 
                     <!-- Contact Form -->
-                    <form id="requestForm"  FormGroupDirective  [formGroup]="requestForm"  class="form-dark" data-toggle="validator" data-focus="false">
-
-                        <div class="form-group">
-                            <mat-form-field>
-                                <mat-label>Anfrageart</mat-label>
-                                <mat-select  formControlName="type" required>
-                                    <mat-option *ngFor="let req of requestTypes" [value]="req">
-                                    {{req.name}}
-                                    </mat-option>
-                                </mat-select>
-                                <mat-error *ngIf="requestForm.get('type').hasError('required')"  >Bitte wählen Sie eine Anfrageart</mat-error>
-                            </mat-form-field>
-                        </div>
-
-                        <div class="form-group">
-                            <mat-form-field class="login-forms">
-                                <input formControlName="name" required matInput type="text" placeholder="Name" class="form-control" required [readonly]="currentUser">
-                                <mat-error  *ngIf="requestForm.get('name').hasError('required')" >Bitte Namen eintragen.</mat-error>
-                            </mat-form-field>
-                        </div>
-
-                        
-                        <div class="form-group">
-                            <mat-form-field class="login-forms">
-                                <input  formControlName="email"  matInput type="text" placeholder="eMail" class="form-control" required [readonly]="currentUser">
-                                <mat-error  *ngIf="requestForm.get('email').hasError('required')" >Bitte Email eintragen.</mat-error>
-                            </mat-form-field>
-                        </div>
-
-                            
-                        
-
-                        <div class="form-group" *ngIf="requestForm.value.type.type == 'general'">
-                            <mat-form-field>
-                                <mat-label>Nachricht</mat-label>
-                                <textarea formControlName="message" required type="text" matInput #messageObj maxlength="256" placeholder="Ihre generelle Anfrage"></textarea>
-                                <mat-hint class="hint" align="end">{{requestForm.value.message.length}} / 256</mat-hint>
-                            </mat-form-field>
-                        </div>
-
-                        <div class="med-requests" *ngFor="let med of medicationsRequest; let i = index;">
-
-                            <h4>Medikamente: 
-                                 <button  class="editBtn" mat-button (click)="editMediRequests()">
-                                    <mat-icon>edit</mat-icon>
-                                </button>
-                            </h4>
-
-                            <div class="med">
-                                    <mat-icon> local_hospital</mat-icon> {{ med.name }} ...
-                            </div>
-
-                        </div>
-
-                        <div class="form-group" *ngIf="requestForm.get('type').value.type == 'prescription'">
-                            <mat-form-field>
-                                <mat-label>Empfangsweg</mat-label>
-                                <mat-select  formControlName="deliveryType" required>
-                                    <mat-option *ngFor="let req of medrequestDelivery" [value]="req.type">
-                                    {{req.name}}
-                                    </mat-option>
-                                </mat-select>
-                                <mat-error   >Bitte wählen Sie einen Empfangsweg</mat-error>
-                            </mat-form-field>
-                        </div>
-
-                        <div class="form-group" *ngIf="requestForm.get('deliveryType').value == 'drugstore'">
-                            <mat-form-field>
-                                <input  formControlName="collectDrugStore"  matInput type="text" placeholder="Apotheke" class="form-control" required>
-                                <mat-error *ngIf="requestForm.get('deliveryType').value == 'drugstore' && requestForm.get('collectDrugStore').value == ''"  >Bitte wählen Sie eine Apotheke </mat-error>
-                            </mat-form-field>
-                        </div>
-
-                        <div class="form-group">
-                                <mat-checkbox  formControlName="acceptTerms"  >Ich akzeptiere die <a  target="_blank"  routerLink="/privacy" routerLinkActive="active" >Nutzungsbedingungen</a></mat-checkbox>
-                        </div>
-
-                        <div class="form-group">
-                            <button mat-button [disabled]="!requestForm.valid"  class="form-control-submit-button" (click)="sendMessage()">Abschicken</button>
-                            <button *ngIf="false" mat-button  class="form-control-submit-button" (click)="sendMessage2()">Abschicken</button>
-                        </div>
-                        
-                    </form>
+                    
                                        
                 </div> <!-- end of col -->
             </div> <!-- end of row -->

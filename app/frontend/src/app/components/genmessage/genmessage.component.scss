@@ -1,0 +1,36 @@
+@import "../../../variables.scss";
+
+.med-requests{
+    margin-bottom: 20px;
+    color: $background_dark;
+
+    .med{
+        display: flex; 
+        mat-icon{
+            margin-right: 5px; 
+        }
+    }
+}
+
+.prescription-dialog{
+    max-height: 100vh;
+}
+
+#requestForm{
+    mat-form-field{
+        width: 100%;
+    }
+
+    textarea{
+        height: 100px;
+        
+    }
+
+    .form-control:disabled, .form-control[readonly], .form-control:focus{
+        background-color: unset !important;
+    }
+
+    .mat-checkbox-layout { white-space: normal !important; }
+
+}
+

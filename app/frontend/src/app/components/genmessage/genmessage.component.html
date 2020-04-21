@@ -1,0 +1,83 @@
+<div>
+
+    <h2 *ngIf="data.type == 'general'">Generelle Nachricht</h2>
+    <h2 *ngIf="data.type == 'prescription'">Rezeptanfrage</h2>
+
+    <form id="requestForm"  FormGroupDirective  [formGroup]="requestForm"  data-toggle="validator" data-focus="false">
+
+
+        <div class="form-group"  *ngIf="(auth.isAuthorized() || auth.isGuest())">
+            <mat-form-field class="login-forms">
+                <input formControlName="name" required matInput type="text" placeholder="Name" class="form-control" required readonly>
+                <mat-error  *ngIf="requestForm.get('name').hasError('required')" >Bitte Namen eintragen.</mat-error>
+            </mat-form-field>
+        </div>
+
+        
+        <div class="form-group" *ngIf="(auth.isAuthorized() || auth.isGuest())">
+            <mat-form-field class="login-forms">
+                <input  formControlName="email"  matInput type="text" placeholder="eMail" class="form-control" required readonly>
+                <mat-error  *ngIf="requestForm.get('email').hasError('required')" >Bitte Email eintragen.</mat-error>
+            </mat-form-field>
+        </div>
+
+
+        <div class="form-group" *ngIf="data.type == 'general' && (auth.isAuthorized() || auth.isGuest())">
+            <mat-form-field>
+                <mat-label>Nachricht</mat-label>
+                <textarea formControlName="message" required type="text" matInput #messageObj maxlength="256" placeholder="Ihre generelle Anfrage"></textarea>
+                <mat-hint class="hint" align="end">{{requestForm.value.message.length}} / 256</mat-hint>
+            </mat-form-field>
+        </div>
+
+        <h4 *ngIf="medicationsRequest.length > 0">
+            <button  class="editBtn" mat-button (click)="editMediRequests()">
+                <mat-icon>edit</mat-icon>
+            </button>
+            Medikam.: 
+        </h4>
+
+        <div class="med-requests" *ngFor="let med of medicationsRequest; let i = index;">
+
+            <div class="med">
+                    <mat-icon> local_hospital</mat-icon> {{ med.name }} ({{ med.dosageform }}) ...
+            </div>
+
+        </div>
+
+        <div class="form-group" *ngIf="data.type == 'prescription'  && (auth.isAuthorized() || auth.isGuest())">
+            <mat-form-field>
+                <mat-label>Empfangsweg</mat-label>
+                <mat-select  formControlName="deliveryType" required>
+                    <mat-option *ngFor="let req of medrequestDelivery" [value]="req.type">
+                    {{req.name}}
+                    </mat-option>
+                </mat-select>
+                <mat-error   >Bitte wählen Sie einen Empfangsweg</mat-error>
+            </mat-form-field>
+        </div>
+
+        <div class="form-group" *ngIf="requestForm.get('deliveryType').value == 'drugstore'">
+            <mat-form-field>
+                <input  formControlName="collectDrugStore"  matInput type="text" placeholder="Apotheke" class="form-control" required>
+                <mat-error *ngIf="requestForm.get('deliveryType').value == 'drugstore' && requestForm.get('collectDrugStore').value == ''"  >Bitte wählen Sie eine Apotheke </mat-error>
+            </mat-form-field>
+        </div>
+
+        <div class="form-group">
+                <mat-checkbox  formControlName="acceptTerms"  >Ich akzeptiere die <a  target="_blank"  routerLink="/privacy" routerLinkActive="active" >Nutzungsbedingungen</a></mat-checkbox>
+        </div>
+
+        <div class="form-group">
+            <button mat-button [disabled]="!requestForm.valid"  class="form-control-submit-button" (click)="sendMessage()">Abschicken</button>
+            <button *ngIf="false" mat-button  class="form-control-submit-button" (click)="sendMessage2()">Abschicken</button>
+        </div>
+        
+    </form>
+
+
+    <div class="form-group">
+        <button mat-button (click)="close()" class="fullwidth">Abbrechen</button>
+    </div>
+
+</div>
