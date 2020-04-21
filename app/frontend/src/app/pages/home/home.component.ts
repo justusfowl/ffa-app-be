@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ViewChild, ViewEncapsulation, OnDestroy } from '@angular/core';
 import { ApiService } from 'src/app/services/api.service';
 import { MatDialog, MatSnackBar } from '@angular/material';
 import { NewsdetailComponent } from '../newsdetail/newsdetail.component';
@@ -24,10 +24,13 @@ declare var $: any;
   styleUrls: ['./home.component.scss', '../../app.component.scss'],
   encapsulation: ViewEncapsulation.None
 })
-export class HomeComponent implements OnInit {
+export class HomeComponent implements OnInit, OnDestroy {
 
   WELCOME_TITLE : string = "Dr. Kaulfuß & Dr. Gärtner"
   WELCOME_SUBHEADER : string = "Facharztpraxis für Allgemeinmedizin";
+
+  currentUser : any;
+  currentUserSubscription : any;
 
   news = [];
   times : any[] = [];
@@ -139,16 +142,20 @@ export class HomeComponent implements OnInit {
 
     this.settingsSubscription = this.settingsSrv.settingsObjObservable.subscribe(result => {
       this.settingsObj = result;
-
       this.executeSettings();
-
     });
 
-
+    this.currentUserSubscription = this.auth.currentUser.subscribe(result => {
+      this.currentUser = result;
+      this.initContactForm();
+      this.initRequestForm();
+    });
 
   }
 
   ngOnInit() {
+
+    this.currentUser = this.auth.currentUserValue;
 
     let command = this.route.snapshot.queryParamMap.get('c');
 
@@ -187,6 +194,10 @@ export class HomeComponent implements OnInit {
 
   }
 
+  ngOnDestroy() {
+    this.currentUserSubscription.unsubscribe();
+  }
+
   executeSettings(){
     let self = this; 
     if (this.settingsObj.popup){
@@ -213,18 +224,36 @@ export class HomeComponent implements OnInit {
   }
 
   initContactForm(){
+
+    let userEmail = '';
+    let name = '';
+
+    if (this.currentUser){
+      userEmail = this.currentUser.userName || "";
+      name = this.currentUser.name || "";
+    }
+
     this.contactForm =  new FormGroup({
-      name : new FormControl('', Validators.required),
-      email : new FormControl('', [Validators.required, Validators.pattern("^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$")]),
+      name : new FormControl(name, Validators.required),
+      email : new FormControl(userEmail, [Validators.required, Validators.pattern("^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$")]),
       message : new FormControl('', Validators.required),
       acceptTerms : new FormControl(false, Validators.requiredTrue)
     });
   }
 
   initRequestForm(){
+
+    let userEmail = '';
+    let name = '';
+
+    if (this.currentUser){
+      userEmail = this.currentUser.userName || "";
+      name = this.currentUser.name || "";
+    }
+
     this.requestForm =  new FormGroup({
-      name : new FormControl('', Validators.required),
-      email : new FormControl('', [Validators.required, Validators.pattern("^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$")]),
+      name : new FormControl(name, Validators.required),
+      email : new FormControl(userEmail, [Validators.required, Validators.pattern("^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$")]),
       type : new FormControl('', Validators.required),
       acceptTerms : new FormControl(false, Validators.requiredTrue),
       deliveryType : new FormControl(""),

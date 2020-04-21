@@ -442,7 +442,7 @@
 
                         <div class="form-group">
                             <mat-form-field class="login-forms">
-                                <input formControlName="name" required matInput type="text" placeholder="Name" class="form-control" required>
+                                <input formControlName="name" required matInput type="text" placeholder="Name" class="form-control" required [readonly]="currentUser">
                                 <mat-error  *ngIf="requestForm.get('name').hasError('required')" >Bitte Namen eintragen.</mat-error>
                             </mat-form-field>
                         </div>
@@ -450,7 +450,7 @@
                         
                         <div class="form-group">
                             <mat-form-field class="login-forms">
-                                <input  formControlName="email"  matInput type="text" placeholder="eMail" class="form-control" required>
+                                <input  formControlName="email"  matInput type="text" placeholder="eMail" class="form-control" required [readonly]="currentUser">
                                 <mat-error  *ngIf="requestForm.get('email').hasError('required')" >Bitte Email eintragen.</mat-error>
                             </mat-form-field>
                         </div>

@@ -140,11 +140,12 @@ export class NewappointmentComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
 
-    let patientName, patientEmail;
+    let patientName, patientEmail, patientMobilePhone;
 
     if (this.auth.isAuthorized()){
       patientName = this.auth.currentUserValue.name || this.auth.currentUserValue.userName;
       patientEmail = this.auth.currentUserValue.userName;
+      patientMobilePhone = this.auth.currentUserValue.patientMobilePhone || null;
     }else if (this.auth.isGuest()){
       let guestObject = this.auth.guestObjectValue;
       patientName = guestObject.name;
@@ -154,6 +155,7 @@ export class NewappointmentComponent implements OnInit, OnDestroy {
     this.baseInfoForm = this._formBuilder.group({
       patientName: [patientName, Validators.required],
       patientEmail : [patientEmail, Validators.required],
+      patientMobilePhone : [patientMobilePhone, [Validators.required, Validators.pattern(new RegExp("[0-9 ]{9}"))]],
       appointmentType: ['', Validators.required],
       doc : ['', Validators.required],
       // appointmentNotes: ['', Validators.required],

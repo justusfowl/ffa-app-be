@@ -42,6 +42,13 @@
                         </div>
 
                         <div class="form-group">
+                            <mat-form-field class="login-forms">
+                                <input required matInput type="number" placeholder="Telefonnummer" class="form-control" [(ngModel)]="currentUser.patientMobilePhone" [ngModelOptions]="{standalone: true}">
+                                <mat-error  *ngIf="currentUser.patientMobilePhone" >Bitte Telefonnummer eintragen.</mat-error>
+                            </mat-form-field>
+                        </div>
+
+                        <div class="form-group">
                             <mat-form-field>
                                 <input matInput placeholder="Geburtsdatum" [matDatepicker]="picker" [(ngModel)]="currentUser.birthdate" [ngModelOptions]="{standalone: true}" readonly class="form-control">
                                 <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>

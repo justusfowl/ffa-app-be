@@ -52,6 +52,7 @@ export class MyComponent implements OnInit {
       this._snackBar.open("Aktualisiert", "", {
         duration: 2000,
       });
+      this.auth.setUserData(this.currentUser);
     }).catch(err => {
       console.error(err);
       this._snackBar.open("Uups - es scheint etwas schief gelaufen zu sein.", "", {

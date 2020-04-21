@@ -50,10 +50,10 @@
 
                     </form>
                    
-                    <form id="loginForm" class="login-form" [class.show]="viewState=='login'" [formGroup]="loginForm" data-toggle="validator" data-focus="false">
+                    <form id="loginForm" class="login-form" [class.show]="viewState=='login'" [formGroup]="loginForm" (submit)="login()">
                         
                         <div class="form-group" *ngIf="data.flagEnableGuest">
-                            <button mat-stroked-button (click)="setState('guest')" class="submit-btn">GASTZUGANG</button>
+                            <button  type="button" mat-stroked-button (click)="setState('guest')" class="submit-btn">GASTZUGANG</button>
                         </div>
 
                         <div class="seperator" *ngIf="data.flagEnableGuest">

@@ -94,7 +94,7 @@ export class AuthenticationService {
         localStorage.removeItem('userData');
         this.currentUserSubject.next(null);
         this.setGuestStatus(null);
-        this.router.navigate(["/"]);
+        this.router.navigate(["/login"]);
 
         this.snackBar.open("Abgemeldet", "", {
             duration: 3000

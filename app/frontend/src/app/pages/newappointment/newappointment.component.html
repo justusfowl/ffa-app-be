@@ -11,6 +11,15 @@
           <input matInput placeholder="Last name, First name" formControlName="patientName" required readonly>
         </mat-form-field>
       </div>
+
+      <div class="form-group">
+        <mat-form-field>
+          <mat-label>Mobilfunk-Nummer</mat-label>
+          <input matInput placeholder="Mobilfunk-Nummer" formControlName="patientMobilePhone" required>
+        </mat-form-field>
+      </div>
+
+      
     
       <div class="form-group">
           <mat-form-field>
@@ -188,7 +197,7 @@
         <div class="form-group">
             <mat-form-field >
                 <input required matInput type="text" placeholder="Name" class="form-control" [ngModel]="baseInfoForm.value.patientName" readonly>
-                <mat-hint class="hint" >{{baseInfoForm.value.patientEmail}}</mat-hint>
+                <mat-hint class="hint" >{{baseInfoForm.value.patientEmail}} | {{baseInfoForm.value.patientMobilePhone}}</mat-hint>
             </mat-form-field>
         </div>
 
