@@ -1,0 +1,20 @@
+<div class="new-user">
+
+    <form class="add">
+        <mat-form-field >
+            <mat-label>Nutzername</mat-label>
+            <input matInput [formControl]="emailFormControl" [errorStateMatcher]="matcher"
+                    placeholder="nutzer@test.de">
+            <mat-hint>Email-Adresse</mat-hint>
+            <mat-error *ngIf="emailFormControl.hasError('email') && !emailFormControl.hasError('required')">
+            ungültige eMail-Adresse
+            </mat-error>
+            <mat-error *ngIf="emailFormControl.hasError('required')">
+            Email wird benötigt
+            </mat-error>
+        </mat-form-field>
+    </form>
+
+    <button mat-button (click)="preregisterUser()">Zufügen</button>
+
+</div>

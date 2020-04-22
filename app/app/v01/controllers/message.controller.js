@@ -6,6 +6,7 @@ var MongoUrl = config.getMongoUrl();
 
 var emailerCtrl = require('./emailer.controller');
 var timesCtrl = require('./times.controller');
+var authCtrl = require('./auth.controller');
 
 async function handleGeneralMessage (req, res){
 
@@ -72,6 +73,7 @@ async function handlePrescriptionMessage(req, res){
         let contextObject = {
             userName : userName, 
             medications : medications, 
+            sendDate : new Date(),
             userEmail : email, 
             flagCollectFromPractice : flagCollectFromPractice, 
             collectDrugStore : collectDrugStore
@@ -82,6 +84,17 @@ async function handlePrescriptionMessage(req, res){
         medications.forEach(element => {
             message += element.name + " "
         });
+
+        let userObj = await authCtrl.getUserByName(email);
+
+        if (userObj._id){
+            let msgObj = JSON.parse(JSON.stringify(contextObject))
+            msgObj["userId"] = userObj._id.toString();
+            delete msgObj.userEmail;
+            storeMessage(msgObj).catch(err => {
+                console.error(err);
+            });
+        }
 
         let isVacationObj = await timesCtrl.getIsCurrentlyVacation();
 
@@ -105,6 +118,36 @@ async function handlePrescriptionMessage(req, res){
         console.error(err);
         res.send(500, "An error occured sending a message: " + JSON.stringify(req.body) );
     }
+}
+
+function storeMessage(messageObject){
+    return new Promise((resolve, reject) => {
+        try{
+
+            MongoClient.connect(MongoUrl, function(err, db) {
+        
+                if (err) throw err;
+                
+                let dbo = db.db(config.mongodb.database);
+        
+                const collection = dbo.collection('messages');
+        
+                collection.insertOne(
+                    messageObject,
+                  function(err, result){
+                    if (err){
+                        reject(err);
+                    }else{
+                        resolve(true);
+                    }
+                    
+                  });
+              });
+    
+        }catch(err){
+            reject(err);
+        }
+    })
 }
 
 

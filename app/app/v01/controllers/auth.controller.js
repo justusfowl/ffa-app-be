@@ -688,5 +688,6 @@ module.exports = {
     userIssueForgotPasswordEmail, 
 
     getManyUsersById, 
-    getUserById
+    getUserById,
+    getUserByName
     }

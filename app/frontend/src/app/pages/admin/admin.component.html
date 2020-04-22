@@ -32,102 +32,84 @@
 
                 <div class="teamList">
 
-                    <div class="member" *ngFor="let m of teamMembers;">
-                        
-                        <div class="avatar">
-                            <div class="pic">
-                                <img [src]="m.picture">
-                                <label>
-                                    <mat-icon>edit</mat-icon>
-                                    <input class="teammember-pic-upload" type="file"  (change)="handleTeamFileInput($event.target.files, m)">
-                                </label>
+                    <div class="addBtn-row">
+                        <button  class="addBtn" mat-button mat-stroked-button (click)="addNewTeamMember()">
+                            <mat-icon>add</mat-icon> Neu
+                        </button>
+                    </div>
+
+                    <mat-accordion>
+                        <mat-expansion-panel *ngFor="let m of teamMembers;">
+                            <mat-expansion-panel-header>
+                                <mat-panel-title>
+                                        {{m.name}}
+                                </mat-panel-title>
+                                <mat-panel-description>
+                                    
+                                    <mat-icon>user</mat-icon>
+    
+                                </mat-panel-description>
+                            </mat-expansion-panel-header>
+                            
+                            <div class="member">
+ 
+                                <div class="avatar">
+                                    <div class="pic">
+                                        <img [src]="getImageUrl(m.picture)" *ngIf="m._id">
+                                        <img [src]="getImageUrl(m.picture)" *ngIf="!m._id && !newTeamMemberFileStr">
+                                        <img [src]="newTeamMemberFileStr" *ngIf="!m._id && newTeamMemberFileStr">
+                                        <label>
+                                            <mat-icon>edit</mat-icon>
+                                            <input class="teammember-pic-upload" type="file"  (change)="handleTeamFileInput($event.target.files, m)">
+                                        </label>
+                                        
+                                    </div> 
+
+                                    <p>
+                                        <mat-checkbox [(ngModel)]="m.flagActive" (ngModelChange)="updateTeamMember(m)" >Aktiv?</mat-checkbox>
+                                    </p>
+                                    <p>
+                                        <button (click)="deleteMember(m)" mat-icon-button color="accent" *ngIf="m._id">
+                                            <mat-icon>delete</mat-icon>
+                                        </button>
+
+                                        <button (click)="addMember(m)" mat-stroked-button color="accent" *ngIf="!m._id">
+                                            <mat-icon>save</mat-icon> Speichern
+                                        </button>
+                                    </p>
+                                    
+                                </div>
+                                <div class="text">
+                                    <mat-form-field >
+                                        <input [(ngModel)]="m.name"  (ngModelChange)="handleUpdateTeamMember(m, $event)" matInput type="text" placeholder="Name"  required>
+                                    </mat-form-field>
+        
+                                    <mat-form-field>
+                                        <mat-label>Gattung</mat-label>
+                                        <mat-select [(ngModel)]="m.type"  required (ngModelChange)="handleUpdateTeamMember(m, $event)">
+                                            <mat-option value="doc">
+                                                doc
+                                            </mat-option>
+                                            <mat-option value="mfa">
+                                                mfa
+                                            </mat-option>
+                                        </mat-select>
+                                    </mat-form-field>
+        
+                                    <mat-form-field >
+                                        <input [(ngModel)]="m.role" (ngModelChange)="handleUpdateTeamMember(m, $event)"  matInput type="text" placeholder="Rolle"  >
+                                    </mat-form-field>
+        
+                                    <mat-form-field >
+                                        <textarea [(ngModel)]="m.description" (ngModelChange)="handleUpdateTeamMember(m, $event)"  matInput type="text" placeholder="Beschreibung"  ></textarea>
+                                    </mat-form-field>
+                                </div>
+                            </div>
                                 
-                            </div> 
+                        </mat-expansion-panel>  
+    
+                    </mat-accordion>
 
-                        
-                            
-
-                            <p>
-                                <mat-checkbox [(ngModel)]="m.flagActive" (ngModelChange)="updateTeamMember(m)" >Aktiv?</mat-checkbox>
-                            </p>
-                            <p>
-                                <button (click)="deleteMember(m)" mat-icon-button color="accent" aria-label="Example icon-button with a heart icon">
-                                    <mat-icon>delete</mat-icon>
-                                </button>
-                            </p>
-                            
-                        </div>
-                        <div class="text">
-                            <mat-form-field >
-                                <input [(ngModel)]="m.name"  (ngModelChange)="handleUpdateTeamMember(m, $event)" matInput type="text" placeholder="Name"  required>
-                            </mat-form-field>
-
-                            <mat-form-field>
-                                <mat-label>Gattung</mat-label>
-                                <mat-select [(ngModel)]="m.type"  required (ngModelChange)="handleUpdateTeamMember(m, $event)">
-                                    <mat-option value="doc">
-                                        doc
-                                    </mat-option>
-                                    <mat-option value="mfa">
-                                        mfa
-                                    </mat-option>
-                                </mat-select>
-                            </mat-form-field>
-
-                            <mat-form-field >
-                                <input [(ngModel)]="m.role" (ngModelChange)="handleUpdateTeamMember(m, $event)"  matInput type="text" placeholder="Rolle"  >
-                            </mat-form-field>
-
-                            <mat-form-field >
-                                <textarea [(ngModel)]="m.description" (ngModelChange)="handleUpdateTeamMember(m, $event)"  matInput type="text" placeholder="Beschreibung"  ></textarea>
-                            </mat-form-field>
-                        </div> 
-                    </div>
-                    <div class="headline">
-                        <h2>
-                            Neues Team-Mitglied
-                        </h2>
-                    </div>
-                    <div class="new member">
-
-                        <div  class="avatar">
-                            <img [src]="newTeamMemberFileStr" *ngIf="newTeamMemberFileStr">
-                            
-                        </div>
-                        <div class="text">
-                            <mat-form-field >
-                                <input [(ngModel)]="newTeamMember.name"   matInput type="text" placeholder="Name"  required>
-                            </mat-form-field>
-
-                            <mat-form-field>
-                                <mat-label>Gattung</mat-label>
-                                <mat-select [(ngModel)]="newTeamMember.type" required >
-                                    <mat-option value="doc">
-                                        doc
-                                    </mat-option>
-                                    <mat-option value="mfa">
-                                        mfa
-                                    </mat-option>
-                                </mat-select>    
-                            </mat-form-field>
-
-                            <mat-form-field >
-                                <input [(ngModel)]="newTeamMember.role"  matInput type="text" placeholder="Rolle"  >
-                            </mat-form-field>
-
-                            <mat-form-field >
-                                <textarea [(ngModel)]="newTeamMember.description" matInput type="text" placeholder="Beschreibung"  ></textarea>
-                            </mat-form-field>
-                            
-                            <input class="teammember-pic-upload" type="file" placeholder="Bild hochladen" (change)="handleFileInput($event.target.files)">
-                            
-                            <button (click)="addMember()" mat-button color="secondary">
-                                <mat-icon>add</mat-icon>
-                            </button>
-                        
-                        </div>
-
-                    </div>
                 </div>
             </ng-template>
         </mat-tab>
@@ -198,105 +180,161 @@
 
         <mat-tab label="Urlaubszeiten" >
 
-            <div class="addBtn-row">
-                <button  class="addBtn" mat-button mat-stroked-button (click)="addNewVacation()">
-                    <mat-icon>add</mat-icon> Neu
-                </button>
-            </div>
+            <div class="closed-times">
 
+                <div class="addBtn-row">
+                    <button  class="addBtn" mat-button mat-stroked-button (click)="addNewVacation()">
+                        <mat-icon>add</mat-icon> Neu
+                    </button>
+                </div>
 
-            <mat-accordion  class="vacation">
-                <mat-expansion-panel *ngFor="let vac of vacation; let i=index;">
-                    <mat-expansion-panel-header>
-                    <mat-panel-title>
-                        {{vac.title}} <span *ngIf="!vac.title">Neuer Eintrag</span>
-                    </mat-panel-title>
-                    <mat-panel-description>
-                       ab {{vac.vacationStart| date:'MMM d, y'}}
-                    </mat-panel-description>
-                    </mat-expansion-panel-header>
-                    
-                    <div class="vacation-container">
+                <h4>
+                    Urlaube
+                </h4>
 
-                        <mat-form-field>
-                            <mat-label>Start</mat-label>
-                            <input  disabled  [(ngModel)]="vac.vacationStart" matInput [matDatepicker]="pickerStart">
-                            <mat-datepicker-toggle matSuffix [for]="pickerStart"></mat-datepicker-toggle>
-                            <mat-datepicker disabled="false" #pickerStart></mat-datepicker>
-                        </mat-form-field>
+                <mat-accordion  class="vacation">
+                    <mat-expansion-panel *ngFor="let vac of vacation; let i=index;">
+                        <mat-expansion-panel-header>
+                        <mat-panel-title>
+                            {{vac.title}} <span *ngIf="!vac.title">Neuer Eintrag</span>
+                        </mat-panel-title>
+                        <mat-panel-description>
+                        ab {{vac.vacationStart| date:'MMM d, y'}}
+                        </mat-panel-description>
+                        </mat-expansion-panel-header>
                         
-                        <mat-form-field>
-                            <mat-label>Ende</mat-label>
-                            <input disabled [min]="vac.vacationStart"  [(ngModel)]="vac.vacationEnd" matInput [matDatepicker]="pickerEnd">
-                            <mat-datepicker-toggle matSuffix [for]="pickerEnd"></mat-datepicker-toggle>
-                            <mat-datepicker disabled="false" #pickerEnd></mat-datepicker>
-                        </mat-form-field>
-                        
-                        <mat-form-field >
-                            <input [(ngModel)]="vac.title"  matInput type="text" placeholder="Titel" >
-                        </mat-form-field>
+                        <div class="vacation-container">
 
-                    </div>
-
-                    <div class="substitutes">
-
-                        <h4>vertretende Kollegen*innen</h4>
-
-                        <div class="new">
-                            <mat-form-field class="field">
-                                <mat-label>Name</mat-label>
-                                <input [(ngModel)]="newSub.name" matInput type="text">
+                            <mat-form-field>
+                                <mat-label>Start</mat-label>
+                                <input  disabled  [(ngModel)]="vac.vacationStart" matInput [matDatepicker]="pickerStart">
+                                <mat-datepicker-toggle matSuffix [for]="pickerStart"></mat-datepicker-toggle>
+                                <mat-datepicker disabled="false" #pickerStart></mat-datepicker>
+                            </mat-form-field>
+                            
+                            <mat-form-field>
+                                <mat-label>Ende</mat-label>
+                                <input disabled [min]="vac.vacationStart"  [(ngModel)]="vac.vacationEnd" matInput [matDatepicker]="pickerEnd">
+                                <mat-datepicker-toggle matSuffix [for]="pickerEnd"></mat-datepicker-toggle>
+                                <mat-datepicker disabled="false" #pickerEnd></mat-datepicker>
+                            </mat-form-field>
+                            
+                            <mat-form-field >
+                                <input [(ngModel)]="vac.title"  matInput type="text" placeholder="Titel" >
                             </mat-form-field>
 
-                            <mat-form-field class="field">
-                                <mat-label>Adresse</mat-label>
-                                <input [(ngModel)]="newSub.address" matInput type="text">
-                            </mat-form-field>
+                        </div>
 
-                            <mat-form-field class="field">
-                                <mat-label>Tel</mat-label>
-                                <input [(ngModel)]="newSub.phone" matInput type="tel">
-                            </mat-form-field>
+                        <div class="substitutes">
 
-                            <button (click)="addSubstitute(vac)"   mat-button mat-icon-only matSuffix >
-                                <mat-icon>add</mat-icon>
+                            <h4>vertretende Kollegen*innen</h4>
+
+                            <div class="new">
+                                <mat-form-field class="field">
+                                    <mat-label>Name</mat-label>
+                                    <input [(ngModel)]="newSub.name" matInput type="text">
+                                </mat-form-field>
+
+                                <mat-form-field class="field">
+                                    <mat-label>Adresse</mat-label>
+                                    <input [(ngModel)]="newSub.address" matInput type="text">
+                                </mat-form-field>
+
+                                <mat-form-field class="field">
+                                    <mat-label>Tel</mat-label>
+                                    <input [(ngModel)]="newSub.phone" matInput type="tel">
+                                </mat-form-field>
+
+                                <button (click)="addSubstitute(vac)"   mat-button mat-icon-only matSuffix >
+                                    <mat-icon>add</mat-icon>
+                                </button>
+
+                            </div>
+
+                            <div class="subs" *ngFor="let s of vac.subs; let i=index;">
+
+                                <p>{{s.name}} (<mat-icon class="detail-icon">location_on</mat-icon> {{s.address}} /  <mat-icon class="detail-icon">call</mat-icon> {{s.phone}})
+                                    <button (click)="removeSub(vac, s)"  mat-button mat-icon-only matSuffix >
+                                        <mat-icon>delete</mat-icon>
+                                    </button> 
+                                </p>
+
+                            </div>
+
+                        </div>
+                        <div>
+                            <button  class="saveBtn" mat-button matSuffix mat-stroked-button (click)="saveVacation(vac)">
+                                <mat-icon>save</mat-icon> Speichern
                             </button>
 
+                            <button  class="saveBtn" mat-button matSuffix mat-stroked-button (click)="copyVacation(vac)">
+                                <mat-icon>file_copy</mat-icon> Kopieren
+                            </button>
+
+                            
+                            <button (click)="deleteVacation(vac)"  mat-button matSuffix mat-stroked-button >
+                                <mat-icon>delete</mat-icon> Löschen
+                            </button>
                         </div>
 
-                        <div class="subs" *ngFor="let s of vac.subs; let i=index;">
+                    </mat-expansion-panel>
 
-                            <p>{{s.name}} (<mat-icon class="detail-icon">location_on</mat-icon> {{s.address}} /  <mat-icon class="detail-icon">call</mat-icon> {{s.phone}})
-                                <button (click)="removeSub(vac, s)"  mat-button mat-icon-only matSuffix >
-                                    <mat-icon>delete</mat-icon>
-                                </button> 
-                            </p>
+                </mat-accordion>
 
-                        </div>
+                <h4>
+                    Feiertage
+                </h4>
 
-                    </div>
-                    <div>
-                        <button  class="saveBtn" mat-button matSuffix mat-stroked-button (click)="saveVacation(vac)">
-                            <mat-icon>save</mat-icon> Speichern
-                        </button>
-
-                        <button  class="saveBtn" mat-button matSuffix mat-stroked-button (click)="copyVacation(vac)">
-                            <mat-icon>file_copy</mat-icon> Kopieren
-                        </button>
-
+                <mat-accordion  class="holidays">
+                    <mat-expansion-panel *ngFor="let holiday of pubholidays; let i=index;">
+                        <mat-expansion-panel-header>
+                        <mat-panel-title>
+                            {{holiday.title}}
+                        </mat-panel-title>
+                        <mat-panel-description>
+                            {{holiday.vacationStart| date:'MMM d, y'}}
+                        </mat-panel-description>
+                        </mat-expansion-panel-header>
                         
-                        <button (click)="deleteVacation(vac)"  mat-button matSuffix mat-stroked-button >
-                            <mat-icon>delete</mat-icon> Löschen
-                        </button>
-                    </div>
+                        <div class="vacation-container">
 
-                </mat-expansion-panel>
+                            <mat-form-field>
+                                <mat-label>Start</mat-label>
+                                <input  disabled  [(ngModel)]="holiday.vacationStart" matInput [matDatepicker]="pickerStart">
+                                <mat-datepicker-toggle matSuffix [for]="pickerStart"></mat-datepicker-toggle>
+                                <mat-datepicker disabled="true" #pickerStart></mat-datepicker>
+                            </mat-form-field>
+                            
+                            <mat-form-field>
+                                <mat-label>Ende</mat-label>
+                                <input disabled  [(ngModel)]="holiday.vacationEnd" matInput [matDatepicker]="pickerEnd">
+                                <mat-datepicker-toggle matSuffix [for]="pickerEnd"></mat-datepicker-toggle>
+                                <mat-datepicker disabled="true" #pickerEnd></mat-datepicker>
+                            </mat-form-field>
+                            
+                            <mat-form-field >
+                                <input readonly [(ngModel)]="holiday.title"  matInput type="text" placeholder="Titel" >
+                            </mat-form-field>
 
+                        </div>
 
-                
-            </mat-accordion>  
+                        <div>
+                            <button (click)="deleteVacation(holiday)"  mat-button matSuffix mat-stroked-button >
+                                <mat-icon>delete</mat-icon> Löschen
+                            </button>
+                        </div>
 
-            
+                    </mat-expansion-panel>
+                    
+                </mat-accordion>
+
+                <div class="addBtn-row">
+                    <button  class="addBtn" mat-button mat-stroked-button (click)="syncPublicHolidays()">
+                        <mat-icon>sync</mat-icon> Feiertage abrufen
+                    </button>
+                </div>
+
+            </div>
 
         </mat-tab>
 
@@ -373,30 +411,25 @@
 
             <div class="user-list">
 
-            
-                <div class="new-user">
-
-                    <form class="add">
-                        <mat-form-field >
-                            <mat-label>Nutzername</mat-label>
-                            <input matInput [formControl]="emailFormControl" [errorStateMatcher]="matcher"
-                                    placeholder="nutzer@test.de">
-                            <mat-hint>Email-Adresse</mat-hint>
-                            <mat-error *ngIf="emailFormControl.hasError('email') && !emailFormControl.hasError('required')">
-                            ungültige eMail-Adresse
-                            </mat-error>
-                            <mat-error *ngIf="emailFormControl.hasError('required')">
-                            Email wird benötigt
-                            </mat-error>
-                        </mat-form-field>
-                    </form>
-
-                    <button mat-button (click)="preregisterUser()">Zufügen</button>
+                <div class="addBtn-row">
+                    <button  class="addBtn" mat-stroked-button (click)="addUser()">
+                        <mat-icon>add</mat-icon> Neu
+                    </button>
 
                 </div>
 
+                <div class="search-row">
+                    
+                    <mat-form-field>
+                        <mat-label>Suche per Email</mat-label>
+                        <input type="search" matInput placeholder="beispiel@nutzer.de" [(ngModel)]="userEmailSearch" (input)="handleUserSearch($event)">
+                        <mat-icon matSuffix>search</mat-icon>
+                    </mat-form-field>
+                    
+                </div>
+
                 <mat-accordion>
-                    <mat-expansion-panel *ngFor="let user of users; let i=index;">
+                    <mat-expansion-panel *ngFor="let user of (users | slice: userPaginatorLowValue : userPaginatorHighValue); let i=index;">
                         <mat-expansion-panel-header>
                         <mat-panel-title>
                                 {{user.userName}}
@@ -451,6 +484,15 @@
                     </mat-expansion-panel>
     
                 </mat-accordion> 
+
+                <mat-paginator 
+                    [length]="users.length"
+                    (page)="getUserPaginatorData($event)"
+                    [pageSize]="10"
+                    [pageSizeOptions]="[5, 10, 25, 100]"
+                >
+                </mat-paginator>
+
             </div>
         </mat-tab>
 
@@ -617,6 +659,63 @@
                     <mat-expansion-panel>
                         <mat-expansion-panel-header>
                             <mat-panel-title>
+                                    Stammdaten
+                            </mat-panel-title>
+                            <mat-panel-description>
+                                
+                                <mat-icon>info</mat-icon>
+
+                            </mat-panel-description>
+                        </mat-expansion-panel-header>
+
+                            <div class="config-content">
+                                <div class="config-settings">
+
+                                    <div class="form-group">
+                                        <mat-form-field>
+                                            <mat-label>Firmenname</mat-label>
+                                            <input matInput [(ngModel)]="configObj.master.firmName" required>
+                                        </mat-form-field>
+                                    </div>
+                                   
+                                    <div class="form-group">
+                                        <mat-form-field>
+                                            <mat-label>Inhaber/Geschäftsführer</mat-label>
+                                            <input matInput [(ngModel)]="configObj.master.firmOwner" required>
+                                        </mat-form-field>
+                                    </div>
+                                   
+                                    <div class="form-group">
+                                        <mat-form-field>
+                                            <mat-label>Bundesland</mat-label>
+                                            <mat-select [(ngModel)]="configObj.master.state" required>
+                                                <mat-option *ngFor="let s of states" [value]="s">
+                                                    {{s.name}}
+                                                </mat-option>
+                                            </mat-select>
+                                        </mat-form-field>
+                                    </div>
+                                   
+                                    <div class="form-group">
+                                        <mat-form-field>
+                                            <mat-label>Zeitzone</mat-label>
+                                            <mat-select [(ngModel)]="configObj.master.timezone" required>
+                                                <mat-option *ngFor="let tz of timezones" [value]="tz">
+                                                    {{tz}}
+                                                </mat-option>
+                                            </mat-select>
+                                        </mat-form-field>
+                                    </div>
+                                   
+
+                                </div>
+
+                            </div>
+                    </mat-expansion-panel>
+
+                    <mat-expansion-panel>
+                        <mat-expansion-panel-header>
+                            <mat-panel-title>
                                     Telemedizin
                             </mat-panel-title>
                             <mat-panel-description>
@@ -641,6 +740,7 @@
                                 </div>
                             </div>
                     </mat-expansion-panel>
+
 
                 </mat-accordion>
 

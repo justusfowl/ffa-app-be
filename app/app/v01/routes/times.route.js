@@ -17,4 +17,7 @@ router.route('/vacation')
 router.route('/vacation/:vacationId')
     .delete([tokenValidator.detectToken, middlware_hasScopeAdmin], timesCtrl.removeVacation)
 
+router.route('/holidays')
+    .post([tokenValidator.detectToken, middlware_hasScopeAdmin], timesCtrl.syncPublicHolidays)
+
 module.exports = router;

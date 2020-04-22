@@ -37,6 +37,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   news = [];
   times : any[] = [];
   vacation : any[] = [];
+  vacationShow : any[] = [];
   teamDocs : any[] = [];
   teamMfa : any[] = [];
 
@@ -208,7 +209,10 @@ export class HomeComponent implements OnInit, OnDestroy {
 
     this.api.get("/times").then((result : any) => {
       this.times = result.opening;
+
+      // do not show public holidays
       this.vacation = result.vacation;
+      this.vacationShow = result.vacation.filter(x => !x.flagHoliday);
 
      this.currentVacation =  this.getIsVacationClosed(true);
 

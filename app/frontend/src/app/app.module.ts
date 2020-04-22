@@ -45,6 +45,7 @@ import { SettingsService } from './services/settings.service';
 import { NotfoundComponent } from './pages/notfound/notfound.component';
 import { AppointmentDetailsComponent } from './components/appointment-details/appointment-details.component';
 import { GenmessageComponent } from './components/genmessage/genmessage.component';
+import { AdduserComponent } from './components/adduser/adduser.component';
 
 const cookieConfig:NgcCookieConsentConfig = {
   cookie: {
@@ -93,7 +94,8 @@ const cookieConfig:NgcCookieConsentConfig = {
     CancelappointmentComponent, 
     NotfoundComponent, 
     AppointmentDetailsComponent,
-    GenmessageComponent
+    GenmessageComponent, 
+    AdduserComponent
   ],
   imports: [
     HttpClientModule,
@@ -132,7 +134,8 @@ const cookieConfig:NgcCookieConsentConfig = {
     NewappointmentComponent, 
     CancelappointmentComponent,
     AppointmentDetailsComponent, 
-    GenmessageComponent
+    GenmessageComponent,
+    AdduserComponent
   ]
 })
 export class AppModule { }

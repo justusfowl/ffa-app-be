@@ -197,7 +197,7 @@ function _getAppointmentsFromDateRange(startDate, endDate, userId=null, docId=nu
      
                 const collection = dbo.collection('appointments');
     
-                collection.find({$and : filterArray}).sort({"appointmentObj.start": -1}).toArray(function(error, result){
+                collection.find({$and : filterArray}).sort({"appointmentObj.start": 1}).toArray(function(error, result){
 
                     if (error){
                         reject(error);

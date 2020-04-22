@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy, AfterViewInit, ViewEncapsulation, Element
 import { ApiService } from 'src/app/services/api.service';
 import { Subject, Subscription } from 'rxjs';
 import {debounceTime, distinctUntilChanged} from "rxjs/internal/operators";
-import { MatSnackBar, MatChipInputEvent, MatAutocomplete, MatDialog } from '@angular/material';
+import { MatSnackBar, MatChipInputEvent, MatAutocomplete, MatDialog, PageEvent } from '@angular/material';
 import { FormControl, FormGroupDirective, NgForm, Validators } from '@angular/forms';
 import {Observable} from 'rxjs';
 import {map, startWith} from 'rxjs/operators';
@@ -30,6 +30,7 @@ import {
 import { TeleSlotComponent } from 'src/app/components/tele-slot/tele-slot.component';
 import { ConfirmDialogComponent } from 'src/app/components/confirm-dialog/confirm-dialog.component';
 import { SettingsService } from 'src/app/services/settings.service';
+import { AdduserComponent } from 'src/app/components/adduser/adduser.component';
 
 /** Error when invalid control is dirty, touched, or submitted. */
 export class MyErrorStateMatcher implements ErrorStateMatcher {
@@ -79,9 +80,16 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy{
   scopeCtrl = new FormControl();
 
   users = [];
+  allUsers = [];
+  userEmailSearch : any = "";
+
+  userPaginatorLowValue: number = 0;
+  userPaginatorHighValue: number = 20;
+
   news = [];
   times : any[] = [];
   vacation : any[] = [];
+  pubholidays : any[] = [];
   teamMembers : any[] = [];
 
   services = [
@@ -115,18 +123,11 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy{
 
   newSub : any = {};
 
-  emailFormControl = new FormControl('', [
-    Validators.required,
-    Validators.email,
-  ]);
-
   matcher = new MyErrorStateMatcher();
 
   settingsObj : any;
 
   configObj : any;
-
-  /* Telemedicine area */
 
   teleSlots : any[] = [];
   // exclude weekends
@@ -144,6 +145,77 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy{
   private configSubscription : Subscription;
   config : any;
 
+  timezones = ["Africa/Abidjan","Africa/Accra","Africa/Addis_Ababa","Africa/Algiers","Africa/Asmara","Africa/Asmera","Africa/Bamako","Africa/Bangui","Africa/Banjul","Africa/Bissau","Africa/Blantyre","Africa/Brazzaville","Africa/Bujumbura","Africa/Cairo","Africa/Casablanca","Africa/Ceuta","Africa/Conakry","Africa/Dakar","Africa/Dar_es_Salaam","Africa/Djibouti","Africa/Douala","Africa/El_Aaiun","Africa/Freetown","Africa/Gaborone","Africa/Harare","Africa/Johannesburg","Africa/Juba","Africa/Kampala","Africa/Khartoum","Africa/Kigali","Africa/Kinshasa","Africa/Lagos","Africa/Libreville","Africa/Lome","Africa/Luanda","Africa/Lubumbashi","Africa/Lusaka","Africa/Malabo","Africa/Maputo","Africa/Maseru","Africa/Mbabane","Africa/Mogadishu","Africa/Monrovia","Africa/Nairobi","Africa/Ndjamena","Africa/Niamey","Africa/Nouakchott","Africa/Ouagadougou","Africa/Porto-Novo","Africa/Sao_Tome","Africa/Timbuktu","Africa/Tripoli","Africa/Tunis","Africa/Windhoek","America/Adak","America/Anchorage","America/Anguilla","America/Antigua","America/Araguaina","America/Argentina/Buenos_Aires","America/Argentina/Catamarca","America/Argentina/ComodRivadavia","America/Argentina/Cordoba","America/Argentina/Jujuy","America/Argentina/La_Rioja","America/Argentina/Mendoza","America/Argentina/Rio_Gallegos","America/Argentina/Salta","America/Argentina/San_Juan","America/Argentina/San_Luis","America/Argentina/Tucuman","America/Argentina/Ushuaia","America/Aruba","America/Asuncion","America/Atikokan","America/Atka","America/Bahia","America/Bahia_Banderas","America/Barbados","America/Belem","America/Belize","America/Blanc-Sablon","America/Boa_Vista","America/Bogota","America/Boise","America/Buenos_Aires","America/Cambridge_Bay","America/Campo_Grande","America/Cancun","America/Caracas","America/Catamarca","America/Cayenne","America/Cayman","America/Chicago","America/Chihuahua","America/Coral_Harbour","America/Cordoba","America/Costa_Rica","America/Creston","America/Cuiaba","America/Curacao","America/Danmarkshavn","America/Dawson","America/Dawson_Creek","America/Denver","America/Detroit","America/Dominica","America/Edmonton","America/Eirunepe","America/El_Salvador","America/Ensenada","America/Fort_Nelson","America/Fort_Wayne","America/Fortaleza","America/Glace_Bay","America/Godthab","America/Goose_Bay","America/Grand_Turk","America/Grenada","America/Guadeloupe","America/Guatemala","America/Guayaquil","America/Guyana","America/Halifax","America/Havana","America/Hermosillo","America/Indiana/Indianapolis","America/Indiana/Knox","America/Indiana/Marengo","America/Indiana/Petersburg","America/Indiana/Tell_City","America/Indiana/Vevay","America/Indiana/Vincennes","America/Indiana/Winamac","America/Indianapolis","America/Inuvik","America/Iqaluit","America/Jamaica","America/Jujuy","America/Juneau","America/Kentucky/Louisville","America/Kentucky/Monticello","America/Knox_IN","America/Kralendijk","America/La_Paz","America/Lima","America/Los_Angeles","America/Louisville","America/Lower_Princes","America/Maceio","America/Managua","America/Manaus","America/Marigot","America/Martinique","America/Matamoros","America/Mazatlan","America/Mendoza","America/Menominee","America/Merida","America/Metlakatla","America/Mexico_City","America/Miquelon","America/Moncton","America/Monterrey","America/Montevideo","America/Montreal","America/Montserrat","America/Nassau","America/New_York","America/Nipigon","America/Nome","America/Noronha","America/North_Dakota/Beulah","America/North_Dakota/Center","America/North_Dakota/New_Salem","America/Ojinaga","America/Panama","America/Pangnirtung","America/Paramaribo","America/Phoenix","America/Port-au-Prince","America/Port_of_Spain","America/Porto_Acre","America/Porto_Velho","America/Puerto_Rico","America/Punta_Arenas","America/Rainy_River","America/Rankin_Inlet","America/Recife","America/Regina","America/Resolute","America/Rio_Branco","America/Rosario","America/Santa_Isabel","America/Santarem","America/Santiago","America/Santo_Domingo","America/Sao_Paulo","America/Scoresbysund","America/Shiprock","America/Sitka","America/St_Barthelemy","America/St_Johns","America/St_Kitts","America/St_Lucia","America/St_Thomas","America/St_Vincent","America/Swift_Current","America/Tegucigalpa","America/Thule","America/Thunder_Bay","America/Tijuana","America/Toronto","America/Tortola","America/Vancouver","America/Virgin","America/Whitehorse","America/Winnipeg","America/Yakutat","America/Yellowknife","Antarctica/Casey","Antarctica/Davis","Antarctica/DumontDUrville","Antarctica/Macquarie","Antarctica/Mawson","Antarctica/McMurdo","Antarctica/Palmer","Antarctica/Rothera","Antarctica/South_Pole","Antarctica/Syowa","Antarctica/Troll","Antarctica/Vostok","Arctic/Longyearbyen","Asia/Aden","Asia/Almaty","Asia/Amman","Asia/Anadyr","Asia/Aqtau","Asia/Aqtobe","Asia/Ashgabat","Asia/Ashkhabad","Asia/Atyrau","Asia/Baghdad","Asia/Bahrain","Asia/Baku","Asia/Bangkok","Asia/Barnaul","Asia/Beirut","Asia/Bishkek","Asia/Brunei","Asia/Calcutta","Asia/Chita","Asia/Choibalsan","Asia/Chongqing","Asia/Chungking","Asia/Colombo","Asia/Dacca","Asia/Damascus","Asia/Dhaka","Asia/Dili","Asia/Dubai","Asia/Dushanbe","Asia/Famagusta","Asia/Gaza","Asia/Harbin","Asia/Hebron","Asia/Ho_Chi_Minh","Asia/Hong_Kong","Asia/Hovd","Asia/Irkutsk","Asia/Istanbul","Asia/Jakarta","Asia/Jayapura","Asia/Jerusalem","Asia/Kabul","Asia/Kamchatka","Asia/Karachi","Asia/Kashgar","Asia/Kathmandu","Asia/Katmandu","Asia/Khandyga","Asia/Kolkata","Asia/Krasnoyarsk","Asia/Kuala_Lumpur","Asia/Kuching","Asia/Kuwait","Asia/Macao","Asia/Macau","Asia/Magadan","Asia/Makassar","Asia/Manila","Asia/Muscat","Asia/Nicosia","Asia/Novokuznetsk","Asia/Novosibirsk","Asia/Omsk","Asia/Oral","Asia/Phnom_Penh","Asia/Pontianak","Asia/Pyongyang","Asia/Qatar","Asia/Qostanay","Asia/Qyzylorda","Asia/Rangoon","Asia/Riyadh","Asia/Saigon","Asia/Sakhalin","Asia/Samarkand","Asia/Seoul","Asia/Shanghai","Asia/Singapore","Asia/Srednekolymsk","Asia/Taipei","Asia/Tashkent","Asia/Tbilisi","Asia/Tehran","Asia/Tel_Aviv","Asia/Thimbu","Asia/Thimphu","Asia/Tokyo","Asia/Tomsk","Asia/Ujung_Pandang","Asia/Ulaanbaatar","Asia/Ulan_Bator","Asia/Urumqi","Asia/Ust-Nera","Asia/Vientiane","Asia/Vladivostok","Asia/Yakutsk","Asia/Yangon","Asia/Yekaterinburg","Asia/Yerevan","Atlantic/Azores","Atlantic/Bermuda","Atlantic/Canary","Atlantic/Cape_Verde","Atlantic/Faeroe","Atlantic/Faroe","Atlantic/Jan_Mayen","Atlantic/Madeira","Atlantic/Reykjavik","Atlantic/South_Georgia","Atlantic/St_Helena","Atlantic/Stanley","Australia/ACT","Australia/Adelaide","Australia/Brisbane","Australia/Broken_Hill","Australia/Canberra","Australia/Currie","Australia/Darwin","Australia/Eucla","Australia/Hobart","Australia/LHI","Australia/Lindeman","Australia/Lord_Howe","Australia/Melbourne","Australia/NSW","Australia/North","Australia/Perth","Australia/Queensland","Australia/South","Australia/Sydney","Australia/Tasmania","Australia/Victoria","Australia/West","Australia/Yancowinna","Brazil/Acre","Brazil/DeNoronha","Brazil/East","Brazil/West","CET","CST6CDT","Canada/Atlantic","Canada/Central","Canada/Eastern","Canada/Mountain","Canada/Newfoundland","Canada/Pacific","Canada/Saskatchewan","Canada/Yukon","Chile/Continental","Chile/EasterIsland","Cuba","EET","EST","EST5EDT","Egypt","Eire","Etc/GMT","Etc/GMT+0","Etc/GMT+1","Etc/GMT+10","Etc/GMT+11","Etc/GMT+12","Etc/GMT+2","Etc/GMT+3","Etc/GMT+4","Etc/GMT+5","Etc/GMT+6","Etc/GMT+7","Etc/GMT+8","Etc/GMT+9","Etc/GMT-0","Etc/GMT-1","Etc/GMT-10","Etc/GMT-11","Etc/GMT-12","Etc/GMT-13","Etc/GMT-14","Etc/GMT-2","Etc/GMT-3","Etc/GMT-4","Etc/GMT-5","Etc/GMT-6","Etc/GMT-7","Etc/GMT-8","Etc/GMT-9","Etc/GMT0","Etc/Greenwich","Etc/UCT","Etc/UTC","Etc/Universal","Etc/Zulu","Europe/Amsterdam","Europe/Andorra","Europe/Astrakhan","Europe/Athens","Europe/Belfast","Europe/Belgrade","Europe/Berlin","Europe/Bratislava","Europe/Brussels","Europe/Bucharest","Europe/Budapest","Europe/Busingen","Europe/Chisinau","Europe/Copenhagen","Europe/Dublin","Europe/Gibraltar","Europe/Guernsey","Europe/Helsinki","Europe/Isle_of_Man","Europe/Istanbul","Europe/Jersey","Europe/Kaliningrad","Europe/Kiev","Europe/Kirov","Europe/Lisbon","Europe/Ljubljana","Europe/London","Europe/Luxembourg","Europe/Madrid","Europe/Malta","Europe/Mariehamn","Europe/Minsk","Europe/Monaco","Europe/Moscow","Europe/Nicosia","Europe/Oslo","Europe/Paris","Europe/Podgorica","Europe/Prague","Europe/Riga","Europe/Rome","Europe/Samara","Europe/San_Marino","Europe/Sarajevo","Europe/Saratov","Europe/Simferopol","Europe/Skopje","Europe/Sofia","Europe/Stockholm","Europe/Tallinn","Europe/Tirane","Europe/Tiraspol","Europe/Ulyanovsk","Europe/Uzhgorod","Europe/Vaduz","Europe/Vatican","Europe/Vienna","Europe/Vilnius","Europe/Volgograd","Europe/Warsaw","Europe/Zagreb","Europe/Zaporozhye","Europe/Zurich","GB","GB-Eire","GMT","GMT+0","GMT-0","GMT0","Greenwich","HST","Hongkong","Iceland","Indian/Antananarivo","Indian/Chagos","Indian/Christmas","Indian/Cocos","Indian/Comoro","Indian/Kerguelen","Indian/Mahe","Indian/Maldives","Indian/Mauritius","Indian/Mayotte","Indian/Reunion","Iran","Israel","Jamaica","Japan","Kwajalein","Libya","MET","MST","MST7MDT","Mexico/BajaNorte","Mexico/BajaSur","Mexico/General","NZ","NZ-CHAT","Navajo","PRC","PST8PDT","Pacific/Apia","Pacific/Auckland","Pacific/Bougainville","Pacific/Chatham","Pacific/Chuuk","Pacific/Easter","Pacific/Efate","Pacific/Enderbury","Pacific/Fakaofo","Pacific/Fiji","Pacific/Funafuti","Pacific/Galapagos","Pacific/Gambier","Pacific/Guadalcanal","Pacific/Guam","Pacific/Honolulu","Pacific/Johnston","Pacific/Kiritimati","Pacific/Kosrae","Pacific/Kwajalein","Pacific/Majuro","Pacific/Marquesas","Pacific/Midway","Pacific/Nauru","Pacific/Niue","Pacific/Norfolk","Pacific/Noumea","Pacific/Pago_Pago","Pacific/Palau","Pacific/Pitcairn","Pacific/Pohnpei","Pacific/Ponape","Pacific/Port_Moresby","Pacific/Rarotonga","Pacific/Saipan","Pacific/Samoa","Pacific/Tahiti","Pacific/Tarawa","Pacific/Tongatapu","Pacific/Truk",
+  "Pacific/Wake","Pacific/Wallis","Pacific/Yap","Poland","Portugal","ROC","ROK","Singapore","Turkey","UCT","US/Alaska","US/Aleutian","US/Arizona","US/Central","US/East-Indiana","US/Eastern","US/Hawaii","US/Indiana-Starke","US/Michigan","US/Mountain","US/Pacific","US/Pacific-New","US/Samoa","UTC","Universal","W-SU","WET","Zulu"]
+
+  states = [
+    {
+      "name" : "Hessen",
+      "abbreviation" : "HE"
+    },
+    {
+      "name" : "Berlin",
+      "abbreviation" : "BE"
+    },
+    {
+      "name" : "Baden-Würtemmberg",
+      "abbreviation" : "BW"
+    },
+    {
+      "name" : "Bayern",
+      "abbreviation" : "BY"
+    },
+    {
+      "name" : "Brandenburg",
+      "abbreviation" : "BB"
+    },
+    {
+      "name" : "Bremen",
+      "abbreviation" : "HB"
+    },
+    {
+      "name" : "Hamburg",
+      "abbreviation" : "HH"
+    },
+    {
+      "name" : "Mecklenburg-Vorpommern",
+      "abbreviation" : "MV"
+    },
+    {
+      "name" : "Niedersachsen",
+      "abbreviation" : "NI"
+    },
+    {
+      "name" : "Nordrhein-Westphalen",
+      "abbreviation" : "NW"
+    },
+    {
+      "name" : "Rheinland-Pfalz",
+      "abbreviation" : "RP"
+    },
+    {
+      "name" : "Saarland",
+      "abbreviation" : "SL"
+    },
+    {
+      "name" : "Sachsen",
+      "abbreviation" : "SN"
+    },
+    {
+      "name" : "Sachsen-Anhalt",
+      "abbreviation" : "ST"
+    },
+    {
+      "name" : "Schleswig-Holstein",
+      "abbreviation" : "SH"
+    },
+    {
+      "name" : "Thüringen",
+      "abbreviation" : "TH"
+    }
+  ];
+
+
   constructor(
     private api : ApiService, 
     private snackBar : MatSnackBar,
@@ -158,14 +230,14 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy{
 
       this.settingsSubscription = this.settingsSrv.settingsObjObservable.subscribe(result => {
         this.settings = result; 
-        this.executeSettings();
+        this.executeSettings();        
       });
 
       this.config = this.settingsSrv.getConfig();
 
       this.configSubscription = this.settingsSrv.configObjObservable.subscribe(result => {
         this.config = result; 
-        this.executeConfig();
+        this.executeConfig();       
       });
 
    }
@@ -186,14 +258,6 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy{
 
   ngAfterViewInit(): void {
     this.getTeam();
-    /*
-    this.getTeam();
-    this.getTimes();
-    this.getNews();
-    this.getUsers();
-    this.getGeneralSettings();
-    this.getAdminSlots();
-    */
   }
 
   ngOnDestroy() {
@@ -225,6 +289,11 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy{
   }
 
   executeConfig(){
+
+    if (!this.config){
+      return;
+    }
+    
     if (this.config.tele){
       if (typeof(this.config.tele.flagIncludeWeekends) != 'undefined'){
         if (this.config.tele.flagIncludeWeekends){
@@ -282,8 +351,8 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy{
 
     this.api.get("/times").then((result : any) => {
       this.times = result.opening;
-      this.vacation = result.vacation;
-
+      this.vacation = result.vacation.filter(x => !x.flagHoliday);
+      this.pubholidays = result.vacation.filter(x => x.flagHoliday);
       if (refresher){
         refresher.target.complete();
       }
@@ -361,37 +430,42 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy{
 
   async handleTeamFileInput(files: FileList, teamMember){
 
-    this.api.setLoading(true);
+    if (!files){
+      return;
+    }
 
-    const formData: FormData = new FormData();
-    formData.append('file', files.item(0), files.item(0).name);
+    if (teamMember._id){
+      this.api.setLoading(true);
 
-    Object.keys(teamMember).forEach(item => {
-      if (item != "picture"){
-        formData.append(item, teamMember[item]);
-      }
-      
-    });
-
-    const fileStr = await this.convertToBase64(files.item(0));
-
-    this.api.put("/team/" + teamMember._id, formData, true).then(res => {
-
-      this.snackBar.open("Mitglied aktualisiert", "", {
-        duration: 1500
+      const formData: FormData = new FormData();
+      formData.append('file', files.item(0), files.item(0).name);
+  
+      Object.keys(teamMember).forEach(item => {
+        if (item != "picture"){
+          formData.append(item, teamMember[item]);
+        }
+        
+      });
+  
+      const fileStr = await this.convertToBase64(files.item(0));
+  
+      this.api.put("/team/" + teamMember._id, formData, true).then(res => {
+  
+        this.snackBar.open("Mitglied aktualisiert", "", {
+          duration: 1500
+        })
+        
+        teamMember.picture = fileStr;
+  
       })
-      
-      teamMember.picture = fileStr;
-
-    })
+    }else{
+      this.newTeamMemberFile = files.item(0);
+      const fileStr = await this.convertToBase64(files.item(0));
+      this.newTeamMemberFileStr = fileStr;
+    }
 
   }
 
-  async handleFileInput(files: FileList){
-    this.newTeamMemberFile = files.item(0);
-    const fileStr = await this.convertToBase64(files.item(0));
-    this.newTeamMemberFileStr = fileStr;
-  }
 
   async handleNewsFileUpload(newsObj, files: FileList){
     this.newNewsImageFile = files.item(0);
@@ -415,6 +489,11 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy{
   }   
 
   updateTeamMember(member){
+
+    if (!member._id){
+      return;
+    }
+
     this.api.put("/team/" + member._id, member, true).then(res => {
 
       this.snackBar.open("Mitglied aktualisiert", "", {
@@ -424,14 +503,23 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy{
 
   }
 
+  addNewTeamMember(){
+
+    let newUserObj = {
+      "name" : "%Neuer Name%"
+    };
+
+    this.teamMembers.push(newUserObj);
+  }
+
   handleUpdateTeamMember(teamMember, evt){
     this.teamMemberLastChg = teamMember;
     this.teamValChanged.next(evt);
   }
 
-  addMember(){
+  addMember(member){
 
-    if (!this.newTeamMemberFile || !this.newTeamMember.name ||  !this.newTeamMember.type){
+    if (!this.newTeamMemberFile || !member.name ||  !member.type){
       this.snackBar.open("Bitte alle Felder ausfüllen", "", {
         duration: 1500
       });
@@ -441,15 +529,16 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy{
     const formData: FormData = new FormData();
     formData.append('file', this.newTeamMemberFile, this.newTeamMemberFile.name);
 
-    Object.keys(this.newTeamMember).forEach(item => {
-      formData.append(item, this.newTeamMember[item]);
-    })
+    Object.keys(member).forEach(item => {
+      formData.append(item, member[item]);
+    });
 
     this.api.post("/team", formData, true).then(res => {
       
-       this.snackBar.open("Hinzugefügt", "", {
+      this.snackBar.open("Hinzugefügt", "", {
         duration: 1500
-      })
+      });
+
       this.getTeam();
       this.initNewMember();
     }).catch(err=>{
@@ -688,6 +777,33 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy{
     })
   }
 
+  syncPublicHolidays(){
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      data: {meta : {"type" : "confirm", "title" : "Feiertage abgleichen", "messageText" : "Möchten Sie Feiertage für Ihr Bundesland abgleichen? Die bisherigen Feiertage werden überschrieben."}}
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result.answerConfirm){
+       
+        this.api.post("/times/holidays", {}).then(result => {
+
+          this.snackBar.open("Erfolgreich abgeglichen", "OK", {
+            duration: 2500
+          });
+
+          this.getTimes();
+
+        }).catch(err => {
+          console.warn(err);
+          this.snackBar.open("Etwas hat nicht geklappt - bitte prüfen Sie, dass für Ihre Praxis ein Bundesland in den Stammdaten hinterlegt wurde.", "", {
+            duration: 2500
+          })
+        })
+      }
+     
+    });
+  }
+
   copyVacation(vacationObj){
     let cp = JSON.parse(JSON.stringify(vacationObj));
     cp.title = cp.title + " (Kopie) ";
@@ -707,15 +823,24 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy{
     }
 
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
-      data: {meta : {"type" : "confirm", "title" : "News-Eintrag löschen", "messageText" : "Sind Sie sicher, dass Sie den Eintrag löschen möchten?"}}
+      data: {meta : {"type" : "confirm", "title" : "Eintrag löschen", "messageText" : "Sind Sie sicher, dass Sie den Eintrag löschen möchten?"}}
     });
 
     dialogRef.afterClosed().subscribe(result => {
       if (result.answerConfirm){
        
         this.api.delete("/times/vacation/"+ vacationObj._id, true).then(result => {
+
           let idx = this.vacation.findIndex(x => x._id == vacationObj._id);
-          this.vacation.splice(idx, 1);
+          if (idx > -1){
+            this.vacation.splice(idx, 1);
+          }
+
+          idx = this.pubholidays.findIndex(x => x._id == vacationObj._id);
+          if (idx > -1){
+            this.pubholidays.splice(idx, 1);
+          }
+
           this.snackBar.open("Gelöscht", "", {
             duration: 1500
           })
@@ -870,38 +995,29 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy{
   }
 
 
-  getUsers(refresher?){
+  getUsers(){
     this.api.get("/auth/users", {params : {}}, true).then((result : any) => {
       this.users = result;
+      this.allUsers = JSON.parse(JSON.stringify(result));
     }).catch(err => {
       console.error(err);
     })
 
   }
 
-  preregisterUser(){
-
-    let userName = this.emailFormControl.value;
-
-    this.api.post("/auth/adminRegisterUser", {userName}, true).then((result : any) => {
-      this.users = result;
-
-      this.getUsers();
-
-      this.emailFormControl.reset();
-
-      this.snackBar.open("Mitglied zugefügt. Bitte Postfach prüfen, um Kennwort zu setzen.", "", {
-        duration: 1500
-      });
-
-    }).catch(err => {
-      this.snackBar.open("Das hat leider nicht geklappt.", "", {
-        duration: 1500
-      });
-      console.error(err);
-    })
-
+  handleUserSearch(evt){
+    this.users = this.allUsers.filter(x => {
+      return x.userName.indexOf(this.userEmailSearch) > -1
+    });
   }
+
+  getUserPaginatorData(event : PageEvent){
+    this.userPaginatorLowValue = event.pageIndex * event.pageSize;
+    this.userPaginatorHighValue = this.userPaginatorLowValue + event.pageSize;
+    return event;
+  }
+
+
 
   saveSettings(){
     let id = "/1";
@@ -1137,13 +1253,37 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy{
         duration: 1500
       });
 
-      this.getConfigObject();
-
       this.settingsSrv.setConfigObj(this.configObj);
 
     }).catch(err => {
       console.error(err);
     })
+  }
+
+  addUser(){
+    const dialogRef = this.dialog.open(AdduserComponent, {
+      data: {}
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result){
+
+        this.snackBar.open("Mitglied zugefügt. Bitte Postfach prüfen, um Kennwort zu setzen. Bevor der Benutzer das Konto nicht verifiziert hat, kann es nicht genutzt werden.", "", {
+          duration: 5000
+        });
+
+        this.getUsers();
+
+      }
+    });
+  }
+
+  getImageUrl(imgUrl){
+    if (imgUrl){
+      return imgUrl;
+    }else{
+      return "https://www.facharztpraxis-fuer-allgemeinmedizin.de/assets/images/header-background.jpg";
+    }
   }
 
 }

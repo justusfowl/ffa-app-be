@@ -2,9 +2,10 @@
 const config = require('../../config/config');
 var MongoClient = require('mongodb').MongoClient;
 var ObjectID = require('mongodb').ObjectID;
-
+var moment = require('moment-timezone');
 var MongoUrl = config.getMongoUrl();
 
+var request = require('request');
 
 async function getTimes(req, res){
 
@@ -277,11 +278,157 @@ function removeVacation(req, res){
     }
 }
 
+/**
+ * Fetch the public holidays per year and state from feiertage-api.de
+ * @param {number} year full year (e.g. 2019)
+ * @param {string} state State information (e.g. HE for Hessia)
+ */
+async function fetchPublicHolidays(year, state){
+
+    return new Promise(async(resolve, reject) => {
+
+        if (!year || !state){
+           reject("Missing information")
+        }
+    
+      request({
+          url: `https://feiertage-api.de/api/?jahr=${year}&nur_land=${state}`,
+          method: 'GET',
+          json: true
+        }, function(error, response, body) {
+            if (error){
+                reject(error);
+            }else{
+                resolve(body);
+            }
+      });
+    });
+  
+}
+
+async function removePublicHolidaysFromToday(){
+
+    return new Promise(async (resolve, reject) => {
+        try{
+
+            let now = new Date();
+            
+            MongoClient.connect(MongoUrl, function(err, db) {
+        
+                if (err) throw err;
+                
+                let dbo = db.db(config.mongodb.database);
+        
+                const collection = dbo.collection('vacation');
+        
+                collection.deleteMany({"flagHoliday" : true, "vacationStart" : {$gte : now}}, function(err, result){
+                    if (err) throw err;
+                    resolve(result)
+                  });
+              });
+    
+        }catch(err){
+            reject(err);
+        }
+    })
+
+}
+
+async function insertPublicHolidays(holidayArray){
+
+    return new Promise(async (resolve, reject) => {
+        try{
+            
+            MongoClient.connect(MongoUrl, function(err, db) {
+        
+                if (err) throw err;
+                
+                let dbo = db.db(config.mongodb.database);
+        
+                const collection = dbo.collection('vacation');
+        
+                collection.insertMany(holidayArray, 
+                  function(err, result){
+                    if (err) throw err;
+                    resolve(result)
+                  });
+              });
+    
+        }catch(err){
+            reject(err);
+        }
+    })
+
+}
+
+async function syncPublicHolidays(req, res){
+
+    try{
+        let backendConfig = await config.getBackendConfig();
+        let stateInfo;
+    
+        try{
+            stateInfo = backendConfig.master.state.abbreviation || "HE";
+        }catch(err){
+            
+           return res.send(500, "Missing master data about state");
+        }
+    
+        let yearStart = new Date().getFullYear();
+        let toBeAddedHolidays = [];
+    
+        await removePublicHolidaysFromToday().catch(err => {
+            console.error(err);
+        });
+    
+    
+        let pubHolidaysThisYear = await fetchPublicHolidays(yearStart, stateInfo).catch(err => {
+            console.error(err);
+        });
+    
+        Object.keys(pubHolidaysThisYear).forEach(key => {
+            let day = pubHolidaysThisYear[key];
+            let newObj = {
+                "vacationStart" : moment(day.datum, 'YYYY-MM-DD').toDate(),
+                "vacationEnd" : moment(day.datum, 'YYYY-MM-DD').toDate(),
+                "title" : key, 
+                "flagHoliday" : true
+            };
+            toBeAddedHolidays.push(newObj);
+        });
+    
+        let pubHolidaysNextYear = await fetchPublicHolidays(yearStart+1, stateInfo).catch(err => {
+            console.error(err);
+        });
+    
+        Object.keys(pubHolidaysNextYear).forEach(key => {
+            let day = pubHolidaysNextYear[key];
+            let newObj = {
+                "vacationStart" : moment(day.datum, 'YYYY-MM-DD').toDate(),
+                "vacationEnd" : moment(day.datum, 'YYYY-MM-DD').toDate(),
+                "title" : key, 
+                "flagHoliday" : true
+            };
+            toBeAddedHolidays.push(newObj);
+        })
+        
+        await insertPublicHolidays(toBeAddedHolidays).catch(err => {
+            console.error(err);
+        });
+    
+        res.json({"success" : true});
+    }catch(err){
+        res.send(500, {"success" : false, "message" : "Something went wrong syncing the public holidays."});
+    }   
+
+}
+
 module.exports = {
     getTimes,
     updateOpenDay,
     upsertVacation,
     removeVacation,
     getIsCurrentlyVacation,
-    getVacationBetweenDates
+    getVacationBetweenDates, 
+    syncPublicHolidays
 }
