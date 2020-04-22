@@ -1,7 +1,15 @@
 import { Component, OnInit, Inject } from '@angular/core';
-import { Validators, FormControl } from '@angular/forms';
-import { MatDialogRef, MatDialog, MAT_DIALOG_DATA } from '@angular/material';
+import { Validators, FormControl, FormGroupDirective, NgForm } from '@angular/forms';
+import { MatDialogRef, MatDialog, MAT_DIALOG_DATA, ErrorStateMatcher } from '@angular/material';
 import { ApiService } from 'src/app/services/api.service';
+
+/** Error when invalid control is dirty, touched, or submitted. */
+export class MyErrorStateMatcher implements ErrorStateMatcher {
+  isErrorState(control: FormControl | null, form: FormGroupDirective | NgForm | null): boolean {
+    const isSubmitted = form && form.submitted;
+    return !!(control && control.invalid && (control.dirty || control.touched || isSubmitted));
+  }
+}
 
 @Component({
   selector: 'app-adduser',
@@ -9,6 +17,8 @@ import { ApiService } from 'src/app/services/api.service';
   styleUrls: ['./adduser.component.scss']
 })
 export class AdduserComponent implements OnInit {
+
+  matcher = new MyErrorStateMatcher();
 
   emailFormControl = new FormControl('', [
     Validators.required,

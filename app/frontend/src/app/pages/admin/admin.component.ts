@@ -32,14 +32,6 @@ import { ConfirmDialogComponent } from 'src/app/components/confirm-dialog/confir
 import { SettingsService } from 'src/app/services/settings.service';
 import { AdduserComponent } from 'src/app/components/adduser/adduser.component';
 
-/** Error when invalid control is dirty, touched, or submitted. */
-export class MyErrorStateMatcher implements ErrorStateMatcher {
-  isErrorState(control: FormControl | null, form: FormGroupDirective | NgForm | null): boolean {
-    const isSubmitted = form && form.submitted;
-    return !!(control && control.invalid && (control.dirty || control.touched || isSubmitted));
-  }
-}
-
 @Component({
   selector: 'app-admin',
   templateUrl: './admin.component.html',
@@ -123,7 +115,7 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy{
 
   newSub : any = {};
 
-  matcher = new MyErrorStateMatcher();
+
 
   settingsObj : any;
 

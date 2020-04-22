@@ -36,7 +36,7 @@ export class GenmessageComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) public data: any, 
     private snackBar : MatSnackBar,
     private dialog : MatDialog, 
-    private auth : AuthenticationService, 
+    public auth : AuthenticationService, 
     private googleAnalytics : GoogleAnalyticsService, 
     private api : ApiService
   ) {
