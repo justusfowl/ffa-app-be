@@ -17,7 +17,6 @@ import { AdminComponent } from './pages/admin/admin.component';
 import { AppointmentsComponent } from './pages/appointments/appointments.component';
 import { NewappointmentComponent } from './pages/newappointment/newappointment.component';
 
-
 import { ApiService } from './services/api.service';
 import { JwtInterceptor } from './services/jwt.intercept';
 import { ErrorInterceptor } from './services/error.intercept';
@@ -29,10 +28,12 @@ import { MedrequestComponent } from './components/medrequest/medrequest.componen
 import { AuthComponent } from './pages/auth/auth.component';
 
 import { RichTextEditorAllModule } from '@syncfusion/ej2-angular-richtexteditor';
-import {NgcCookieConsentModule, NgcCookieConsentConfig} from 'ngx-cookieconsent';
+import { NgcCookieConsentModule, NgcCookieConsentConfig } from 'ngx-cookieconsent';
 
 import { CalendarModule, DateAdapter } from 'angular-calendar';
 import { adapterFactory } from 'angular-calendar/date-adapters/date-fns';
+import { DragDropModule } from '@angular/cdk/drag-drop';
+import { SocketIoModule, SocketIoConfig } from 'ngx-socket-io';
 
 import { DatePipe } from '@angular/common';
 import { TeleSlotComponent } from './components/tele-slot/tele-slot.component';
@@ -46,6 +47,9 @@ import { NotfoundComponent } from './pages/notfound/notfound.component';
 import { AppointmentDetailsComponent } from './components/appointment-details/appointment-details.component';
 import { GenmessageComponent } from './components/genmessage/genmessage.component';
 import { AdduserComponent } from './components/adduser/adduser.component';
+import { TVHomeComponent } from './pages/tv/tvhome/tvhome.component';
+import { LivedataService } from './services/livedata.service';
+import { AdddeviceComponent } from './pages/tv/adddevice/adddevice.component';
 
 const cookieConfig:NgcCookieConsentConfig = {
   cookie: {
@@ -71,7 +75,7 @@ const cookieConfig:NgcCookieConsentConfig = {
     "policy": "Datenschutz"
   }
 };
-
+const config: SocketIoConfig = { url: environment.apiProtocol + '://' + environment.apiBase + ':' + environment.apiPort, options: {} };
 
 @NgModule({
   declarations: [
@@ -95,7 +99,8 @@ const cookieConfig:NgcCookieConsentConfig = {
     NotfoundComponent, 
     AppointmentDetailsComponent,
     GenmessageComponent, 
-    AdduserComponent
+    AdduserComponent, 
+    TVHomeComponent, AdddeviceComponent
   ],
   imports: [
     HttpClientModule,
@@ -111,7 +116,9 @@ const cookieConfig:NgcCookieConsentConfig = {
       useFactory: adapterFactory
     }),
     NgcCookieConsentModule.forRoot(cookieConfig), 
-    AppRoutingModule
+    AppRoutingModule,
+    DragDropModule, 
+    SocketIoModule.forRoot(config)
   ], 
   providers: [
     { provide: LOCALE_ID, useValue: "de-DE" },
@@ -122,7 +129,8 @@ const cookieConfig:NgcCookieConsentConfig = {
     JwtInterceptor,
     DatePipe,
     GoogleAnalyticsService, 
-    SettingsService
+    SettingsService, 
+    LivedataService
   ],
   bootstrap: [AppComponent], 
   entryComponents : [

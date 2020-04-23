@@ -12,6 +12,7 @@ import { AuthComponent } from './pages/auth/auth.component';
 import { AuthGuard } from './services/authguard';
 import { ImprintComponent } from './pages/imprint/imprint.component';
 import { NotfoundComponent } from './pages/notfound/notfound.component';
+import { TVHomeComponent } from './pages/tv/tvhome/tvhome.component';
 
 
 const routes: Routes = [
@@ -24,7 +25,8 @@ const routes: Routes = [
   { path: 'my', component: MyComponent, canActivate: [AuthGuard]},
   { path: 'admin', component: AdminComponent, canActivate: [AuthGuard]},
   { path: 'appointments', component: AppointmentsComponent, canActivate: [AuthGuard]},
-  
+  { path: 'tv', component: TVHomeComponent, canActivate: [AuthGuard]},
+
   { path: '', redirectTo: '/home', pathMatch: 'full' },
   // otherwise redirect to home
   { path: '**', component: NotfoundComponent }

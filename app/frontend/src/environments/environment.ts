@@ -6,6 +6,7 @@ export const environment = {
   env : "dev", 
   production: false, 
 
+  apiProtocol: "http",
   apiBase : "localhost", 
   apiPort: "8000", 
   apiEnd : "/api/v01", 

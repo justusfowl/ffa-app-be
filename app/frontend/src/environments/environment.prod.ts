@@ -2,6 +2,7 @@ export const environment = {
   env : "prod", 
   production: true,
 
+  apiProtocol: "https",
   apiBase : "", 
   apiPort : "",
   apiEnd : "/api/v01", 

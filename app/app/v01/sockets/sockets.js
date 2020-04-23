@@ -1,8 +1,41 @@
 
 var coachCtrl = require('../controllers/coach.controller');
+var deviceCtrl = require('../controllers/device.controller');
+var authCtrl = require('../controllers/auth.controller');
 var jwt = require('jsonwebtoken');
 const config = require('../../config/config');
+
+
 var sockets = {};
+
+var devicesRequests = [];
+
+const getAllIndexes = (arr, deviceId) => {
+  return arr.map((elm, idx) => elm.deviceId == deviceId ? idx : null)// .filter(String);
+}
+
+function makePin(length) {
+
+  let unique = false;
+  var result           = '';
+
+  while (!unique) {
+    var characters       = 'ABCDEFGHIJKLMNPQRSTUVWXYZ123456789';
+    var charactersLength = characters.length;
+    for ( var i = 0; i < length; i++ ) {
+       result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+  
+    let devIdx = devicesRequests.reduce((c, v, i) => v.pin == result ? c.concat(i) : c, []);
+  
+    if (devIdx.length < 1){
+      unique = true;
+    }
+  }
+
+  return result;
+}
+
 
 sockets.init = function (server) {
 
@@ -11,27 +44,80 @@ sockets.init = function (server) {
     require('socketio-auth')(io, {
       authenticate: async (socket, data, callback) => {
 
-        console.log('socket connected, waiting for authentication | ' + socket.id);
+        
+
+        if (data.type == 'deviceSetup' && data.deviceId){
+
+          console.log('socket connected, waiting for device to respond | ' + socket.id);
+
+          socket["deviceSetup"] = data;
+
+          let devIdx = devicesRequests.reduce((c, v, i) => v.deviceId == data.deviceId ? c.concat(i) : c, []);
+
+          devIdx.forEach(element => {
+            devicesRequests.splice(element, 1);
+          });
+
+          let storeDeviceRequest = {
+            deviceId: data.deviceId, 
+            socketId : socket.id, 
+            pin : makePin(4)
+          };
+          
+          devicesRequests.push(storeDeviceRequest);
+
+          socket.emit('device:pin', {pin: storeDeviceRequest.pin});          
+
+          return callback(null, true);
+          
+        }else{
+          console.log('socket connected, waiting for authentication | ' + socket.id);
+        }
 
         const { token } = data;
     
-        jwt.verify(token, config.auth.jwtsec, function(err, decoded) {
+        jwt.verify(token, config.auth.jwtsec,  function(err, decoded) {
           if (err){
             if (err.name == "TokenExpiredError"){
+              socket.emit('token:expired', {});
               return callback({ message: 'EXPIRED' , status : 440});
             }else{
               return callback({ message: 'UNAUTHORIZED' });
             }
             
           }else{
-            socket["userId"] = decoded._id;
+            if (decoded.deviceId){
+              socket["deviceId"] = decoded._id;
+              socket["device"] = decoded;
+            }else{
+              socket["userId"] = decoded._id;
+            }
+           
             return callback(null, true);
           }
         });
 
       },
-      postAuthenticate: (socket) => {
-        console.log(`Socket ${socket.id} authenticated.`);
+      postAuthenticate: async (socket) => {
+        if (socket.device){
+
+          let updateObj = {
+            "_id" : socket.device._id, 
+            "socketId" : socket.id
+          };
+
+          await deviceCtrl.updateDeviceDatabase(updateObj).catch(err => {
+            console.error(err);
+          });
+
+          socket.broadcast.emit('device:do-reload', {});
+
+        }else if (socket.deviceSetup){
+          console.log(`Socket ${socket.id} is a device.`);
+        }else{
+          console.log(`Socket ${socket.id} authenticated.`);
+        }
+        
       },
       disconnect: (socket) => {
         console.log(`Socket ${socket.id} disconnected.`);
@@ -41,51 +127,162 @@ sockets.init = function (server) {
 
     io.sockets.on('connection', function (socket) {
 
-        socket.on('coach:ask', async function(inputSessionObj){
+      socket.on('device:force-disconnect', async function(){
+        socket.disconnect();
+      });
 
-          let sessionObj = coachCtrl.getNextQuestion(inputSessionObj);
+      socket.on('device:add', async function (data){
 
-          if (sessionObj.complete){
+        let pin = data.pin;
+        let title = data.title;
+        let userId = socket.userId; 
 
-            socket.emit('loading', {isLoading: true});
+        let hasScope = await authCtrl.validateUserScope(userId, "admin");
 
-            let flagValidEval = true;
-            let error;
+        if (!hasScope){
+          return socket.emit('system:unauthorized', {});
+        }
 
-            let evaluation = await coachCtrl.getWellbeingEvaluation(socket.userId, sessionObj).catch(err => {
-              flagValidEval = false;
-              error = err;
+        let devIdx = devicesRequests.reduce((c, v, i) => v.pin == pin ? c.concat(i) : c, []);
+        let deviceDetails, deviceSocketId;
+
+        if (devIdx.length > 0){
+          deviceDetails = devicesRequests[devIdx[0]];
+          deviceSocketId = deviceDetails.socketId;
+        
+          let deviceObj = {
+            "title" : title, 
+            "deviceId" : deviceDetails.deviceId, 
+            "dateAdded" : new Date(), 
+            "socketId" : socket.userId
+          };
+
+          await deviceCtrl.addDevice(deviceObj, socket.userId).then(result => {
+
+            socket.emit('device:add-success', {});
+
+            var deviceToken = jwt.sign(deviceObj, config.auth.jwtsec, {});
+
+            deviceObj["token"] = deviceToken;
+
+            io.to(deviceSocketId).emit('device:successfully-added', deviceObj);
+
+            // remove device-pairing request
+            devIdx.forEach(idx => {
+              devicesRequests.splice(idx,1);
             });
-            
-            if (flagValidEval){
 
-              sessionObj.evaluation = evaluation;
+          }).catch(err => {
+            console.error(err);
+            socket.emit('device:add-error', {"message" : "Something went wrong storing the device."});
+          });
 
-              let s = await coachCtrl.storeSession(socket.userId, sessionObj).catch(err => {
-                socket.emit('coach:badcomplete', sessionObj);
-              });
+        }else{
+          // throw error - device not found on server 
+          socket.emit('device:add-error', {"message" : "Device not found - please try pairing again."});
+        }
 
-              if (typeof(sessionObj._id) == "undefined"){
-                sessionObj["_id"] = (s.insertedId).toString()
-              }      
+      });
+
+      socket.on('device:remove', async function (data){
+
+        try{
+          if (typeof(data.device) == "undefined"){
+            return socket.emit('device:remove-error', {"message" : "Please provide a device."});
+          }
   
-              socket.emit('coach:complete', sessionObj);
+          let device = data.device;
+          let _id = device._id;
+  
+          let deviceObject = await deviceCtrl.loadDeviceById(_id).catch(err => {
+            throw err
+          });
 
-            }else{
-              
+          if (!deviceObject){
+            return socket.emit('device:remove-error', {"message" : "Device could not be found."});
+          }
+  
+          if (!_id){
+            return socket.emit('device:remove-error', {"message" : "Please provide a deviceId."});
+          }
+
+          let deviceSocketId = deviceObject.socketId;
+  
+          await deviceCtrl.removeDeviceDatabase(_id).then(result => {
+            
+            socket.emit('device:remove-success', {"_id" : _id});
+            io.to(deviceSocketId).emit('device:remove', {});
+
+          }).catch(err => {
+            throw err;
+          });
+        }catch(err){
+          socket.emit('device:remove-error', {"message" : "Something went wrong deleting the device."});
+        }
+    
+      });
+
+      socket.on('device:reload', async function (data){
+        try{
+          let deviceSocketId = data.device.socketId;
+          io.to(deviceSocketId).emit('device:reload', {});
+        }catch(err){
+          console.error(err);
+        }
+        
+      });
+       
+      socket.on('coach:ask', async function(inputSessionObj){
+
+        let error;
+
+        let sessionObj = coachCtrl.getNextQuestion(inputSessionObj).catch(err => {
+          error = err;
+        });
+
+        if (sessionObj.complete){
+
+          socket.emit('loading', {isLoading: true});
+
+          let flagValidEval = true;
+          
+
+          let evaluation = await coachCtrl.getWellbeingEvaluation(socket.userId, sessionObj).catch(err => {
+            flagValidEval = false;
+            error = err;
+          });
+          
+          if (flagValidEval){
+
+            sessionObj.evaluation = evaluation;
+
+            let s = await coachCtrl.storeSession(socket.userId, sessionObj).catch(err => {
               socket.emit('coach:badcomplete', sessionObj);
-              
-            }
-           
+            });
+
+            if (typeof(sessionObj._id) == "undefined"){
+              sessionObj["_id"] = (s.insertedId).toString()
+            }      
+
+            socket.emit('coach:complete', sessionObj);
 
           }else{
-            socket.emit('coach:question', inputSessionObj);
-            socket.emit('coach:progress', {perc: inputSessionObj.progress});
-          }
             
-        })
+            socket.emit('coach:badcomplete', sessionObj);
+            
+          }
+          
 
-        // other logic
+        }else if (error){
+          socket.emit('coach:error', inputSessionObj);
+        }else{
+          socket.emit('coach:question', inputSessionObj);
+          socket.emit('coach:progress', {perc: inputSessionObj.progress});
+        }
+          
+      })
+     
+
     });
 
 }

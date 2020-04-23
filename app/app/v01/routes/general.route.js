@@ -5,9 +5,10 @@ var generalCtrl = require('../controllers/general.controller');
 var tokenValidator = require('../controllers/tokenvalidate.controller');
 var middlware_hasScopeAdmin = tokenValidator.HasScope('admin');
 
-
+/*
 router.route('/test')
     .get(generalCtrl.test)
+*/
 
 router.route('/settings')
     .get(generalCtrl.getSettings)

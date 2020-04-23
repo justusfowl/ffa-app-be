@@ -877,7 +877,7 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy{
   removeUser(user){
     let self = this;
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
-      data: {meta : {"type" : "confirm", "title" : "Scope ändern", "messageText" : `WARNUNG: Sind Sie sicher, dass Sie ${user.userName} löschen möchten? Diese Aktion ist nicht umkehrbar.`}}
+      data: {meta : {"type" : "confirm", "title" : "Nutzer löschen", "messageText" : `WARNUNG: Sind Sie sicher, dass Sie ${user.userName} löschen möchten? Diese Aktion ist nicht umkehrbar.`}}
     });
 
     dialogRef.afterClosed().subscribe(result => {

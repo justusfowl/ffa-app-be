@@ -1,0 +1,209 @@
+<header  class="header">
+    <div class="header-content small" >
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="text-container">
+                    </div>
+                </div> 
+            </div> 
+        </div> 
+    </div> 
+</header> 
+
+
+<div class="tv-container container">
+    <h1>
+        Wartezimmer-TV
+    </h1>
+
+    <mat-tab-group>
+
+        <mat-tab label="Playlisten"> 
+
+            <div class="playlist-container">
+
+                <div class="playlists" *ngFor="let list of playlists">
+
+                    <div class="head">
+
+                        <div class="title">
+
+
+                            <button mat-icon-button class="deleteplaylist-btn" (click)="removePlaylist(list)" >
+                                <mat-icon>delete</mat-icon>
+                            </button>
+
+
+                            <button mat-icon-button class="saveplaylist-btn" (click)="savePlaylist(list)" >
+                                <mat-icon>save</mat-icon>
+                            </button>
+
+
+                            <div class="attr">
+                                <mat-form-field  class="name">
+                                    <input matInput  placeholder="Name" [(ngModel)]="list.title">
+                                    <mat-hint> 
+                                        <div class="duration">
+                                            (Gesamtzeit: {{getSumDurationItem(list)}}s)
+                                        </div>
+                                    </mat-hint>
+                                </mat-form-field>                               
+                            </div>
+                           
+                            <button mat-fab color="primary" class="new-item-btn" [matMenuTriggerFor]="addItemsMenu" >
+                                <mat-icon>add</mat-icon>
+                            </button>
+                            <mat-menu #addItemsMenu="matMenu">
+                                <button mat-menu-item (click)="addNewItem(list, t)" *ngFor="let t of itemTypes">
+                                    <mat-icon>{{t.icon}}</mat-icon>
+                                    <span>{{t.title}}</span>
+                                </button>
+                            </mat-menu>
+                            
+                        </div>
+                        
+                    </div>
+                    
+                    <div cdkDropList class="playlist-list" (cdkDropListDropped)="dropPlaylist(list, $event)" *ngIf="list.items.length > 0">
+                        <div class="box" *ngFor="let item of list.items" cdkDrag>
+
+                            <div class="timing" [matMenuTriggerFor]="changeDurationMenu">
+                                {{item.duration}}
+                            </div>
+                           
+                            <div class="row-container">
+                                <div class="type-icon">
+                                    <mat-icon>{{item.type.icon}}</mat-icon>
+                                </div>
+
+                                <div class="avatar">
+                                    <img src="https://www.facharztpraxis-fuer-allgemeinmedizin.de/assets/images/header-background.jpg">
+                                </div>
+
+                                <div class="details">
+                                    <div class="main">
+                                        {{item.title}}
+                                    </div>
+
+                                    <div class="subtitle">
+                                        {{item.subtitle}}
+                                    </div>
+
+                                </div>
+                            </div>                        
+
+                            <button class="edit endbtn" mat-icon-button>
+                                <mat-icon>more_vert</mat-icon>
+                            </button>
+
+                            <button class="remove endbtn" mat-icon-button (click)="removeItem(list, item)">
+                                <mat-icon>delete</mat-icon>
+                            </button>
+
+                            <mat-menu #changeDurationMenu="matMenu" class="changeDurationMenu">
+                                <button mat-menu-item (click)="changeDurationItem(item, d)" *ngFor="let d of durationOptions">
+                                    <span>{{d}}s</span>
+                                </button>
+                            </mat-menu>
+
+                        </div>
+                    </div>
+
+                    <div class="empty-data-placeholder" *ngIf="list.items.length < 1">
+                        Noch keine Elemente zugefügt. Klicken Sie auf das Plus-Zeichen, um dies zu tun.
+                    </div>
+
+
+                </div>
+
+                <div class="new-playlist" (click)="addPlaylist()">
+                    Neue Playlist
+                </div>
+
+             </div>
+
+        </mat-tab>
+
+        <mat-tab label="Geräte" > 
+            <div class="devices">
+
+                <div class="head">
+
+                    <div class="title">
+                        <div class="attr">
+                            <div class="name">
+                                    Ihre Geräte
+                            </div>
+                            <div class="duration">
+                                {{devices.length}}/20 Geräte zugefügt
+                            </div>
+                        </div>
+                        
+                        <button mat-fab color="primary" class="add-device-btn" [matMenuTriggerFor]="addDeviceMenu">
+                            <mat-icon>add</mat-icon>
+                        </button>
+
+                        <mat-menu #addDeviceMenu="matMenu" class="addDeviceMenu">
+                            <form class="addDeviceMenu-form" [formGroup]="newDeviceForm">
+                                <mat-form-field >
+                                    <input matInput placeholder="Gerätename" class="title" formControlName="title" (click)="$event.stopPropagation()">
+                                    <mat-error *ngIf="newDeviceForm.get('title').hasError('required')" >Bitte Gerätenamen eintragen.</mat-error>
+                                </mat-form-field>
+
+                                <mat-form-field >
+                                    <input matInput placeholder="PIN" class="pin" formControlName="pin" maxlength="4" (click)="$event.stopPropagation()">
+                                    <mat-error *ngIf="newDeviceForm.get('pin').hasError('required')" >Bitte PIN eintragen.</mat-error>
+                                </mat-form-field>
+
+                            </form>
+                            
+                            <button mat-menu-item (click)="addDevice($event)"  [disabled]="!newDeviceForm.valid">
+                                <mat-icon>add</mat-icon> 
+                                <span>Zufügen</span>
+                            </button>
+                            
+                        </mat-menu>
+                        
+                    </div>
+                    
+                </div>
+
+                <div class="device-list">
+
+                    <div class="device-item" *ngFor="let device of devices; let i=index;">
+
+                        <div class="wrapper">
+                            <div class="type-icon">
+                                <mat-icon>tv</mat-icon>
+                            </div>
+
+                            <div class="title">
+                                {{device.title}}
+                            </div>
+                        </div>
+
+                        <div class="buttons">
+                            <button class="edit endbtn" mat-icon-button *ngIf="false">
+                                <mat-icon>more_vert</mat-icon>
+                            </button>
+
+                            <button class="edit endbtn" mat-icon-button (click)="reloadScreen(device)">
+                                <mat-icon>sync</mat-icon>
+                            </button>
+    
+                            <button class="remove endbtn" mat-icon-button (click)="removeDevice(device)">
+                                <mat-icon>delete</mat-icon>
+                            </button>
+                        </div>
+
+                    </div>
+
+                </div>
+              
+            </div>
+        </mat-tab>
+
+    </mat-tab-group>               
+</div>
+

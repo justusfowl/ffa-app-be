@@ -11,6 +11,7 @@ import { GoogleAnalyticsService } from './services/google-analytics.service';
 import { Title, DomSanitizer } from '@angular/platform-browser';
 import { SettingsService } from './services/settings.service';
 import { JEN_BUILD_NUMBER } from '../environments/environment';
+import { LivedataService } from './services/livedata.service';
 
 declare var $: any;
 
@@ -50,7 +51,8 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
     private googleAnalytics : GoogleAnalyticsService,
     private titleService: Title, 
     private settingsSrv : SettingsService,
-    private sanitizer : DomSanitizer
+    private sanitizer : DomSanitizer, 
+    private livedata : LivedataService
   ){  
     this.buildNum = JEN_BUILD_NUMBER;
 
@@ -90,6 +92,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
         }
       });
 
+      this.livedata.initService();
       
   }
 

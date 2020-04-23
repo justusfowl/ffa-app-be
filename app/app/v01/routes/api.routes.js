@@ -11,6 +11,7 @@ var timesRoutes = require('./times.route');
 var messageRoutes= require('./message.routes');
 var generalRoutes = require('./general.route');
 var appointmentRoutes = require('./appointment.route');
+var deviceRoutes= require('./devices.route');
 
 const tokenValidator = require('../controllers/tokenvalidate.controller');
 
@@ -37,5 +38,7 @@ router.use('/times', timesRoutes);
 router.use('/general', generalRoutes)
 
 router.use('/appointment', appointmentRoutes)
+
+router.use('/devices', deviceRoutes)
 
 module.exports = router; 
