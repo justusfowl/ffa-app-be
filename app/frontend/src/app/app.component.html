@@ -114,7 +114,7 @@
     <button routerLink="/my" routerLinkActive="active"  mat-menu-item>Profil</button>
     <button *ngIf="auth.checkUIForRole(['admin', 'doc', 'mfa'])" routerLink="/appointments" routerLinkActive="active"  mat-menu-item>Termine</button>
     <button *ngIf="auth.checkUIForRole('admin')" routerLink="/admin" routerLinkActive="active"  mat-menu-item>Administration</button>
-    <button *ngIf="auth.checkUIForRole(['admin'])" routerLink="/tv" routerLinkActive="active"  mat-menu-item>TV</button>
+    <button *ngIf="auth.checkUIForRole(['tv'])" routerLink="/tv" routerLinkActive="active"  mat-menu-item>TV</button>
     <button (click)="auth.logout()" mat-menu-item>logout</button>
 </mat-menu>
 
