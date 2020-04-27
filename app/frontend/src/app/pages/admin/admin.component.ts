@@ -67,7 +67,8 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy{
     "admin", 
     "user", 
     "patient", 
-    "doc"
+    "doc", 
+    "mfa"
   ];
   scopeCtrl = new FormControl();
 

@@ -42,6 +42,8 @@ import { AppointmentDetailsComponent } from 'src/app/components/appointment-deta
   encapsulation: ViewEncapsulation.None,
   styleUrls: ['./appointments.component.scss', '../../app.component.scss']
 })
+
+
 export class AppointmentsComponent implements OnInit {
 
   locale : any; 

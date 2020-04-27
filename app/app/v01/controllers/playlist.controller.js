@@ -153,6 +153,7 @@ function removePlaylist(req, res){
 module.exports = {
     addPlaylist,
     getPlaylists,
+    loadPlaylists,
     updatePlaylist,
     removePlaylist
 }

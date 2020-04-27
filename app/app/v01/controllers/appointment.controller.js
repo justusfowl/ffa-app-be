@@ -1046,37 +1046,6 @@ function removeAdminTeleSlot(req, res){
     }
 }
 
-const cal = ical({
-    domain: 'example.com',
-    prodId: '//superman-industries.com//ical-generator//EN',
-    events: [
-        {
-            start: moment(),
-            end: moment().add(1, 'hour'),
-            summary: 'Example Event',
-            description: 'It works ;)',
-            url: 'https://example.com'
-        }
-    ]
-});
-
-function serveAdminCal(req, res){
-    cal.serve(res);
-}
-
-function addEvent(req, res){
-    let meeting = {
-        start: moment().add(3, 'hour'),
-        end: moment().add(4, 'hour'),
-        summary: 'Blubb',
-        description: 'BlubbBlubbBlubb It works ;)',
-        url: 'https://example.com'
-    };
-    cal.createEvent(meeting)
-
-    res.json({"success" : true})
-}
-
 module.exports = {
     getAvailableSlots, 
     getAvailableDocs, 
@@ -1091,8 +1060,5 @@ module.exports = {
     adminGetTeleSlots, 
     adminAddTeleSlot, 
     adminUpdateTeleSlot,
-    removeAdminTeleSlot,
-
-    serveAdminCal,
-    addEvent
+    removeAdminTeleSlot
 }

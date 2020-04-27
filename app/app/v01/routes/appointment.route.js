@@ -4,10 +4,10 @@ var router = express.Router();
 var appointmentCtrl = require('../controllers/appointment.controller');
 var tokenValidator = require('../controllers/tokenvalidate.controller');
 var middlware_hasScopeAdmin = tokenValidator.HasScope('admin');
-var middlware_hasScopeAdminDoc = tokenValidator.HasScope(['admin', 'doc']);
+var middlware_hasScopeAdminDocMfa = tokenValidator.HasScope(['admin', 'doc', 'mfa']);
 
 router.route("/")
-    .get([tokenValidator.verifyToken, middlware_hasScopeAdminDoc], appointmentCtrl.getAppointments)
+    .get([tokenValidator.verifyToken, middlware_hasScopeAdminDocMfa], appointmentCtrl.getAppointments)
 
 router.route("/:appointmentId")
     .delete([tokenValidator.detectToken, middlware_hasScopeAdmin], appointmentCtrl.adminRemoveAppointment)
@@ -33,8 +33,4 @@ router.route('/slots')
 router.route('/slots/:slotId')
     .delete([tokenValidator.detectToken, middlware_hasScopeAdmin], appointmentCtrl.removeAdminTeleSlot)
 
-router.route("/calendar")
-    .get([tokenValidator.verifyToken, middlware_hasScopeAdminDoc], appointmentCtrl.serveAdminCal)
-    .post(appointmentCtrl.addEvent)
- // [tokenValidator.verifyToken, [tokenValidator.detectToken, tokenValidator.HasUserVerifiedEmail]
 module.exports = router;

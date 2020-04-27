@@ -1,6 +1,7 @@
 
 var coachCtrl = require('../controllers/coach.controller');
 var deviceCtrl = require('../controllers/device.controller');
+var playlistCtrl = require('../controllers/playlist.controller');
 var authCtrl = require('../controllers/auth.controller');
 var jwt = require('jsonwebtoken');
 const config = require('../../config/config');
@@ -231,6 +232,16 @@ sockets.init = function (server) {
         }
         
       });
+
+      socket.on('device:get-playlist', async function (){
+        try{
+          let playlists = await playlistCtrl.loadPlaylists();
+          socket.emit('device:playlist', playlists);
+        }catch(err){
+          console.error(err);
+        }
+        
+      });    
        
       socket.on('coach:ask', async function(inputSessionObj){
 
