@@ -1,0 +1,79 @@
+<div class="add-admin-video-appointment">
+
+    
+    <h4>BETA - freier Termin</h4>
+    <span>Einstellen aktuell nur für eigenen Benutzer möglich</span>
+    <br/>    
+
+    <form [formGroup]="appointmentForm">
+
+        <div class="form-group">
+            <mat-form-field>
+                <mat-label>Arzt</mat-label>
+                <mat-select  formControlName="doc" required>
+                <mat-option *ngFor="let doc of availableDocs" [value]="doc">
+                {{doc.userName}}
+                </mat-option>
+                </mat-select>
+                <mat-error *ngIf="appointmentForm.get('doc').hasError('required')">Bitte Arzt wählen.</mat-error>
+            </mat-form-field>
+        </div>
+
+        <div class="form-group">
+            <mat-form-field>
+                <mat-label>Anfrageart</mat-label>
+                <mat-select  formControlName="appointmentType" required>
+                <mat-option *ngFor="let req of appointmentTypes" [value]="req">
+                {{req.name}}
+                </mat-option>
+                </mat-select>
+                <mat-error *ngIf="appointmentForm.get('appointmentType').hasError('required')"  >Bitte wählen Sie eine Anfrageart</mat-error>
+            </mat-form-field>
+        </div>
+
+        <div class="form-group">
+            <mat-form-field>
+                <input matInput placeholder="Datum" [matDatepicker]="picker" formControlName="date" readonly class="form-control">
+                <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                <mat-datepicker #picker></mat-datepicker>
+            </mat-form-field>
+        </div>
+
+        <div class="form-group">
+            <mat-form-field  class="time">
+              <mat-label>Startzeit</mat-label>
+                <mat-select  required 
+                formControlName="startTime"
+                fxLayout="row">
+                    <mat-option *ngFor="let time of timeSelectionStart" [value]="time"  >
+                    {{time}}
+                    </mat-option>
+                </mat-select>
+                <mat-error *ngIf="appointmentForm.get('startTime').hasError('required')"  >Bitte wählen Sie eine Startzeit</mat-error>
+    
+            </mat-form-field>
+        </div>
+
+        <div class="form-group">
+            <mat-form-field  class="time">
+                <mat-label>Endzeit</mat-label>
+                <mat-select  required 
+                formControlName="endTime"
+                fxLayout="row">
+                    <mat-option *ngFor="let time of timeSelectionEnd" [value]="time"  >
+                    {{time}}
+                    </mat-option>
+                </mat-select>
+                <mat-error *ngIf="appointmentForm.get('endTime').hasError('required')"  >Bitte wählen Sie eine Endzeit</mat-error>
+    
+            </mat-form-field>
+        </div>
+
+    </form>
+
+    <div class="actions">
+        <button mat-stroked-button (click)="close()">Schließen</button>
+        <button mat-stroked-button color="accent" [disabled]="appointmentForm.invalid || state == 'submit'" (click)="createAppointment()"><mat-icon>save</mat-icon>Termin einstellen</button>
+    </div>        
+
+</div>

@@ -11,9 +11,13 @@
     </div> 
 </header> 
 
-<div class="container">
+<div class="container appointment-container">
     <h1>
         Termine
+        <button mat-icon-button (click)="addAdminAppointment()" *ngIf="auth.checkUIForRole(['beta'])">
+          <mat-icon>add</mat-icon>
+        </button>
+
     </h1>
 
     <div class="page-appointments">
@@ -28,7 +32,10 @@
                       </mat-option>
                     </mat-select>
                   </mat-form-field>
+
+                 
             </div>
+
         </div>
 
         <div class="row text-center">

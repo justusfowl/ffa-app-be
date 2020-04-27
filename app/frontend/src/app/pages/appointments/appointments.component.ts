@@ -34,6 +34,8 @@ import { DatePipe } from '@angular/common';
 import { ConfirmDialogComponent } from 'src/app/components/confirm-dialog/confirm-dialog.component';
 import { MatDialog } from '@angular/material';
 import { AppointmentDetailsComponent } from 'src/app/components/appointment-details/appointment-details.component';
+import { AdminaddvideoappointmentComponent } from 'src/app/components/adminaddvideoappointment/adminaddvideoappointment.component';
+import { AuthenticationService } from 'src/app/services/authentication.service';
 
 
 @Component({
@@ -77,7 +79,8 @@ export class AppointmentsComponent implements OnInit {
   availableDocs : any[] = [];
   appointmentDocSelected : any ; 
 
-  constructor(
+  constructor (
+    public auth : AuthenticationService,
     private api : ApiService,
     private datePipe : DatePipe,
     public dialog: MatDialog
@@ -212,6 +215,22 @@ export class AppointmentsComponent implements OnInit {
   closeOpenMonthViewDay() {
     this.activeDayIsOpen = false;
     this.fetchEvents();
+  }
+
+  addAdminAppointment(){
+
+    const dialogRef = this.dialog.open(AdminaddvideoappointmentComponent, {
+      data: {}
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+
+      if (result){
+        this.fetchEvents();
+      }
+
+    });
+
   }
 
 
