@@ -175,4 +175,8 @@ export class AdminaddvideoappointmentComponent implements OnInit {
 
   }
 
+  close(){
+    this.dialogRef.close();
+  }
+
 }
