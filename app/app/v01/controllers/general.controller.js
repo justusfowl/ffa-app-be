@@ -4,6 +4,10 @@ var MongoClient = require('mongodb').MongoClient;
 var ObjectID = require('mongodb').ObjectID;
 
 var MongoUrl = config.getMongoUrl();
+var path = require('path');
+var LZString = require('lz-string');
+var base64ToImage = require('base64-to-image');
+var uuid = require("uuid");
 
 function getSettings(req, res){
 
@@ -170,7 +174,7 @@ function storeSettings(req, res){
 
 var emailCtrl = require('./emailer.controller');
 
-async function test (req, res){
+async function testEmail (req, res){
 
     await emailCtrl.testEmail("ulikaulfuss@k-datacenter.de", "https://blank").then(result => {
         res.json({"message" : "ok"});
@@ -180,11 +184,61 @@ async function test (req, res){
     
 }
 
+function uploadFile(req, res){
+    try{
+
+        var file = req.file;
+        var body = req.body;
+        var fsEndPoint = req.fsEndPoint;
+
+        var previewItem;
+
+      
+
+        if (!fsEndPoint){
+            throw new Error("No endpoint defined");
+        }
+
+        if (file){
+            var fqdn_file = config.getPubExposedDirUrl() + fsEndPoint + file.filename;
+        }else{
+            throw new Error("Either type is not allowed of no file could be found uploaded")
+        }
+
+        let responseObj = {
+            "filePath" : fqdn_file
+        };
+
+        if (body.previewSrc){
+            var base64Str = body.previewSrc; // LZString.decompress(body.previewSrc);
+
+            let filename =  uuid.v1();
+
+            let dir = path.join(config.baseDirectory, "pub/" + fsEndPoint);
+
+            var optionalObj = {'fileName': filename, 'type':'jpeg'}; 
+            
+            var imageInfo = base64ToImage(base64Str, dir, optionalObj); 
+            
+            responseObj["avatarPath"] = config.getPubExposedDirUrl() + fsEndPoint + filename + ".jpeg";
+        }
+
+        res.json(responseObj);
+
+    }catch(err){
+        console.error(err);
+        res.send(500, "Something went wrong uploading a file.")
+    }
+}
+
 
 module.exports = {
     getSettings, 
     storeSettings,
     getConfig, 
     storeConfig,
-    test
+    uploadFile,
+
+
+    testEmail
 }

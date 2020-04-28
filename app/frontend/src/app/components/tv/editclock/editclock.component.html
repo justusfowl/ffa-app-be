@@ -1,0 +1,41 @@
+<div class="edit-clock-dialog-container">
+
+    <p>
+        {{timezones.length}} / 4 Uhren
+    </p>
+
+    <mat-form-field class="clock-chip-list">
+        <mat-chip-list #chipList aria-label="Timezone Selection">
+            <mat-chip
+            *ngFor="let tz of timezones" 
+            [selectable]="selectable"
+            [removable]="removable"
+            (removed)="remove(tz)">
+            {{tz.timeZone}}
+            <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
+            </mat-chip>
+            <input
+            placeholder="Neue Zeitzone..."
+            #tzInput
+            [formControl]="tzControl"
+            [matAutocomplete]="auto"
+            [matChipInputFor]="chipList"
+            [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+            (matChipInputTokenEnd)="add($event)">
+        </mat-chip-list>
+        <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
+            <mat-option *ngFor="let tz of filteredTimezones | async" [value]="tz">
+            {{tz}}
+            </mat-option>
+        </mat-autocomplete>
+        </mat-form-field>
+
+        <div class="buttons">
+
+            <button mat-button (click)="close()">
+                Schließen
+            </button>
+
+        </div>
+
+</div>

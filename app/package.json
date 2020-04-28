@@ -14,6 +14,7 @@
   "author": "justusfowl",
   "license": "ISC",
   "dependencies": {
+    "base64-to-image": "^1.0.2",
     "bcrypt": "^4.0.1",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
@@ -21,6 +22,7 @@
     "express-handlebars": "^3.1.0",
     "ical-generator": "^1.9.4",
     "jsonwebtoken": "^8.5.1",
+    "lz-string": "^1.4.4",
     "moment": "^2.24.0",
     "moment-timezone": "^0.5.28",
     "mongodb": "^3.5.3",
@@ -30,6 +32,7 @@
     "request": "^2.88.2",
     "socket.io": "^2.3.0",
     "socketio-auth": "^0.1.1",
+    "uuid": "^7.0.3",
     "versiony": "^2.0.1"
   },
   "devDependencies": {

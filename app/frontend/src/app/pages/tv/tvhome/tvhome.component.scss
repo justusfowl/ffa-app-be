@@ -129,10 +129,15 @@
     background-color: black; 
 }
 
-.box .endbtn{
+.box .endbtn, 
+.box .item-upload{
     position : absolute;
     display: none;
     transition: 0.3s;
+}
+
+.box .item-upload{
+    right: 20%;
 }
 
 
@@ -162,9 +167,18 @@
         }
     }
 
+    .avatar{
+        width: 150px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid #f1f1f1;
+        overflow: hidden;
+    }
+
     img{
         height: 100px;
-        width: 150px;
+        max-width: 150px;
         object-fit: cover;
     }
 
@@ -188,7 +202,8 @@
 
 .box:hover{
     .edit, 
-    .remove{
+    .remove,
+    .item-upload{
         opacity: 1;
         display: initial;
     }

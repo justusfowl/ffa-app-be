@@ -50,6 +50,7 @@ import { AdduserComponent } from './components/adduser/adduser.component';
 import { TVHomeComponent } from './pages/tv/tvhome/tvhome.component';
 import { LivedataService } from './services/livedata.service';
 import { AdminaddvideoappointmentComponent } from './components/adminaddvideoappointment/adminaddvideoappointment.component';
+import { EditclockComponent } from './components/tv/editclock/editclock.component';
 
 const cookieConfig:NgcCookieConsentConfig = {
   cookie: {
@@ -101,7 +102,7 @@ const config: SocketIoConfig = { url: environment.apiProtocol + '://' + environm
     GenmessageComponent, 
     AdduserComponent, 
     TVHomeComponent, 
-    AdminaddvideoappointmentComponent
+    AdminaddvideoappointmentComponent, EditclockComponent
   ],
   imports: [
     HttpClientModule,
@@ -145,7 +146,8 @@ const config: SocketIoConfig = { url: environment.apiProtocol + '://' + environm
     AppointmentDetailsComponent, 
     GenmessageComponent,
     AdduserComponent, 
-    AdminaddvideoappointmentComponent
+    AdminaddvideoappointmentComponent, 
+    EditclockComponent
   ]
 })
 export class AppModule { }

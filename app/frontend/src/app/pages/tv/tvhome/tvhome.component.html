@@ -78,7 +78,7 @@
                                 </div>
 
                                 <div class="avatar">
-                                    <img src="https://www.facharztpraxis-fuer-allgemeinmedizin.de/assets/images/header-background.jpg">
+                                    <img [src]="getTypeAvatar(item)">
                                 </div>
 
                                 <div class="details">
@@ -91,9 +91,13 @@
                                     </div>
 
                                 </div>
-                            </div>                        
+                            </div>
+                            
+                            <input  *ngIf="item.type.type == 'image' || item.type.type == 'video'" class="item-upload" type="file" placeholder="Element hochladen" (change)="handleFileUpload(item, $event.target.files)">
 
-                            <button class="edit endbtn" mat-icon-button>
+
+
+                            <button class="edit endbtn" mat-icon-button (click)="editItem(item)">
                                 <mat-icon>more_vert</mat-icon>
                             </button>
 

@@ -1,0 +1,19 @@
+
+.edit-clock-dialog-container{
+    .clock-chip-list{
+        width: 100%;
+    }
+}
+
+@media(max-width: 550px){
+    .edit-clock-dialog-container{
+        min-width: 100vw;    
+    }
+}
+
+@media(min-width: 551px){
+    .edit-clock-dialog-container{
+        min-width: 350px;
+    
+    }
+}

@@ -5,6 +5,11 @@ import { MatSnackBar, MatDialog } from '@angular/material';
 import { FormGroup, Validators, FormControl } from '@angular/forms';
 import { ApiService } from 'src/app/services/api.service';
 import { ConfirmDialogComponent } from 'src/app/components/confirm-dialog/confirm-dialog.component';
+import { EditclockComponent } from 'src/app/components/tv/editclock/editclock.component';
+
+import VideoSnapshot from 'video-snapshot';
+
+import * as LZString from 'lz-string';
 
 @Component({
   selector: 'app-tvhome',
@@ -14,7 +19,7 @@ import { ConfirmDialogComponent } from 'src/app/components/confirm-dialog/confir
 })
 export class TVHomeComponent implements OnInit {
 
-  playlists : any[] = []
+  playlists : any[] = [];
 
   itemTypes : any[] = [
     {
@@ -35,7 +40,8 @@ export class TVHomeComponent implements OnInit {
     {
       "type" : "clock", 
       "title" : "Weltuhr",
-      "icon": "watch_later"
+      "icon": "watch_later", 
+      "avatar" : "/assets/images/clock.jpg"
     },
     {
       "type" : "weather", 
@@ -54,6 +60,9 @@ export class TVHomeComponent implements OnInit {
   ];
 
   devices : any[] = [];
+
+  newUploadFile : File;
+  allowedUploadTypes : string[] = ["jpeg", "jpg", "mp4", "ogg", "png"];
 
   newDeviceForm : FormGroup = new FormGroup({
     title : new FormControl("", Validators.required), 
@@ -268,5 +277,89 @@ export class TVHomeComponent implements OnInit {
     this.livedata.send("device:reload", {device: deviceObj});
   }
 
+  editItem(item){
+    if (item.type.type == 'clock'){
+
+      const dialogRef = this.dialog.open(EditclockComponent, {
+        data: {item : item}, 
+        panelClass : "edit-clock-dialog"
+      });
+    }
+    
+  }
+
+  getTypeAvatar(item){
+    let defaultPath = "https://www.facharztpraxis-fuer-allgemeinmedizin.de/assets/images/header-background.jpg";
+    try{
+      let path = item.type.avatar;
+      if (path){
+        return path;
+      }else{
+        return defaultPath;
+      }
+      return path;
+    }catch(err){
+      return defaultPath;
+    }
+    
+  }
+
+  async handleFileUpload(item, files: FileList){
+    this.newUploadFile = files.item(0);
+
+    let ext = this.newUploadFile.type.substring(this.newUploadFile.type.indexOf("/")+1, this.newUploadFile.type.length).toLowerCase();
+
+    if (this.allowedUploadTypes.indexOf(ext) < 0){
+      this._snackBar.open("Bitte beachten Sie - es werden nur folgende Datei-Typen zugelassen: " + this.allowedUploadTypes.join(" "), "OK", {});
+      this.newUploadFile = null;
+      return;
+    }
+
+    if (ext == 'mp4'){
+      const snapshoter = new VideoSnapshot(this.newUploadFile);
+      var previewSrc = await snapshoter.takeSnapshot();
+
+      // previewSrc = LZString.compress(previewSrc); 
+
+    }
+    
+    const formData: FormData = new FormData();
+
+    if (this.newUploadFile){
+      formData.append('file', this.newUploadFile, this.newUploadFile.name);
+    }
+
+    if (previewSrc){
+      formData.append("previewSrc", previewSrc);
+    }
+    
+    this.api.post("/general/content/tv", formData, true).then((res : any) => {
+
+      if (res.filePath){
+        
+        if (item.type.type == 'image'){
+          item.imageFullPath = res.filePath;
+          item.type.avatar = res.filePath;
+        }else if (item.type.type == 'video'){
+          item.videoFullPath = res.filePath;
+          item.type.avatar = res.avatarPath;
+        }
+        
+      }
+        
+      this._snackBar.open("Upload erfolgreich", "", {
+       duration: 1500
+     });
+
+     this.newUploadFile = null;
+
+   }).catch(err=>{
+     console.warn(err);
+     this._snackBar.open("Etwas hat nicht geklappt", "", {
+       duration: 1500
+     })
+   })
+
+  } 
 
 }
