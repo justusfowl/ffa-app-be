@@ -82,20 +82,39 @@
                                 </div>
 
                                 <div class="details">
-                                    <div class="main">
-                                        {{item.title}}
-                                    </div>
+                                    <ng-container *ngIf="item.type.type == 'feed'" >
+                                        <mat-form-field class="input-no-floating-header main" >
+                                            <input  matInput  placeholder="https://" [(ngModel)]="item.RSSUrl">
+                                        </mat-form-field> 
 
-                                    <div class="subtitle">
-                                        {{item.subtitle}}
-                                    </div>
+                                        <div class="subtitle">
+                                            {{item.title}}
+                                        </div>
 
+                                    </ng-container>
+                                    
+                                    <ng-container *ngIf="item.type.type != 'feed'" >
+                                        <div class="main">
+                                            {{item.title}}
+                                        </div>
+    
+                                        <div class="subtitle">
+                                            {{item.subtitle}}
+                                        </div>
+                                    </ng-container>
+                                    
                                 </div>
                             </div>
                             
-                            <input  *ngIf="item.type.type == 'image' || item.type.type == 'video'" class="item-upload" type="file" placeholder="Element hochladen" (change)="handleFileUpload(item, $event.target.files)">
-
-
+                            <div class="item-upload" *ngIf="item.type.type == 'image' || item.type.type == 'video'">
+                                <div class="wrapper">
+                                        <button mat-stroked-button class="btn">
+                                            <mat-icon>cloud_upload</mat-icon>
+                                            Hochladen
+                                        </button>
+                                        <input class="item-upload-input" type="file" placeholder="Element hochladen" (change)="handleFileUpload(item, $event.target.files)">
+                                </div>
+                            </div>
 
                             <button class="edit endbtn" mat-icon-button (click)="editItem(item)">
                                 <mat-icon>more_vert</mat-icon>

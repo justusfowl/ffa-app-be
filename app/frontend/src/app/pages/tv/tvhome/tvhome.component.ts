@@ -33,6 +33,11 @@ export class TVHomeComponent implements OnInit {
       "icon": "video_library"
     },
     {
+      "type" : "feed", 
+      "title" : "RSS Feed",
+      "icon": "rss_feed"
+    },
+    {
       "type" : "quote", 
       "title" : "Zitat",
       "icon": "format_quote"
@@ -62,7 +67,7 @@ export class TVHomeComponent implements OnInit {
   devices : any[] = [];
 
   newUploadFile : File;
-  allowedUploadTypes : string[] = ["jpeg", "jpg", "mp4", "ogg", "png"];
+  allowedUploadTypes : any = {"image" : ["jpeg", "jpg", "png" ], "video" : ["mp4", "ogg"]}
 
   newDeviceForm : FormGroup = new FormGroup({
     title : new FormControl("", Validators.required), 
@@ -223,7 +228,7 @@ export class TVHomeComponent implements OnInit {
       duration: 30
     };
 
-    list.items.push(newObj);
+    list.items.push(JSON.parse(JSON.stringify(newObj)));
   };
 
   removeItem(list, item){
@@ -309,8 +314,8 @@ export class TVHomeComponent implements OnInit {
 
     let ext = this.newUploadFile.type.substring(this.newUploadFile.type.indexOf("/")+1, this.newUploadFile.type.length).toLowerCase();
 
-    if (this.allowedUploadTypes.indexOf(ext) < 0){
-      this._snackBar.open("Bitte beachten Sie - es werden nur folgende Datei-Typen zugelassen: " + this.allowedUploadTypes.join(" "), "OK", {});
+    if (this.allowedUploadTypes[item.type.type].indexOf(ext) < 0){
+      this._snackBar.open("Bitte beachten Sie - es werden nur folgende Datei-Typen zugelassen: " + this.allowedUploadTypes[item.type.type].join(", "), "OK", {});
       this.newUploadFile = null;
       return;
     }
@@ -318,9 +323,7 @@ export class TVHomeComponent implements OnInit {
     if (ext == 'mp4'){
       const snapshoter = new VideoSnapshot(this.newUploadFile);
       var previewSrc = await snapshoter.takeSnapshot();
-
       // previewSrc = LZString.compress(previewSrc); 
-
     }
     
     const formData: FormData = new FormData();
@@ -354,10 +357,12 @@ export class TVHomeComponent implements OnInit {
      this.newUploadFile = null;
 
    }).catch(err=>{
+
      console.warn(err);
      this._snackBar.open("Etwas hat nicht geklappt", "", {
        duration: 1500
-     })
+     });
+
    })
 
   } 
