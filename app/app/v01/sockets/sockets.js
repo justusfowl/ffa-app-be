@@ -77,22 +77,34 @@ sockets.init = function (server) {
 
         const { token } = data;
     
-        jwt.verify(token, config.auth.jwtsec,  function(err, decoded) {
+        jwt.verify(token, config.auth.jwtsec, async function(err, decoded) {
           if (err){
             if (err.name == "TokenExpiredError"){
               socket.emit('token:expired', {});
               return callback({ message: 'EXPIRED' , status : 440});
             }else{
-              return callback({ message: 'UNAUTHORIZED' });
+              return callback({ message: 'UNAUTHORIZED' , status : 401});
             }
             
           }else{
             if (decoded.deviceId){
               socket["deviceId"] = decoded._id;
               socket["device"] = decoded;
+
+              let deviceObject = await deviceCtrl.loadDeviceById( decoded._id).catch(err => {
+                throw err
+              });
+
+              // if no deviceId can be found tell the TV that it has been removed
+              if (!deviceObject){
+                return socket.emit('device:remove', {});
+              }
+
             }else{
               socket["userId"] = decoded._id;
             }
+
+           
            
             return callback(null, true);
           }
@@ -107,7 +119,9 @@ sockets.init = function (server) {
             "socketId" : socket.id
           };
 
-          await deviceCtrl.updateDeviceDatabase(updateObj).catch(err => {
+          await deviceCtrl.updateDeviceDatabase(updateObj).then(result => {
+            // 
+          }).catch(err => {
             console.error(err);
           });
 
@@ -155,7 +169,7 @@ sockets.init = function (server) {
             "title" : title, 
             "deviceId" : deviceDetails.deviceId, 
             "dateAdded" : new Date(), 
-            "socketId" : socket.userId
+            "socketId" : deviceSocketId
           };
 
           await deviceCtrl.addDevice(deviceObj, socket.userId).then(result => {
@@ -185,6 +199,35 @@ sockets.init = function (server) {
 
       });
 
+      socket.on('device:update', async function (data){
+     
+        try{
+          if (typeof(data.device) == "undefined"){
+            return;
+          }
+  
+          let device = data.device;
+          let _id = device._id;
+
+         let updateObj = {
+           "_id" : _id, 
+           "title" : device.title || "Unbenannt"
+         };
+
+          await deviceCtrl.updateDeviceDatabase(updateObj).then(result => {
+            socket.emit('device:update-success', {});
+          }).catch(err => {
+            socket.emit('device:update-error', {"message" : "Device not found - please try pairing again."});
+          });
+
+        }catch(err){
+          socket.emit('device:update-error', {"message" : "Something went wrong deleting the device."});
+        }
+    
+      });
+
+
+
       socket.on('device:remove', async function (data){
 
         try{
@@ -213,6 +256,7 @@ sockets.init = function (server) {
             
             socket.emit('device:remove-success', {"_id" : _id});
             io.to(deviceSocketId).emit('device:remove', {});
+            io.sockets.connected[deviceSocketId].disconnect();
 
           }).catch(err => {
             throw err;

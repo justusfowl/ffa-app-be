@@ -51,6 +51,8 @@
             align-items: center;
             justify-content: center;
 
+
+
             .new-item-btn,
             .add-device-btn{
                 margin-left: 30px;
@@ -59,7 +61,8 @@
             .duration{
                 font-size: 14px;
             }
-        }
+
+        }        
 
         .mat-form-field-label:not(.mat-form-field-empty){
             opacity: 0;
@@ -84,6 +87,7 @@
             opacity: 1;
         }
     }
+
 }
 
 .input-no-floating-header{
@@ -314,11 +318,25 @@
 
             .title{
                 font-size: 30px;
+
+                .mat-form-field{
+                    min-width: 30vw; 
+                }
+
+                .mat-hint{
+                    font-size: 14px;
+                }
             }
         }
 
         button.edit, button.remove{
             opacity: 0;
+        }
+
+        .buttons{
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
     }

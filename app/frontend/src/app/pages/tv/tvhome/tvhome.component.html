@@ -85,11 +85,8 @@
                                     <ng-container *ngIf="item.type.type == 'feed'" >
                                         <mat-form-field class="input-no-floating-header main" >
                                             <input  matInput  placeholder="https://" [(ngModel)]="item.RSSUrl">
+                                            <mat-hint class="subtitle">{{item.title}}</mat-hint>
                                         </mat-form-field> 
-
-                                        <div class="subtitle">
-                                            {{item.title}}
-                                        </div>
 
                                     </ng-container>
                                     
@@ -116,7 +113,7 @@
                                 </div>
                             </div>
 
-                            <button class="edit endbtn" mat-icon-button (click)="editItem(item)">
+                            <button class="edit endbtn" mat-icon-button (click)="editItem(item)" *ngIf="item.type.type == 'clock'">
                                 <mat-icon>more_vert</mat-icon>
                             </button>
 
@@ -202,13 +199,16 @@
                             </div>
 
                             <div class="title">
-                                {{device.title}}
+                                <mat-form-field class="input-no-floating-header main" >
+                                    <input  matInput  placeholder="Gerätename" [(ngModel)]="device.title">
+                                    <mat-hint>zugefügt am {{device.dateAdded | date:'medium'}}</mat-hint>
+                                </mat-form-field> 
                             </div>
                         </div>
 
                         <div class="buttons">
-                            <button class="edit endbtn" mat-icon-button *ngIf="false">
-                                <mat-icon>more_vert</mat-icon>
+                            <button class="edit endbtn" mat-icon-button  (click)="updateDevice(device)">
+                                <mat-icon>save</mat-icon>
                             </button>
 
                             <button class="edit endbtn" mat-icon-button (click)="reloadScreen(device)">

@@ -99,7 +99,14 @@ export class TVHomeComponent implements OnInit {
 
     });
 
+    this.livedata.socket.fromEvent('device:update-error').subscribe(data => {
+        this._snackBar.open("Leider konnten wir das Gerät nicht aktualisieren - bitte probieren Sie es erneut oder melden Sich erneut bei dieser Website an.", "", { duration: 1500 });
+    });
+
     
+    this.livedata.socket.fromEvent('device:update-success').subscribe((data:any) => {
+      this._snackBar.open("Gerät aktualisiert.", "", { duration: 1500 });
+    }); 
 
     this.livedata.socket.fromEvent('device:add-error').subscribe(data => {
         this._snackBar.open("Leider konnten wir das Gerät nicht zufügen - wir haben den Code nicht zuordnen können.", "", { duration: 1500 });
@@ -254,12 +261,15 @@ export class TVHomeComponent implements OnInit {
 
     event.stopPropagation();
 
-
     let addObj = this.newDeviceFormValue;
     addObj.pin = addObj.pin.toUpperCase();
 
     this.livedata.send("device:add", {pin: addObj.pin, title: addObj.title});
 
+  }
+
+  updateDevice(deviceObj){
+    this.livedata.send("device:update", {device: deviceObj});
   }
 
   removeDevice(deviceObj){
