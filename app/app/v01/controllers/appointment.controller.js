@@ -409,9 +409,13 @@ async function getAvailableSlots(req, res){
         // create all theoretical slots for that type of appointment
 
         let allTheoSlots = [];
+
         let duration = appointmentTypeObj.durationInSeconds;
 
         datesInBetween.forEach(t_date => {
+
+            let daySlots = [];
+
             slots.forEach(slot => {
 
                 let flagIsWithinException = false;
@@ -468,7 +472,7 @@ async function getAvailableSlots(req, res){
 
                         if (endingEvent.unix() >= eventEnd.unix()){
                             if (_validateSlotAgainstAppointments(event, existingAppointments)){
-                                allTheoSlots.push(event);
+                                daySlots.push(event);
                             }
                         }
 
@@ -479,6 +483,25 @@ async function getAvailableSlots(req, res){
                 }
                 
             });
+
+            daySlots.sort(function(a, b) {
+                try{
+                    var keyA = a.start.unix(),
+                    keyB = b.start.unix();
+                    // Compare the 2 dates
+                    if (keyA < keyB) return -1;
+                    if (keyA > keyB) return 1;
+                    return 0;
+                }catch(err){
+                    return 0;
+                }
+               
+              });
+
+              daySlots.forEach(element => {
+                allTheoSlots.push(element);
+              });
+
         });
 
         res.json(allTheoSlots);
