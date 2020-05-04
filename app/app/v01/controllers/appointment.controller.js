@@ -441,10 +441,10 @@ async function getAvailableSlots(req, res){
                 })
 
                 // first possible time based on the slot provided 
-                let startingEvent = moment.tz(t_date.format("MM-DD-YYYY") + " " + slot.startTime, "MM-DD-YYYY HH:ss", config.timeZone);
+                let startingEvent = moment.tz(t_date.format("MM-DD-YYYY") + " " + slot.startTime, "MM-DD-YYYY HH:mm", config.timeZone);
 
                 // last ending time based on the slot provided 
-                let endingEvent = moment.tz(t_date.format("MM-DD-YYYY") + " " + slot.endTime, "MM-DD-YYYY HH:ss", config.timeZone);
+                let endingEvent = moment.tz(t_date.format("MM-DD-YYYY") + " " + slot.endTime, "MM-DD-YYYY HH:mm", config.timeZone);
 
                 let eventEnd;
 
