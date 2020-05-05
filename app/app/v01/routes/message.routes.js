@@ -12,9 +12,12 @@ router.route('/general')
 router.route('/prescription')
     .post([tokenValidator.detectToken], messageCtrl.handlePrescriptionMessage)
 
-    /*
+router.route('/my')
+    .get([tokenValidator.verifyToken],messageCtrl.getMyMessages)
+
+/*
 router.route("/test")
     .post(emailerCtrl.testEmail)
-    */
+*/
 
 module.exports = router;

@@ -96,9 +96,13 @@ async function handlePrescriptionMessage(req, res){
             });
         }
 
-        let isVacationObj = await timesCtrl.getIsCurrentlyVacation();
+        let isVacationObj = await timesCtrl.getIsCurrentlyVacation().catch(err => {
+            console.error(err);
+        });;
 
-        let emailSent = await emailerCtrl.sendMessageToBackOffice(contextObject);
+        let emailSent = await emailerCtrl.sendMessageToBackOffice(contextObject).catch(err => {
+            console.error(err);
+        });;
 
         if (isVacationObj.isVacation){
             await emailerCtrl.sendVacationAutoReply(userName, email, message, isVacationObj.vacationObj).then(result => {
@@ -123,6 +127,10 @@ async function handlePrescriptionMessage(req, res){
 function storeMessage(messageObject){
     return new Promise((resolve, reject) => {
         try{
+
+            if (messageObject.sendDate){
+                messageObject.sendDate = new Date(messageObject.sendDate);
+            }
 
             MongoClient.connect(MongoUrl, function(err, db) {
         
@@ -150,9 +158,51 @@ function storeMessage(messageObject){
     })
 }
 
+function getMessagesByUserId(userId){
+    return new Promise((resolve, reject) => {
+        try{
+
+            if (!userId){
+                return reject(false);
+            }
+
+            MongoClient.connect(MongoUrl, function(err, db) {
+        
+                if (err) throw err;
+                
+                let dbo = db.db(config.mongodb.database);
+        
+                const collection = dbo.collection('messages');
+        
+                collection.find({userId : userId}).sort( { sendDate: -1 } ).toArray(function(err, result){
+                    if (err){
+                        reject(err);
+                    }else{
+                        resolve(result);
+                    }                    
+                  });
+              });
+    
+        }catch(err){
+            reject(err);
+        }
+    })
+}
+
+async function getMyMessages(req, res){
+    try{
+        let userId = req.userId;
+        let messages = await getMessagesByUserId(userId);
+        res.json({"messages" : messages});
+    }catch(err){
+        console.error(err);
+        res.send(500, "An error occured acquiring myMessages: " + JSON.stringify(err) );
+    }
+}
 
 
 module.exports = {
     handleGeneralMessage,
-    handlePrescriptionMessage
+    handlePrescriptionMessage,
+    getMyMessages
 }

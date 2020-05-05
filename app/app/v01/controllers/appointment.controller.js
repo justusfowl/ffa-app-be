@@ -484,11 +484,12 @@ async function getAvailableSlots(req, res){
                 
             });
 
+            // sort by date 
+            
             daySlots.sort(function(a, b) {
                 try{
                     var keyA = a.start.unix(),
                     keyB = b.start.unix();
-                    // Compare the 2 dates
                     if (keyA < keyB) return -1;
                     if (keyA > keyB) return 1;
                     return 0;

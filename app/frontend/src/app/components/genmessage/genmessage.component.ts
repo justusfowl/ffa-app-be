@@ -58,17 +58,46 @@ export class GenmessageComponent implements OnInit {
       this.dialogRef.close();
     }
 
-    this.requestForm = new FormGroup({
-      name : new FormControl(name, Validators.required),
-      email : new FormControl(userEmail, [Validators.required, Validators.pattern("^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$")]),
-      acceptTerms : new FormControl(false, Validators.requiredTrue),
-      deliveryType : new FormControl(""),
-      collectDrugStore : new FormControl(""),
-      message : new FormControl('')
-    });
+    if (this.data.type == 'prescription' && this.data.messageData){
 
-    if (this.data.type == 'prescription'){
-      this.openMedicationDialog();
+      let deliveryType = this.medrequestDelivery[0].type;
+      let collectDrugStore = "";
+
+      if (!this.data.messageData.flagCollectFromPractice){
+        deliveryType = this.medrequestDelivery[1].type;
+        collectDrugStore = this.data.messageData.collectDrugStore;
+      }
+
+      this.requestForm = new FormGroup({
+        name : new FormControl(name, Validators.required),
+        email : new FormControl(userEmail, [Validators.required, Validators.pattern("^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$")]),
+        acceptTerms : new FormControl(false, Validators.requiredTrue),
+        deliveryType : new FormControl(deliveryType),
+        collectDrugStore : new FormControl(collectDrugStore),
+        message : new FormControl('')
+      });
+
+      if (this.data.messageData.medications){
+        this.medicationsRequest = this.data.messageData.medications;
+        this.openMedicationDialog(this.medicationsRequest);
+      }else{
+        this.openMedicationDialog();
+      }
+
+
+    }else{
+      this.requestForm = new FormGroup({
+        name : new FormControl(name, Validators.required),
+        email : new FormControl(userEmail, [Validators.required, Validators.pattern("^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$")]),
+        acceptTerms : new FormControl(false, Validators.requiredTrue),
+        deliveryType : new FormControl(""),
+        collectDrugStore : new FormControl(""),
+        message : new FormControl('')
+      });
+
+      if (this.data.type == 'prescription'){
+        this.openMedicationDialog();
+      }
     }
   
   }
@@ -149,7 +178,7 @@ export class GenmessageComponent implements OnInit {
       });
 
       setTimeout(() => {
-        this.dialogRef.close();
+        this.dialogRef.close(true);
       }, 1000);
 
     }).catch(err=>{

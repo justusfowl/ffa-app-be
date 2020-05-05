@@ -10,7 +10,7 @@ import { NewappointmentComponent } from '../newappointment/newappointment.compon
 import { AuthenticationService } from 'src/app/services/authentication.service';
 import { LoginComponent } from '../login/login.component';
 import { GoogleAnalyticsService } from 'src/app/services/google-analytics.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { CancelappointmentComponent } from 'src/app/components/cancelappointment/cancelappointment.component';
 import { LoaderService } from 'src/app/services/loader.service';
 import { Subscription } from 'rxjs';
@@ -119,7 +119,7 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   constructor(
     private api: ApiService,
-    private auth : AuthenticationService,
+    public auth : AuthenticationService,
     public dialog: MatDialog, 
     private _snackBar: MatSnackBar, 
     protected sanitizer: DomSanitizer, 
@@ -127,7 +127,8 @@ export class HomeComponent implements OnInit, OnDestroy {
     private route : ActivatedRoute,
     private loaderSrv : LoaderService, 
     private settingsSrv : SettingsService, 
-    private location : Location
+    private location : Location, 
+    private router: Router
   ) {
 
     this.settingsSubscription = this.settingsSrv.settingsObjObservable.subscribe(result => {
@@ -589,6 +590,10 @@ export class HomeComponent implements OnInit, OnDestroy {
       this.loaderSrv.setMsgLoading(false);
     });
 
+  }
+
+  goToMyPrescriptions(){
+    this.router.navigate(["/my"], {queryParams: {tab: "rezeptanfragen"}});
   }
 
 }

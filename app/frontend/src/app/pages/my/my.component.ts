@@ -5,6 +5,9 @@ import { MatSnackBar, MatDialog } from '@angular/material';
 import { LoginComponent } from '../login/login.component';
 import { NewappointmentComponent } from '../newappointment/newappointment.component';
 import { ConfirmDialogComponent } from 'src/app/components/confirm-dialog/confirm-dialog.component';
+import { GenmessageComponent } from 'src/app/components/genmessage/genmessage.component';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-my',
@@ -18,16 +21,39 @@ export class MyComponent implements OnInit {
   myAppointments : any;
   flagIncludePast : boolean = false;
 
+  myPrescriptionRequests : any[] = [];
+  mediDisplayColumns: string[] = ['name', 'amount', 'substance', 'dose', 'pzn', 'dosageform'];
+
+  tab : any; 
+  tabs : any[] = [
+    "profil", 
+    "termine", 
+    "rezeptanfragen"
+  ]
+  selectedIndex : number = 1;
+
   constructor(
     private auth : AuthenticationService, 
     private api : ApiService,
     private _snackBar: MatSnackBar,
-    public dialog: MatDialog
-  ) { }
+    public dialog: MatDialog, 
+    private route: ActivatedRoute, 
+    private router : Router, 
+    private location : Location
+  ) {
+    this.route.queryParams.subscribe(params => {
+      this.tab = params['tab'] || ""; 
+      let idx = this.tabs.findIndex(x => x.toLowerCase() == this.tab.toLowerCase()); 
+      this.selectedIndex = idx;
+  });
+   }
 
   ngOnInit() {
+   //  this.router.routeReuseStrategy.shouldReuseRoute = () => false;
+
     this.currentUser = this.auth.currentUserValue;
     this.getMyAppointments();
+    this.getMyMessages();
   }
 
   getMyAppointments(){
@@ -40,6 +66,28 @@ export class MyComponent implements OnInit {
 
     this.api.get("/appointment/my", params).then(result => {
       this.myAppointments = result;
+    }).catch(err => {
+      this._snackBar.open("Uups - es scheint etwas schief gelaufen zu sein.", "", {
+        duration: 2000,
+      });
+    })
+  }
+
+  getMyMessages(){
+
+    let params = {};
+
+    this.api.get("/message/my", params).then((result : any) => {
+      let messages = result.messages || [];
+
+      this.myPrescriptionRequests = [];
+
+      messages.forEach(element => {
+        if (element.medications){
+          this.myPrescriptionRequests.push(element);
+        }
+      });
+
     }).catch(err => {
       this._snackBar.open("Uups - es scheint etwas schief gelaufen zu sein.", "", {
         duration: 2000,
@@ -147,6 +195,84 @@ export class MyComponent implements OnInit {
       });
     }
 
+  }
+
+  openMessageDialog(type, messageDataObject=null) : void {
+
+    if (this.auth.isAuthorized()){
+
+      if (this.auth.isAuthorized()){
+        if (!this.auth.currentUserValue.validated){
+          this._snackBar.open("Bitte verifizieren Sie ihr Konto bevor Sie digitale Dienste nutzen können. Prüfen Sie ihr Postfach oder gehen Sie auf 'myFFA'", "OK", {
+            duration: 10000
+          })
+          return;
+        }
+      }
+      
+      const dialogRef = this.dialog.open(GenmessageComponent, {
+        data: {type : type, messageData : messageDataObject},
+        panelClass : "generalmessage-dialog"
+      });
+    
+      dialogRef.afterClosed().subscribe((resultObj : any) => {
+        if (resultObj){
+          this.getMyMessages();
+        }
+      });
+
+    }else{
+
+     const dialogRef = this.dialog.open(LoginComponent, {
+        data: {},
+        panelClass : "login-dialog"
+      });
+
+      dialogRef.afterClosed().subscribe((resultData : any) => {
+        if (resultData){
+          this.openMessageDialog(type, messageDataObject);
+        }
+      });
+
+    }
+
+  }
+
+  newPrescriptionRequest(prescriptionRequest=null){
+    this.openMessageDialog("prescription", prescriptionRequest);
+  }
+
+  getListMedis(prescriptionRequest){
+    if (prescriptionRequest.medications){
+      let outString = "";
+      prescriptionRequest.medications.forEach(element => {
+        if (outString.length > 0){
+          outString += ", ";
+        }
+        outString += element.name;
+      });
+
+      return outString;
+
+    }
+  }
+
+  updateUrl(tab){
+
+    const url = this.router
+        .createUrlTree([], {
+          relativeTo: this.route,
+          queryParams: { tab: tab },
+          
+          queryParamsHandling: 'merge'}
+        )
+        .toString();
+
+      this.location.go(url);
+  }
+
+  tabChanged(evt){
+    this.updateUrl(evt.tab.textLabel.toLowerCase())
   }
 
 }

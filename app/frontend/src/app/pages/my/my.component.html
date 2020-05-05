@@ -18,7 +18,7 @@
             myFFA
         </h1>
     
-        <mat-tab-group>
+        <mat-tab-group [selectedIndex]="selectedIndex" (selectedTabChange)="tabChanged($event)">
     
             <mat-tab label="Profil" > 
                 <div class="content profile" *ngIf="currentUser">
@@ -139,9 +139,117 @@
                 
 
             </mat-tab>
-            <mat-tab label="Rezepte" *ngIf="false">
+            <mat-tab label="Rezeptanfragen" >
+
+                <div class="prescriptions">
+                    <div class="content-header ">
+                        <button class="newBtn" mat-button matSuffix mat-stroked-button (click)="newPrescriptionRequest()" >
+                            Neue Rezeptanfrage
+                        </button> 
+                    </div>
+    
+                    <div class="no-data" *ngIf="myPrescriptionRequests.length < 1" >
+                            Sie haben noch keine Termine - klicken Sie auf das "+", um einen neuen Termin zu vereinbaren.
+                    </div>
+    
+                    <div class="content prescriptions" *ngIf="myPrescriptionRequests.length > 0">
+    
+                        <mat-accordion>
+                            <mat-expansion-panel *ngFor="let preq of myPrescriptionRequests; let i=index;" class="prescriptions-item">
+                                <mat-expansion-panel-header>
+                                    <mat-panel-title>
+                                        {{preq.sendDate  | date:'longDate':'de'}} <span class="prescription-time">{{preq.sendDate | date:'shortTime':'de'}}</span>
+                                    </mat-panel-title>
+                                    <mat-panel-description>
+
+                                        <span class="medis-list">{{getListMedis(preq)}} </span>
+                                        
+                                        <span *ngIf="preq.flagCollectFromPractice">
+                                            (Praxisabholung)
+                                        </span>
+                                        <mat-icon *ngIf="preq.flagCollectFromPractice">local_hospital</mat-icon>
+                                        
+
+                                        <span *ngIf="!preq.flagCollectFromPractice">
+                                            (Apotheke)
+                                        </span>
+                                        <mat-icon *ngIf="!preq.flagCollectFromPractice">add_location</mat-icon>
+
+                                    </mat-panel-description>
+                                </mat-expansion-panel-header>
+
+                            <div class="prescriptions-content">
+                                                                                
+                                    <div class="form-group" *ngIf="!preq.flagCollectFromPractice">
+                                        <mat-form-field >
+                                            <input required matInput type="text" placeholder="Apotheken-Abholung" class="form-control" [ngModel]="preq.collectDrugStore" readonly>
+                                        </mat-form-field>
+                                    </div>
+
+                                    <div class="medications-table-mobile" *ngFor="let m of preq.medications; let i=index;">
+                                        <div class="name">
+                                            {{m.name}}
+                                        </div>
+                                        <div class="details">
+                                            {{m.substance}} | {{m.amount}} | {{m.dose}} | {{m.dosageform}}
+                                        </div>
+                                    </div>
+                            
+                                    <table mat-table [dataSource]="preq.medications" class="medication-table">
+                                        
+                                        <ng-container matColumnDef="name">
+                                            <th mat-header-cell *matHeaderCellDef> Name </th>
+                                            <td mat-cell *matCellDef="let element"> {{element.name}} </td>
+                                        </ng-container>
+                                        
+                                        <ng-container matColumnDef="amount">
+                                            <th mat-header-cell *matHeaderCellDef> Anz. </th>
+                                            <td mat-cell *matCellDef="let element"> {{element.amount}} </td>
+                                        </ng-container>
+                                        
+                                        <ng-container matColumnDef="substance">
+                                            <th mat-header-cell *matHeaderCellDef> Wirkstoff </th>
+                                            <td mat-cell *matCellDef="let element"> {{element.substance}} </td>
+                                        </ng-container>
+                                        
+                                        <ng-container matColumnDef="dose">
+                                            <th mat-header-cell *matHeaderCellDef> Dosis </th>
+                                            <td mat-cell *matCellDef="let element"> {{element.dose}} </td>
+                                        </ng-container>
+
+                                        <ng-container matColumnDef="pzn">
+                                            <th mat-header-cell *matHeaderCellDef> PZN </th>
+                                            <td mat-cell *matCellDef="let element"> {{element.pzn}} </td>
+                                        </ng-container>
+
+                                        <ng-container matColumnDef="dosageform">
+                                            <th mat-header-cell *matHeaderCellDef> Darreichungsform </th>
+                                            <td mat-cell *matCellDef="let element"> {{element.dosageform}} </td>
+                                        </ng-container>
+                                        
+                                        <tr mat-header-row *matHeaderRowDef="mediDisplayColumns"></tr>
+                                        <tr mat-row *matRowDef="let row; columns: mediDisplayColumns;"></tr>
+                                    </table>
+                                        
+
+                                    <div class="buttons">
+                                       
+                                        <button class="saveBtn floatright"  mat-button matSuffix mat-stroked-button (click)="newPrescriptionRequest(preq)">
+                                            Erneut anfordern
+                                        </button>
+                
+                                    </div>
+
+                            </div>
+
+                            </mat-expansion-panel>
+                        </mat-accordion>
+    
+                    </div>
+                </div>
 
             </mat-tab>
+
             <mat-tab label="Einstellungen" *ngIf="false" >
 
                 <mat-accordion>

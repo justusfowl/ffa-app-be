@@ -436,6 +436,15 @@
                             <mat-icon>videocam</mat-icon> Video-Termin vereinbaren
                         </button>
 
+                        <button 
+                            *ngIf="auth.isAuthorized()"
+                            matTooltip="Nutzen Sie Ihre vorherigen Rezeptanfragen bequem erneut." 
+                            class="history-prescription-btn" mat-raised-button color="primary" 
+                            (click)="goToMyPrescriptions()"
+                            >
+                            <mat-icon>local_hospital</mat-icon> Historie meiner Rezeptbestellungen
+                        </button>
+
 
                     </div>
                 </div> <!-- end of col -->
