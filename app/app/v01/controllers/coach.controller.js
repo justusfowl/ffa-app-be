@@ -216,7 +216,6 @@ function autoCompleteSessionObj(sessionObj){
                     }
                 }
 
-
             }
             
         }
@@ -265,8 +264,6 @@ function getNextQuestion(sessionObj){
         sessionObj.complete = true;
         sessionObj.progress = 1;
     }
-
-    console.log(sessionObj)
 
     return sessionObj;
 
@@ -385,7 +382,9 @@ function createInputVector(userObj, sessionObj){
   }
 
   Object.keys(userObj).forEach(element => {
-    inputVector[element] = userObj[element];
+    if (!Array.isArray(userObj[element])){
+      inputVector[element] = userObj[element];
+    }
   });
 
   sessionObj.questions.forEach(element => {
@@ -421,8 +420,10 @@ async function getWellbeingEvaluation(userId, sessionObj){
 
     let userObj = await profileCtrl.asyncGetUserProfile(userId);
 
+    let inputVector = createInputVector(userObj, sessionObj);
+
     let requestBody = {
-        inputVector: createInputVector(userObj, sessionObj)
+        "inputVector": inputVector
     };
 
     request({
@@ -438,7 +439,8 @@ async function getWellbeingEvaluation(userId, sessionObj){
             "score" : body["GZmehm01_score"], 
             "evalDate" : body["evalDate"], 
             "evalDetails" : body["evalDetails"], 
-            "suggestions" : body["suggestions"]
+            "suggestions" : body["suggestions"], 
+            "inputVector" : inputVector
           };
 
           resolve(response);

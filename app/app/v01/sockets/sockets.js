@@ -291,9 +291,7 @@ sockets.init = function (server) {
 
         let error;
 
-        let sessionObj = coachCtrl.getNextQuestion(inputSessionObj).catch(err => {
-          error = err;
-        });
+        let sessionObj = coachCtrl.getNextQuestion(inputSessionObj);
 
         if (sessionObj.complete){
 
