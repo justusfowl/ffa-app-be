@@ -297,8 +297,7 @@ sockets.init = function (server) {
 
           socket.emit('loading', {isLoading: true});
 
-          let flagValidEval = true;
-          
+          let flagValidEval = true;          
 
           let evaluation = await coachCtrl.getWellbeingEvaluation(socket.userId, sessionObj).catch(err => {
             flagValidEval = false;

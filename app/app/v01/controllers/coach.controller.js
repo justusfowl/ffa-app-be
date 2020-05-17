@@ -465,6 +465,14 @@ async function storeSession(userId, inSessionObj){
     delete sessionObj._id
   }
 
+  if (sessionObj.evaluation){
+    let date = new Date();
+    if (typeof(sessionObj.evaluation["evalDate"]) == "undefined"){
+      date = new Date(sessionObj.evaluation["evalDate"])
+    }
+    sessionObj.evaluation["evalDate"] = date;
+  }
+
  return new Promise ((resolve, reject) => {
   try{
 
@@ -528,7 +536,7 @@ function getSessions(req, res){
 
           collection.find({
             "userId" : userId
-          }).toArray(function(error, result){
+          }).sort( { date: -1 } ).toArray(function(error, result){
               if (error){
                   throw err;
               }
@@ -543,36 +551,73 @@ function getSessions(req, res){
   }
 }
 
-function loadSession(req, res){
+function _getSessionObj(userId, sessionId){
+  return new Promise((resolve, reject) => {
+
+    try{
+
+      MongoClient.connect(MongoUrl, function(err, db) {
+  
+            if (err) throw err;
+            
+            let dbo = db.db(config.mongodb.database);
+  
+            const collection = dbo.collection('coach');
+  
+            collection.findOne({
+              "userId" : userId, 
+              "_id" : ObjectID(sessionId)
+            }, function(error, result){
+                if (error){
+                  reject(err);
+                }else{
+                  resolve(result);
+                }
+            });
+          });
+  
+    }catch(error){
+        console.error(error.stack);
+        reject(error);
+    }
+  })
+}
+
+async function loadSession(req, res){
   let userId = req.userId;
   let sessionId = req.params.sessionId;
 
+  let flagReEvaluate = req.query.reevaluate;
+
   try{
 
-    MongoClient.connect(MongoUrl, function(err, db) {
+    let sessionObj = await _getSessionObj(userId, sessionId).catch(err => {
+      throw err;
+    });
 
-          if (err) throw err;
-          
-          let dbo = db.db(config.mongodb.database);
+    if (flagReEvaluate){
+      
+      let evaluation = await getWellbeingEvaluation(userId, sessionObj).catch(err => {
+        flagValidEval = false;
+        error = err;
+      });
 
-          const collection = dbo.collection('coach');
+      sessionObj.evaluation = evaluation;
 
-          collection.findOne({
-            "userId" : userId, 
-            "_id" : ObjectID(sessionId)
-          }, function(error, result){
-              if (error){
-                  throw err;
-              }
-              res.json(result)
-          });
-              
-        });
+      let s = await storeSession(userId, sessionObj).catch(err => {
+        throw err;
+      });
 
-  }catch(error){
-      console.error(error.stack);
-      res.send(403, "Something went wrong getting the sessions.");
+      res.json(sessionObj);
+
+    }else{
+      res.json(sessionObj);
+    }
+  }catch(err){
+    res.send(403, "Something went wrong getting the sessions.");
   }
+
+
 }
 
 function deleteSession(req, res){
