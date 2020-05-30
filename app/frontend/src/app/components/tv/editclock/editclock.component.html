@@ -9,7 +9,7 @@
             <mat-chip
             *ngFor="let tz of timezones" 
             [selectable]="selectable"
-            [removable]="removable"
+            [removable]="true"
             (removed)="remove(tz)">
             {{tz.timeZone}}
             <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>

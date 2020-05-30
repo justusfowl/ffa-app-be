@@ -1,4 +1,13 @@
 
+
+#tmp_canvas_video_snap,
+#tmp_video_video_snap{
+    max-width: 200px;
+    max-height: 200px;
+    display: none;
+}
+
+
 .playlist-container{
     .new-playlist{
         margin-top: 30px;
@@ -192,6 +201,10 @@
     right: 70px;
 }
 
+.box .mute{
+    right: 70px;
+}
+
 .box .remove{
     right: 20px;
 }
@@ -241,6 +254,16 @@
             width: 400px;
             max-width: 80%;
         }
+        
+        .main.quote{
+            font-style: italic;
+            display: block;
+            width: 500px;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+
         .subtitle{
             color: gray;
         }
@@ -250,7 +273,8 @@
 }
 
 .box:hover{
-    .edit, 
+    .edit,
+    .mute,
     .remove,
     .item-upload{
         opacity: 1;
@@ -303,6 +327,16 @@
         padding: 20px;
         border-radius: 4px;
         margin: 20px;
+
+        .online{
+            color: rgb(39, 116, 39); 
+            font-weight: 600;
+        }
+
+        .offline{
+            color: rgb(131, 24, 24);
+            font-weight: 600;
+        }
 
         .wrapper{
             display: flex;

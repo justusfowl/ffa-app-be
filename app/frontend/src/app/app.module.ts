@@ -51,6 +51,8 @@ import { TVHomeComponent } from './pages/tv/tvhome/tvhome.component';
 import { LivedataService } from './services/livedata.service';
 import { AdminaddvideoappointmentComponent } from './components/adminaddvideoappointment/adminaddvideoappointment.component';
 import { EditclockComponent } from './components/tv/editclock/editclock.component';
+import { EditquoteComponent } from './components/tv/editquote/editquote.component';
+import { EditweatherComponent } from './components/tv/editweather/editweather.component';
 
 const cookieConfig:NgcCookieConsentConfig = {
   cookie: {
@@ -102,7 +104,10 @@ const config: SocketIoConfig = { url: environment.apiProtocol + '://' + environm
     GenmessageComponent, 
     AdduserComponent, 
     TVHomeComponent, 
-    AdminaddvideoappointmentComponent, EditclockComponent
+    AdminaddvideoappointmentComponent, 
+    EditclockComponent, 
+    EditquoteComponent, 
+    EditweatherComponent
   ],
   imports: [
     HttpClientModule,
@@ -147,7 +152,9 @@ const config: SocketIoConfig = { url: environment.apiProtocol + '://' + environm
     GenmessageComponent,
     AdduserComponent, 
     AdminaddvideoappointmentComponent, 
-    EditclockComponent
+    EditclockComponent,
+    EditquoteComponent,
+    EditweatherComponent
   ]
 })
 export class AppModule { }

@@ -1,0 +1,28 @@
+
+.edit-quote-dialog-container{
+    .types-chip-list{
+        width: 100%;
+    }
+}
+
+@media(max-width: 550px){
+    .edit-quote-dialog-container{
+        min-width: 100vw;    
+    }
+}
+
+@media(min-width: 551px){
+    .edit-quote-dialog-container{
+        min-width: 350px;
+    }
+}
+
+#requestForm{
+    mat-form-field{
+        width: 100%;
+    }
+
+    textarea{
+        height: 150px;
+    }
+}

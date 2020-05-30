@@ -10,6 +10,8 @@ import { EditclockComponent } from 'src/app/components/tv/editclock/editclock.co
 import VideoSnapshot from 'video-snapshot';
 
 import * as LZString from 'lz-string';
+import { EditquoteComponent } from 'src/app/components/tv/editquote/editquote.component';
+import { EditweatherComponent } from 'src/app/components/tv/editweather/editweather.component';
 
 @Component({
   selector: 'app-tvhome',
@@ -35,12 +37,14 @@ export class TVHomeComponent implements OnInit {
     {
       "type" : "feed", 
       "title" : "RSS Feed",
-      "icon": "rss_feed"
+      "icon": "rss_feed", 
+      "avatar" : "/assets/images/news.jpg"
     },
     {
       "type" : "quote", 
       "title" : "Zitat",
-      "icon": "format_quote"
+      "icon": "format_quote", 
+      "avatar" : "/assets/images/open_book.jpg"
     },
     {
       "type" : "clock", 
@@ -51,7 +55,8 @@ export class TVHomeComponent implements OnInit {
     {
       "type" : "weather", 
       "title" : "Wetter",
-      "icon": "wb_sunny"
+      "icon": "wb_sunny", 
+      "avatar" : "/assets/images/weather.jpg"
     },
     {
       "type" : "designer", 
@@ -65,9 +70,11 @@ export class TVHomeComponent implements OnInit {
   ];
 
   devices : any[] = [];
-
+  
   newUploadFile : File;
-  allowedUploadTypes : any = {"image" : ["jpeg", "jpg", "png" ], "video" : ["mp4", "ogg"]}
+  allowedUploadTypes : any = {"image" : ["jpeg", "jpg", "png" ], "video" : ["mp4", "ogg"]};
+
+  tmpvideosrc : any; 
 
   newDeviceForm : FormGroup = new FormGroup({
     title : new FormControl("", Validators.required), 
@@ -292,13 +299,43 @@ export class TVHomeComponent implements OnInit {
     this.livedata.send("device:reload", {device: deviceObj});
   }
 
+  toggleMute(item){
+    if (item.mute){
+      item.mute = false;
+    }else{
+      item.mute = true;
+    }
+  }
+
   editItem(item){
+
     if (item.type.type == 'clock'){
 
       const dialogRef = this.dialog.open(EditclockComponent, {
         data: {item : item}, 
         panelClass : "edit-clock-dialog"
       });
+    }else if (item.type.type == 'quote'){
+
+      const dialogRef = this.dialog.open(EditquoteComponent, {
+        data: {item : item.quote || null}, 
+        panelClass : "edit-quote-dialog"
+      });
+
+      dialogRef.afterClosed().subscribe(resultItem => {
+        if (resultItem){
+          console.log(resultItem);
+         item["quote"] = resultItem;
+        }
+      });
+
+    }else if (item.type.type == 'weather'){
+
+      const dialogRef = this.dialog.open(EditweatherComponent, {
+        data: {item : item}, 
+        panelClass : "edit-weather-dialog"
+      });
+
     }
     
   }
@@ -319,7 +356,62 @@ export class TVHomeComponent implements OnInit {
     
   }
 
+  createSnapshot(file){
+    let self = this;
+    return new Promise(async (resolve, reject) => {
+      var reader = new FileReader();
+      reader.readAsDataURL(file);
+
+      reader.onload = function () {
+
+        self.tmpvideosrc = reader.result;
+
+        var video = document.getElementById('tmp_video_video_snap') as any;
+        var canvas = document.getElementById('tmp_canvas_video_snap') as any;
+        var context = canvas.getContext('2d');
+  
+        var w = 0 , h =0 , ratio = 0 as any;
+        //add loadedmetadata which will helps to identify video attributes......
+        video.addEventListener('loadeddata', function() {
+          video.currentTime = 3;
+
+          let maxWidth = 400;
+          
+
+          ratio = video.videoWidth / video.videoHeight as any;
+          w = video.videoWidth - 100 as any;
+          h = w  / ratio;
+
+          let scaleRatio = w/maxWidth;
+
+          canvas.width = maxWidth;
+          canvas.height = h/scaleRatio; 
+
+          setTimeout(function(){
+
+            context.fillRect(0, 0, maxWidth, h/scaleRatio);
+            context.drawImage(video, 0, 0, maxWidth, h/scaleRatio);
+  
+            var dataURL = canvas.toDataURL('image/jpeg', 0.5);
+  
+            resolve(dataURL)
+
+          }, 1000);
+        
+
+        }, false);
+
+      };
+      reader.onerror = function (error) {
+        reject(error);
+      };
+    })
+  }
+
   async handleFileUpload(item, files: FileList){
+
+    let self = this;
+
     this.newUploadFile = files.item(0);
 
     let ext = this.newUploadFile.type.substring(this.newUploadFile.type.indexOf("/")+1, this.newUploadFile.type.length).toLowerCase();
@@ -331,9 +423,13 @@ export class TVHomeComponent implements OnInit {
     }
 
     if (ext == 'mp4'){
-      const snapshoter = new VideoSnapshot(this.newUploadFile);
-      var previewSrc = await snapshoter.takeSnapshot();
-      // previewSrc = LZString.compress(previewSrc); 
+      let screenSnack = this._snackBar.open("Wir erstellen einen Snapshot des Videos", "", {});
+      var previewSrc = await this.createSnapshot(this.newUploadFile).catch(err => {
+        this._snackBar.open("Ups - leider ist etwas schief gelaufen mit dem Screenshot.", "", {});
+        console.error(err);
+      }) as any;
+
+      screenSnack.dismiss();
     }
     
     const formData: FormData = new FormData();
@@ -342,11 +438,17 @@ export class TVHomeComponent implements OnInit {
       formData.append('file', this.newUploadFile, this.newUploadFile.name);
     }
 
+    
     if (previewSrc){
-      formData.append("previewSrc", previewSrc);
+      formData.append("previewSrc", previewSrc); 
     }
+
+    let uploadSnack = this._snackBar.open("Upload...", "", {});
+    
     
     this.api.post("/general/content/tv", formData, true).then((res : any) => {
+
+      uploadSnack.dismiss();
 
       if (res.filePath){
         
@@ -368,12 +470,16 @@ export class TVHomeComponent implements OnInit {
 
    }).catch(err=>{
 
+    uploadSnack.dismiss();
+
      console.warn(err);
      this._snackBar.open("Etwas hat nicht geklappt", "", {
        duration: 1500
      });
 
    })
+   
+
 
   } 
 

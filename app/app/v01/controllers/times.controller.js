@@ -192,7 +192,7 @@ function updateOpenDay(req, res){
             dayObj,
             function(err, docs){
               if (err) throw err;
-              res.json(docs);
+              res.json(docs.result);
             });
   
         });
@@ -237,7 +237,7 @@ function upsertVacation(req, res){
             { upsert: true },
             function(err, docs){
               if (err) throw err;
-              res.json(docs);
+              res.json(docs.result);
             });
   
         });

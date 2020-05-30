@@ -116,7 +116,8 @@ sockets.init = function (server) {
 
           let updateObj = {
             "_id" : socket.device._id, 
-            "socketId" : socket.id
+            "socketId" : socket.id,
+            "online" : true
           };
 
           await deviceCtrl.updateDeviceDatabase(updateObj).then(result => {
@@ -134,8 +135,27 @@ sockets.init = function (server) {
         }
         
       },
-      disconnect: (socket) => {
+      disconnect: async (socket) => {
         console.log(`Socket ${socket.id} disconnected.`);
+
+        if (socket.device){
+
+          let updateObj = {
+            "_id" : socket.device._id, 
+            "socketId" : null,
+            "online" : false
+          };
+
+          await deviceCtrl.updateDeviceDatabase(updateObj).then(result => {
+            // 
+          }).catch(err => {
+            console.error(err);
+          });
+
+          socket.broadcast.emit('device:do-reload', {});
+
+        }
+
       },
       timeout: 1000
     });
@@ -205,6 +225,14 @@ sockets.init = function (server) {
           if (typeof(data.device) == "undefined"){
             return;
           }
+
+          let userId = socket.userId; 
+
+          let hasScope = await authCtrl.validateUserScope(userId, "admin");
+  
+          if (!hasScope){
+            return socket.emit('system:unauthorized', {});
+          }
   
           let device = data.device;
           let _id = device._id;
@@ -233,6 +261,13 @@ sockets.init = function (server) {
         try{
           if (typeof(data.device) == "undefined"){
             return socket.emit('device:remove-error', {"message" : "Please provide a device."});
+          }
+
+          let userId = socket.userId; 
+          let hasScope = await authCtrl.validateUserScope(userId, "admin");
+  
+          if (!hasScope){
+            return socket.emit('system:unauthorized', {});
           }
   
           let device = data.device;
@@ -269,6 +304,14 @@ sockets.init = function (server) {
 
       socket.on('device:reload', async function (data){
         try{
+
+          let userId = socket.userId; 
+          let hasScope = await authCtrl.validateUserScope(userId, "admin");
+  
+          if (!hasScope){
+            return socket.emit('system:unauthorized', {});
+          }
+
           let deviceSocketId = data.device.socketId;
           io.to(deviceSocketId).emit('device:reload', {});
         }catch(err){

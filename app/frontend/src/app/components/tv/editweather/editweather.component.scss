@@ -1,0 +1,50 @@
+
+.edit-weather-dialog-container{
+
+    .result-list{
+        .result-item{
+            display: flex; 
+            flex-direction: row;
+            justify-content: flex-start;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 5px;
+
+            .mdi{
+                padding-right: 10px;
+                font-size: 30px;
+            }
+
+            .item{
+                .name{
+                    color: black;
+                }
+
+                .description{
+                    color: gray;
+                }
+            }
+        }
+
+        .result-item:not(:last-child){
+            border-bottom: 1px solid #d7d7d7;
+        }
+
+        .result-item:active{
+            background-color: rgb(235, 235, 235);
+        }
+
+        .result-item:hover{
+            background-color: rgb(189, 189, 189);
+            cursor: pointer;
+        }
+    }
+
+    .result-info{
+        color: gray;
+        font-size: 12px;
+        text-align: center;
+    }
+
+}
+

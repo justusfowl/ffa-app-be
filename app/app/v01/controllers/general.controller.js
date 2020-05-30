@@ -2,7 +2,7 @@
 const config = require('../../config/config');
 var MongoClient = require('mongodb').MongoClient;
 var ObjectID = require('mongodb').ObjectID;
-
+var request = require('request');
 var MongoUrl = config.getMongoUrl();
 var path = require('path');
 var LZString = require('lz-string');
@@ -193,8 +193,6 @@ function uploadFile(req, res){
 
         var previewItem;
 
-      
-
         if (!fsEndPoint){
             throw new Error("No endpoint defined");
         }
@@ -210,7 +208,7 @@ function uploadFile(req, res){
         };
 
         if (body.previewSrc){
-            var base64Str = body.previewSrc; // LZString.decompress(body.previewSrc);
+            var base64Str = body.previewSrc;
 
             let filename =  uuid.v1();
 
@@ -231,6 +229,79 @@ function uploadFile(req, res){
     }
 }
 
+async function findCities(req, res){
+
+    try{
+
+        let backendConfig = await config.getBackendConfig();
+        let q = req.query.q;
+
+        if (typeof(backendConfig.tv.weatherAPIKey) == "undefined"){
+            return res.send(500, "Please provide an API key.")
+        }
+
+        if (!q){
+            return res.send(500, "Please provide a search string.");
+        }
+
+        request({
+            url: 'https://api.openweathermap.org/data/2.5/find?appid=' + backendConfig.tv.weatherAPIKey  + '&q=' + q + '&type=like&sort=population&cnt=30&lang=de',
+            method: 'GET',
+            json: true
+          }, function(error, response, body) {
+    
+            if (error || parseFloat(body.cod) != 200){
+                throw error;
+            }
+
+            console.log(body)
+            res.json(body);
+
+        });
+
+    }catch(err){
+        console.error(err);
+        res.send(500, "Something went wrong finding a City.")
+    }
+  
+}
+
+async function getWeatherFromLocation(req, res){
+
+    try{
+
+        let backendConfig = await config.getBackendConfig();
+        let lon = parseFloat(req.query.lon);
+        let lat = parseFloat(req.query.lat); 
+
+        if (typeof(backendConfig.tv.weatherAPIKey) == "undefined"){
+            return res.send(500, "Please provide an API key.")
+        }
+
+        if (!lon || !lat){
+            return res.send(500, "Please provide both LON and LAT coordinates.");
+        }
+
+        request({
+            url: 'https://api.openweathermap.org/data/2.5/onecall?appid=' + backendConfig.tv.weatherAPIKey  + '&lon=' + lon + '&lat=' + lat + '&lang=de&units=metric',
+            method: 'GET',
+            json: true
+          }, function(error, response, body) {
+    
+            if (error){
+                throw error;
+            }
+            res.json(body);
+
+        });
+
+    }catch(err){
+        console.error(err);
+        res.send(500, "Something went wrong finding a City.")
+    }
+  
+}
+
 
 module.exports = {
     getSettings, 
@@ -238,6 +309,9 @@ module.exports = {
     getConfig, 
     storeConfig,
     uploadFile,
+
+    findCities,
+    getWeatherFromLocation,
 
 
     testEmail

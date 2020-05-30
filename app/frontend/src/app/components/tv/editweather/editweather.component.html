@@ -1,0 +1,62 @@
+<div class="edit-weather-dialog-container">
+
+    <mat-form-field >
+
+        <mat-chip-list #chipList aria-label="selected locations"  *ngIf="selectedLocations.length > 0">
+            <mat-chip *ngFor="let l of selectedLocations" [selectable]="selectable"
+                    removable (removed)="removeItem()">
+            {{l.name}}
+            <mat-icon matChipRemove>cancel</mat-icon>
+            </mat-chip>
+        </mat-chip-list>
+        
+        <input type="text"
+            placeholder="Ort suchen..."
+            #searchVal
+            name="search"
+            matInput
+            (keydown.enter)="handleSearch(searchVal.value)"
+            [(ngModel)]="searchString" 
+            *ngIf="selectedLocations.length == 0"
+            >
+       
+    </mat-form-field>
+
+    <div class="result-list" *ngIf="selectedLocations.length == 0">
+
+        <div class="result-item" *ngFor="let result of searchResults; let i=index;" (click)="selectItem(result)">
+            <i [class]="getIconClass(result)"></i>
+            <div class="item">
+                <div class="name">
+                    {{result.name}} ({{result.sys.country}})
+                </div>
+                <div class="description" *ngIf="result.weather.length > 0">
+                    {{result.weather[0].description}} 
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <mat-progress-spinner
+        class="spinner"
+        color="primary"
+        mode="determinate"
+        *ngIf="loadingCities"
+        >
+
+    </mat-progress-spinner>
+
+    <div class="result-info" *ngIf="searchString.length > 0  && submitted">
+        {{searchResults.length}} Ergebnisse
+    </div>
+
+    <div class="buttons">
+
+        <button mat-button (click)="close()">
+            Schließen
+        </button>
+
+    </div>
+
+</div>

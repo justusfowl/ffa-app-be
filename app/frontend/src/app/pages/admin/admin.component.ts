@@ -754,7 +754,15 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy{
   }
 
   saveVacation(vacationObj){
-    this.api.put("/times/vacation", vacationObj, true).then(res => {
+    this.api.put("/times/vacation", vacationObj, true).then((res : any) => {
+      console.log(res);
+
+      if (typeof(vacationObj._id) == "undefined"){
+        if (res.upserted.length > 0){
+          vacationObj._id = res.upserted[0]._id;
+        }
+      }
+
       this.snackBar.open("Aktualisiert", "", {
         duration: 1500
       });
@@ -814,6 +822,12 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy{
 
   deleteVacation(vacationObj){
     if (!vacationObj._id){
+
+      let idx = this.vacation.findIndex(vacationObj);
+      if (idx > -1){
+        this.vacation.splice(idx, 1);
+      }
+
       return;
     }
 

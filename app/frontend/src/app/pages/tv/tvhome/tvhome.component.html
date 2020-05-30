@@ -17,6 +17,13 @@
         Wartezimmer-TV
     </h1>
 
+    <video id="tmp_video_video_snap" >
+        <ng-container *ngIf="tmpvideosrc">
+            <source  [src]="tmpvideosrc"/>
+        </ng-container>
+    </video>
+    <canvas id="tmp_canvas_video_snap" width="40" height="80"></canvas>
+
     <mat-tab-group>
 
         <mat-tab label="Playlisten"> 
@@ -82,15 +89,15 @@
                                 </div>
 
                                 <div class="details">
+
                                     <ng-container *ngIf="item.type.type == 'feed'" >
                                         <mat-form-field class="input-no-floating-header main" >
                                             <input  matInput  placeholder="https://" [(ngModel)]="item.RSSUrl">
                                             <mat-hint class="subtitle">{{item.title}}</mat-hint>
                                         </mat-form-field> 
-
                                     </ng-container>
                                     
-                                    <ng-container *ngIf="item.type.type != 'feed'" >
+                                    <ng-container *ngIf="item.type.type != 'feed' && !item.quote && !item.location" >
                                         <div class="main">
                                             {{item.title}}
                                         </div>
@@ -99,21 +106,49 @@
                                             {{item.subtitle}}
                                         </div>
                                     </ng-container>
+
+                                    <ng-container *ngIf="item.type.type == 'quote' && item.quote" >
+                                        <div class="main quote">
+                                            {{item.quote.quote}}
+                                        </div>
+    
+                                        <div class="subtitle">
+                                            {{item.quote.author}}
+                                        </div>
+                                    </ng-container>
+
+                                    <ng-container *ngIf="item.type.type == 'weather' && item.location" >
+                                        <div class="main">
+                                            {{item.location.name}} ({{item.location.sys.country}})
+                                        </div>
+    
+                                        <div class="subtitle">
+                                            Wetter
+                                        </div>
+                                    </ng-container>
                                     
                                 </div>
                             </div>
                             
                             <div class="item-upload" *ngIf="item.type.type == 'image' || item.type.type == 'video'">
+                                
                                 <div class="wrapper">
-                                        <button mat-stroked-button class="btn">
-                                            <mat-icon>cloud_upload</mat-icon>
-                                            Hochladen
-                                        </button>
-                                        <input class="item-upload-input" type="file" placeholder="Element hochladen" (change)="handleFileUpload(item, $event.target.files)">
+                                    
+                                    <button mat-stroked-button class="btn" [disabled]="newUploadFile">
+                                        <mat-icon>cloud_upload</mat-icon>
+                                        Hochladen
+                                    </button>
+                                    
+                                    <input class="item-upload-input" type="file" placeholder="Element hochladen" (change)="handleFileUpload(item, $event.target.files)">
                                 </div>
                             </div>
 
-                            <button class="edit endbtn" mat-icon-button (click)="editItem(item)" *ngIf="item.type.type == 'clock'">
+                            <button class="mute endbtn" mat-icon-button (click)="toggleMute(item)" *ngIf="item.type.type == 'video'">
+                                <mat-icon *ngIf="!item.mute">volume_up</mat-icon>
+                                <mat-icon *ngIf="item.mute">volume_off</mat-icon>
+                            </button>
+
+                            <button class="edit endbtn" mat-icon-button (click)="editItem(item)" *ngIf="item.type.type == 'clock' || item.type.type == 'quote' || item.type.type == 'weather'">
                                 <mat-icon>more_vert</mat-icon>
                             </button>
 
@@ -123,7 +158,7 @@
 
                             <mat-menu #changeDurationMenu="matMenu" class="changeDurationMenu">
                                 <button mat-menu-item (click)="changeDurationItem(item, d)" *ngFor="let d of durationOptions">
-                                    <span>{{d}}s</span>
+                                    <span>{{d}} s</span>
                                 </button>
                             </mat-menu>
 
@@ -201,7 +236,10 @@
                             <div class="title">
                                 <mat-form-field class="input-no-floating-header main" >
                                     <input  matInput  placeholder="Gerätename" [(ngModel)]="device.title">
-                                    <mat-hint>zugefügt am {{device.dateAdded | date:'medium'}}</mat-hint>
+                                    <mat-hint>zugefügt am {{device.dateAdded | date:'medium'}} | 
+                                        <span class="online" *ngIf="device.online">online</span> 
+                                        <span class="offline" *ngIf="!device.online">offline</span> 
+                                    </mat-hint>
                                 </mat-form-field> 
                             </div>
                         </div>
@@ -211,7 +249,7 @@
                                 <mat-icon>save</mat-icon>
                             </button>
 
-                            <button class="edit endbtn" mat-icon-button (click)="reloadScreen(device)">
+                            <button class="edit endbtn" mat-icon-button (click)="reloadScreen(device)" [disabled]="!device.online">
                                 <mat-icon>sync</mat-icon>
                             </button>
     

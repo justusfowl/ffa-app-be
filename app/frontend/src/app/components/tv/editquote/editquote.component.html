@@ -1,0 +1,53 @@
+<div class="edit-quote-dialog-container">
+
+    <form id="requestForm"  FormGroupDirective  [formGroup]="quoteForm"  data-toggle="validator" data-focus="false">
+        <mat-form-field>
+            <mat-label>Zitat</mat-label>
+            <textarea formControlName="quote" required type="text" matInput #messageObj maxlength="300" placeholder="Das Zitat"></textarea>
+            <mat-hint class="hint" align="end">{{quoteForm.value.quote.length}} / 300</mat-hint>
+        </mat-form-field>
+    
+        <mat-form-field >
+            <input  formControlName="author"  matInput type="text" placeholder="Autor" class="form-control" required>
+            <mat-error  *ngIf="quoteForm.get('author').hasError('required')" >Bitte Author eintragen.</mat-error>
+        </mat-form-field>
+    </form>
+    
+    <mat-form-field class="types-chip-list" *ngIf="false">
+        <mat-chip-list #chipList aria-label="Quote-Typ Selection">
+            <mat-chip
+            *ngFor="let type of quoteTypes" 
+            [selectable]="selectable"
+            [removable]="removable"
+            (removed)="remove(type)">
+            {{type}}
+            <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
+            </mat-chip>
+            <input
+            placeholder="Zitat-Typen..."
+            #typeInput
+            [formControl]="typeControl"
+            [matAutocomplete]="auto"
+            [matChipInputFor]="chipList"
+            [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+            (matChipInputTokenEnd)="add($event)">
+        </mat-chip-list>
+        <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
+            <mat-option *ngFor="let types of filteredTypes | async" [value]="types">
+            {{types}}
+            </mat-option>
+        </mat-autocomplete>
+    </mat-form-field>
+
+    <div class="buttons">
+
+        <button mat-button (click)="close()">
+            Schließen
+        </button>
+        <button mat-button (click)="save()" [disabled]="!quoteForm.valid">
+            Speichern
+        </button>
+
+    </div>
+
+</div>

@@ -68,4 +68,13 @@ router.route('/config/:configObjId')
 router.route('/content/tv')
     .post([tokenValidator.detectToken, middlware_hasScopeAdminTV, upload.single('file')], generalCtrl.uploadFile)
 
+router.route('/content/tv/weather')
+    .get([tokenValidator.detectToken], generalCtrl.getWeatherFromLocation)
+
+router.route('/content/tv/weather/find')
+    .get([tokenValidator.detectToken, middlware_hasScopeAdminTV], generalCtrl.findCities)
+
+
+    
+
 module.exports = router;
