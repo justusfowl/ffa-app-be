@@ -12,32 +12,6 @@
             <mat-error  *ngIf="quoteForm.get('author').hasError('required')" >Bitte Author eintragen.</mat-error>
         </mat-form-field>
     </form>
-    
-    <mat-form-field class="types-chip-list" *ngIf="false">
-        <mat-chip-list #chipList aria-label="Quote-Typ Selection">
-            <mat-chip
-            *ngFor="let type of quoteTypes" 
-            [selectable]="selectable"
-            [removable]="removable"
-            (removed)="remove(type)">
-            {{type}}
-            <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
-            </mat-chip>
-            <input
-            placeholder="Zitat-Typen..."
-            #typeInput
-            [formControl]="typeControl"
-            [matAutocomplete]="auto"
-            [matChipInputFor]="chipList"
-            [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
-            (matChipInputTokenEnd)="add($event)">
-        </mat-chip-list>
-        <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
-            <mat-option *ngFor="let types of filteredTypes | async" [value]="types">
-            {{types}}
-            </mat-option>
-        </mat-autocomplete>
-    </mat-form-field>
 
     <div class="buttons">
 

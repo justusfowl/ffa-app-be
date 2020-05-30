@@ -40,7 +40,9 @@ export class EditweatherComponent implements OnInit {
       "code" : 8, 
       "iconClass" : "mdi-weather-cloudy"
     }
-  ]
+  ];
+
+  selectable : boolean = true;
 
   searchString : string = "";
   searchStringCopy : string = "";
