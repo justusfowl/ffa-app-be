@@ -189,7 +189,8 @@ sockets.init = function (server) {
             "title" : title, 
             "deviceId" : deviceDetails.deviceId, 
             "dateAdded" : new Date(), 
-            "socketId" : deviceSocketId
+            "socketId" : deviceSocketId, 
+            "online" : true
           };
 
           await deviceCtrl.addDevice(deviceObj, socket.userId).then(result => {

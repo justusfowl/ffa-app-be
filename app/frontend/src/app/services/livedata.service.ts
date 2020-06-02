@@ -21,8 +21,6 @@ export class LivedataService implements OnDestroy {
 
 
     this.currentUserSubscription = this.auth.currentUser.subscribe(userObject => {
-        console.log("authenticated"); 
-        console.log(userObject)
         if (userObject){
             this.initService();
         }else{

@@ -221,6 +221,11 @@ function uploadFile(req, res){
             responseObj["avatarPath"] = config.getPubExposedDirUrl() + fsEndPoint + filename + ".jpeg";
         }
 
+        if (body.duration){
+            responseObj["duration"] = parseInt(body.duration).toFixed(); 
+            responseObj["videoDuration"] = parseInt(body.duration).toFixed(); 
+        }
+
         res.json(responseObj);
 
     }catch(err){

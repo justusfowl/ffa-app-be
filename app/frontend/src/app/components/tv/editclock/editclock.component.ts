@@ -8,7 +8,6 @@ import { Observable } from 'rxjs';
 
 import * as moment from 'moment-timezone';
 
-
 @Component({
   selector: 'app-editclock',
   templateUrl: './editclock.component.html',
@@ -20,7 +19,6 @@ export class EditclockComponent implements OnInit {
   @ViewChild('auto', {static : true}) matAutocomplete: MatAutocomplete;
 
   displayItem : any;
-
   visible = true;
   selectable = true;
   removable = true;

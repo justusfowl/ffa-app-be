@@ -1,0 +1,13 @@
+.edit-media-dialog-container{
+    display: flex;
+    flex-direction: column;
+    
+    .form-group{
+
+        min-width: 350px;
+
+        input{
+            width: 100%;
+        }
+    }
+}

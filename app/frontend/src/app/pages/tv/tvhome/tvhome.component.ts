@@ -12,6 +12,7 @@ import VideoSnapshot from 'video-snapshot';
 import * as LZString from 'lz-string';
 import { EditquoteComponent } from 'src/app/components/tv/editquote/editquote.component';
 import { EditweatherComponent } from 'src/app/components/tv/editweather/editweather.component';
+import { EditmediaComponent } from 'src/app/components/tv/editmedia/editmedia.component';
 
 @Component({
   selector: 'app-tvhome',
@@ -133,7 +134,9 @@ export class TVHomeComponent implements OnInit {
         }
 
         this._snackBar.open("Gerät gelöscht.", "", { duration: 1500 });
-    }); 
+    });
+
+
    }
 
   ngOnInit() {
@@ -264,9 +267,11 @@ export class TVHomeComponent implements OnInit {
     return duration;
   }
 
-  addDevice(event){
+  addDevice(event?){
 
-    event.stopPropagation();
+    if (event){
+      event.stopPropagation();
+    }
 
     let addObj = this.newDeviceFormValue;
     addObj.pin = addObj.pin.toUpperCase();
@@ -336,6 +341,13 @@ export class TVHomeComponent implements OnInit {
         panelClass : "edit-weather-dialog"
       });
 
+    }else if (item.type.type == 'video' || item.type.type == 'image'){
+
+      const dialogRef = this.dialog.open(EditmediaComponent, {
+        data: {item : item}, 
+        panelClass : "edit-media-dialog"
+      });
+
     }
     
   }
@@ -375,6 +387,7 @@ export class TVHomeComponent implements OnInit {
         video.addEventListener('loadeddata', function() {
           video.currentTime = 3;
 
+
           let maxWidth = 400;
           
 
@@ -393,8 +406,13 @@ export class TVHomeComponent implements OnInit {
             context.drawImage(video, 0, 0, maxWidth, h/scaleRatio);
   
             var dataURL = canvas.toDataURL('image/jpeg', 0.5);
+
+            let response = {
+              "dataURL" : dataURL, 
+              "duration" : video.duration
+            };
   
-            resolve(dataURL)
+            resolve(response)
 
           }, 1000);
         
@@ -423,11 +441,14 @@ export class TVHomeComponent implements OnInit {
     }
 
     if (ext == 'mp4'){
-      let screenSnack = this._snackBar.open("Wir erstellen einen Snapshot des Videos", "", {});
-      var previewSrc = await this.createSnapshot(this.newUploadFile).catch(err => {
+      let screenSnack = this._snackBar.open("Bitte warten, wir verarbeiten das Video...", "", {});
+      let videoPreProcResponse = await this.createSnapshot(this.newUploadFile).catch(err => {
         this._snackBar.open("Ups - leider ist etwas schief gelaufen mit dem Screenshot.", "", {});
         console.error(err);
       }) as any;
+
+      var previewSrc = videoPreProcResponse.dataURL; 
+      var videoDuration = videoPreProcResponse.duration;
 
       screenSnack.dismiss();
     }
@@ -441,6 +462,10 @@ export class TVHomeComponent implements OnInit {
     
     if (previewSrc){
       formData.append("previewSrc", previewSrc); 
+    }
+
+    if (videoDuration){
+      formData.append("duration", videoDuration); 
     }
 
     let uploadSnack = this._snackBar.open("Upload...", "", {});
@@ -458,6 +483,8 @@ export class TVHomeComponent implements OnInit {
         }else if (item.type.type == 'video'){
           item.videoFullPath = res.filePath;
           item.type.avatar = res.avatarPath;
+          item.duration = res.duration;
+          item.videoDuration = res.videoDuration;
         }
         
       }

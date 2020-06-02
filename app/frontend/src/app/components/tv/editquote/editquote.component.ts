@@ -35,7 +35,7 @@ export class EditquoteComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) public data: any, 
     private snackBar : MatSnackBar
   ) {
-    console.log(data.item);
+   
     if (data.item){
       this.quoteItem = data.item;
     }else{
@@ -46,6 +46,7 @@ export class EditquoteComponent implements OnInit {
       startWith(null),
       map((type: string | null) => type ? this._filter(type) : this.allQuoteTypes.slice()));
 
+      
    }
 
   ngOnInit() {

@@ -53,6 +53,7 @@ import { AdminaddvideoappointmentComponent } from './components/adminaddvideoapp
 import { EditclockComponent } from './components/tv/editclock/editclock.component';
 import { EditquoteComponent } from './components/tv/editquote/editquote.component';
 import { EditweatherComponent } from './components/tv/editweather/editweather.component';
+import { EditmediaComponent } from './components/tv/editmedia/editmedia.component';
 
 const cookieConfig:NgcCookieConsentConfig = {
   cookie: {
@@ -107,7 +108,8 @@ const config: SocketIoConfig = { url: environment.apiProtocol + '://' + environm
     AdminaddvideoappointmentComponent, 
     EditclockComponent, 
     EditquoteComponent, 
-    EditweatherComponent
+    EditweatherComponent, 
+    EditmediaComponent
   ],
   imports: [
     HttpClientModule,
@@ -154,7 +156,8 @@ const config: SocketIoConfig = { url: environment.apiProtocol + '://' + environm
     AdminaddvideoappointmentComponent, 
     EditclockComponent,
     EditquoteComponent,
-    EditweatherComponent
+    EditweatherComponent, 
+    EditmediaComponent
   ]
 })
 export class AppModule { }

@@ -148,7 +148,8 @@
                                 <mat-icon *ngIf="item.mute">volume_off</mat-icon>
                             </button>
 
-                            <button class="edit endbtn" mat-icon-button (click)="editItem(item)" *ngIf="item.type.type == 'clock' || item.type.type == 'quote' || item.type.type == 'weather'">
+                            <button class="edit endbtn" mat-icon-button (click)="editItem(item)" 
+                                    *ngIf="item.type.type == 'clock' || item.type.type == 'quote' || item.type.type == 'weather' || item.type.type == 'image' || item.type.type == 'video'">
                                 <mat-icon>more_vert</mat-icon>
                             </button>
 
@@ -160,6 +161,11 @@
                                 <button mat-menu-item (click)="changeDurationItem(item, d)" *ngFor="let d of durationOptions">
                                     <span>{{d}} s</span>
                                 </button>
+                                <button class="video-duration" mat-menu-item (click)="changeDurationItem(item, item.videoDuration)" *ngIf="item.videoDuration">
+                                    <mat-icon>video_library</mat-icon>
+                                    <span>{{item.videoDuration | number:'1.0-0'}} s</span>
+                                </button>
+
                             </mat-menu>
 
                         </div>
@@ -199,15 +205,17 @@
                             <mat-icon>add</mat-icon>
                         </button>
 
-                        <mat-menu #addDeviceMenu="matMenu" class="addDeviceMenu">
-                            <form class="addDeviceMenu-form" [formGroup]="newDeviceForm">
+                        <mat-menu #addDeviceMenu="matMenu" class="addDeviceMenu" >
+                            <form class="addDeviceMenu-form" [formGroup]="newDeviceForm" (click)="$event.stopPropagation()">
                                 <mat-form-field >
                                     <input matInput placeholder="Gerätename" class="title" formControlName="title" (click)="$event.stopPropagation()">
                                     <mat-error *ngIf="newDeviceForm.get('title').hasError('required')" >Bitte Gerätenamen eintragen.</mat-error>
                                 </mat-form-field>
 
                                 <mat-form-field >
-                                    <input matInput placeholder="PIN" class="pin" formControlName="pin" maxlength="4" (click)="$event.stopPropagation()">
+                                    <input matInput placeholder="PIN" class="pin" formControlName="pin" maxlength="4" (click)="$event.stopPropagation()" 
+                                    (keydown.enter)="addDevice($event)"
+                                    >
                                     <mat-error *ngIf="newDeviceForm.get('pin').hasError('required')" >Bitte PIN eintragen.</mat-error>
                                 </mat-form-field>
 

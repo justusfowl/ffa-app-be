@@ -1,0 +1,27 @@
+<div class="edit-media-dialog-container">
+
+    <mat-form-field class="form-group" >
+        <input matInput placeholder="Titel" class="form-item" [(ngModel)]="mediaItem.title" >
+    </mat-form-field>
+
+    <mat-form-field class="form-group">
+        <input matInput placeholder="Untertitel" class="form-item" [(ngModel)]="mediaItem.subtitle">
+    </mat-form-field>
+
+    <mat-form-field class="form-group">
+        <input matInput placeholder="Quellen-Angaben" class="form-item" [(ngModel)]="mediaItem.source">
+    </mat-form-field>
+
+    <mat-form-field class="form-group">
+        <input matInput placeholder="Quelle-Link" class="form-item" [(ngModel)]="mediaItem.sourceUrl">
+    </mat-form-field>
+
+    <div class="buttons">
+
+        <button mat-button (click)="close()">
+            Schließen
+        </button>
+
+    </div>
+
+</div>
