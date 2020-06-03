@@ -4,5 +4,7 @@ var profileController = require('../controllers/profile.controller')
 
 router.route('/user')
     .put(profileController.updateUser)
+    .delete(profileController.deleteAccount)
 
+    
 module.exports = router;

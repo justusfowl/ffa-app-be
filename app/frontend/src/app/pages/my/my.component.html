@@ -25,39 +25,145 @@
                     <div class="content-header">
                         <button mat-button matSuffix mat-stroked-button  (click)="updateUser()" >Speichern</button>    
                     </div>
-                    
-                    <form id="profileForm"  FormGroupDirective >
 
-                        <div class="form-group">
-                            <mat-form-field class="login-forms">
-                                <input required matInput type="text" placeholder="eMail" class="form-control" readonly [(ngModel)]="currentUser.userName" [ngModelOptions]="{standalone: true}">
-                            </mat-form-field>
-                        </div>
+                    <mat-accordion>
 
-                        <div class="form-group">
-                            <mat-form-field class="login-forms">
-                                <input required matInput type="text" placeholder="Name" class="form-control" [(ngModel)]="currentUser.name" [ngModelOptions]="{standalone: true}">
-                                <mat-error  *ngIf="currentUser.name" >Bitte Namen eintragen.</mat-error>
-                            </mat-form-field>
-                        </div>
+                        <mat-expansion-panel expanded>
+                                <mat-expansion-panel-header>
+                                    <mat-panel-title>
+                                        Profil
+                                    </mat-panel-title>
+                                    <mat-panel-description>
+                                        
+                                        <mat-icon>account_circle</mat-icon>
 
-                        <div class="form-group">
-                            <mat-form-field class="login-forms">
-                                <input required matInput type="number" placeholder="Telefonnummer" class="form-control" [(ngModel)]="currentUser.patientMobilePhone" [ngModelOptions]="{standalone: true}">
-                                <mat-error  *ngIf="currentUser.patientMobilePhone" >Bitte Telefonnummer eintragen.</mat-error>
-                            </mat-form-field>
-                        </div>
+                                    </mat-panel-description>
+                                </mat-expansion-panel-header>
 
-                        <div class="form-group">
-                            <mat-form-field>
-                                <input matInput placeholder="Geburtsdatum" [matDatepicker]="picker" [(ngModel)]="currentUser.birthdate" [ngModelOptions]="{standalone: true}" readonly class="form-control">
-                                <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-                                <mat-datepicker #picker></mat-datepicker>
-                            </mat-form-field>
-                        </div>
+                            <div class="settings-content">
 
+                                <form id="profileForm"  FormGroupDirective >
+
+                                    <div class="form-group">
+                                        <mat-form-field class="login-forms">
+                                            <input required matInput type="text" placeholder="eMail" class="form-control" readonly [(ngModel)]="currentUser.userName" [ngModelOptions]="{standalone: true}">
+                                        </mat-form-field>
+                                    </div>
+            
+                                    <div class="form-group">
+                                        <mat-form-field class="login-forms">
+                                            <input required matInput type="text" placeholder="Name" class="form-control" [(ngModel)]="currentUser.name" [ngModelOptions]="{standalone: true}">
+                                            <mat-error  *ngIf="currentUser.name" >Bitte Namen eintragen.</mat-error>
+                                        </mat-form-field>
+                                    </div>
+            
+                                    <div class="form-group">
+                                        <mat-form-field class="login-forms">
+                                            <input required matInput type="number" placeholder="Telefonnummer" class="form-control" [(ngModel)]="currentUser.patientMobilePhone" [ngModelOptions]="{standalone: true}">
+                                            <mat-error  *ngIf="currentUser.patientMobilePhone" >Bitte Telefonnummer eintragen.</mat-error>
+                                        </mat-form-field>
+                                    </div>
+            
+                                    <div class="form-group">
+                                        <mat-form-field>
+                                            <input matInput placeholder="Geburtsdatum" [matDatepicker]="picker" [(ngModel)]="currentUser.birthdate" [ngModelOptions]="{standalone: true}" readonly class="form-control">
+                                            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                                            <mat-datepicker #picker></mat-datepicker>
+                                        </mat-form-field>
+                                    </div>
+            
+                                    
+                                </form>
+
+                            </div>
+
+                        </mat-expansion-panel>
                         
-                    </form>
+                        <mat-expansion-panel >
+                            <mat-expansion-panel-header>
+                                <mat-panel-title>
+                                    Benachrichtigungen
+                                </mat-panel-title>
+                                <mat-panel-description>
+                                    
+                                    <mat-icon>notification_important</mat-icon>
+
+                                </mat-panel-description>
+                            </mat-expansion-panel-header>
+
+                            <div class="settings-content">
+
+                                <div class="settings-row">
+                                    <mat-slide-toggle [(ngModel)]="currentUser.notifications.reminderAppointments">
+                                        <span class="title">Video-Termin-Erinnerung</span>
+                                        <mat-hint>Erhalten Sie eine Benachrichtigung per Email als Erinnerung für den bevorstehenden Video-Termin.</mat-hint>
+                                    </mat-slide-toggle>
+                                    
+                                </div>
+
+                                <div class="settings-row">
+                                    <mat-slide-toggle [(ngModel)]="currentUser.notifications.newsletter">
+                                        <span class="title">Newsletter</span>
+                                        <mat-hint>Bleiben Sie auf dem aktuellsten Stand über unsere Praxis - wir informieren Sie über aktuelle Gesundheitsthemen.</mat-hint>
+                                    </mat-slide-toggle>
+                                </div>
+
+                                <div class="settings-row">
+                                    <mat-slide-toggle [(ngModel)]="currentUser.notifications.reminderVaccination">
+                                        <span class="title">Impferinnerung</span>
+                                        <mat-hint>Verpassen Sie keinen Impftermin mehr - wir senden Ihnen bequem eine Information, wenn Ihr Impfschutz einer Auffrischung bedarf.</mat-hint>
+                                        <mat-hint class="small">Bitte beachten Sie: Wir können Ihnen diesen Dienst erst nach einem Termin mit einem unserer Ärzte*innen zur Verfügung stellen.</mat-hint>
+                                    </mat-slide-toggle>
+                                </div>
+
+                                <div class="settings-row">
+                                    <mat-slide-toggle [(ngModel)]="currentUser.notifications.reminderCheckups">
+                                        <span class="title">Checkups & Vorsorge</span>
+                                        <mat-hint>Wir informieren Sie über mögliche Gesundheits-Checkups oder Vorsorgeuntersuchungen, die für Sie individuell passend sind.</mat-hint>
+                                        <mat-hint class="small">Bitte beachten Sie: Wir können Ihnen diesen Dienst erst nach einem Termin mit einem unserer Ärzte*innen zur Verfügung stellen.</mat-hint>
+                                    </mat-slide-toggle>
+                                </div>
+
+
+                            </div>
+
+                        </mat-expansion-panel>
+
+                        <mat-expansion-panel >
+                            <mat-expansion-panel-header>
+                                <mat-panel-title>
+                                    Erweitert
+                                </mat-panel-title>
+                                <mat-panel-description>
+                                    
+                                    <mat-icon>toc</mat-icon>
+
+                                </mat-panel-description>
+                            </mat-expansion-panel-header>
+
+                            <div class="settings-content">
+
+
+
+                                <div class="settings-row">
+
+                                    <div class="title">
+                                        Account vollständig löschen
+                                    </div>
+                                    
+                                    <button mat-stroked-button color="accent" (click)="deleteAccount()"><mat-icon>delete</mat-icon>Account löschen</button>
+                                </div>
+
+                            </div>
+    
+                        </mat-expansion-panel>
+            
+                                
+            
+                    </mat-accordion>
+
+                    
+
                 </div>
             </mat-tab>
             <mat-tab label="Termine" >
@@ -250,48 +356,6 @@
 
             </mat-tab>
 
-            <mat-tab label="Einstellungen" *ngIf="false" >
-
-                <mat-accordion>
-                    <mat-expansion-panel >
-                        <mat-expansion-panel-header>
-                            <mat-panel-title>
-                                Benachrichtigungen
-                            </mat-panel-title>
-                            <mat-panel-description>
-                                
-                                <mat-icon>notification_important</mat-icon>
-
-                            </mat-panel-description>
-                        </mat-expansion-panel-header>
-
-                        <div class="settings-content">
-
-                        </div>
-
-                    </mat-expansion-panel>
-
-                    <mat-expansion-panel>
-                            <mat-expansion-panel-header>
-                                <mat-panel-title>
-                                    Benachrichtigungen
-                                </mat-panel-title>
-                                <mat-panel-description>
-                                    
-                                    <mat-icon>notification_important</mat-icon>
-
-                                </mat-panel-description>
-                            </mat-expansion-panel-header>
-
-                        <div class="settings-content">
-
-                        </div>
-
-                    </mat-expansion-panel>
-
-                </mat-accordion>
-
-            </mat-tab>
 
     </mat-tab-group>
 

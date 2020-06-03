@@ -52,6 +52,10 @@ export class AuthenticationService {
                 // store user details and jwt token in local storage to keep user logged in between page refreshes
                 let userData = resp.data; 
 
+                if (typeof(userData.notifications) == "undefined"){
+                    userData["notifications"] = {};
+                }
+
                 this.setUserData(userData);
                 this.setGuestStatus(null);
 

@@ -67,7 +67,7 @@ export class MyComponent implements OnInit {
     this.api.get("/appointment/my", params).then(result => {
       this.myAppointments = result;
     }).catch(err => {
-      this._snackBar.open("Uups - es scheint etwas schief gelaufen zu sein.", "", {
+      this._snackBar.open("Ups - es scheint etwas schief gelaufen zu sein.", "", {
         duration: 2000,
       });
     })
@@ -89,7 +89,7 @@ export class MyComponent implements OnInit {
       });
 
     }).catch(err => {
-      this._snackBar.open("Uups - es scheint etwas schief gelaufen zu sein.", "", {
+      this._snackBar.open("Ups - es scheint etwas schief gelaufen zu sein.", "", {
         duration: 2000,
       });
     })
@@ -103,7 +103,7 @@ export class MyComponent implements OnInit {
       this.auth.setUserData(this.currentUser);
     }).catch(err => {
       console.error(err);
-      this._snackBar.open("Uups - es scheint etwas schief gelaufen zu sein.", "", {
+      this._snackBar.open("Ups - es scheint etwas schief gelaufen zu sein.", "", {
         duration: 2000,
       });
     });
@@ -273,6 +273,35 @@ export class MyComponent implements OnInit {
 
   tabChanged(evt){
     this.updateUrl(evt.tab.textLabel.toLowerCase())
+  }
+
+  deleteAccount(){
+
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      data: {meta : {"type" : "confirm", "title" : "Profil löschen", "messageText" : "Warnung: Sind Sie sicher, dass Sie Ihren Account löschen möchten? Dieser Schritt lässt sich nicht umkehren."}}
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result.answerConfirm){
+       
+        this.api.delete("/profile/user").then(result => {
+          this._snackBar.open("Account wurde gelöscht", "", {
+            duration: 2000,
+          });
+          this.auth.logout();
+        }).catch(err => {
+          console.error(err);
+          this._snackBar.open("Ups - es scheint etwas schief gelaufen zu sein.", "", {
+            duration: 2000,
+          });
+        });
+
+      }
+      console.log('The dialog was closed');
+    });
+
+
+
   }
 
 }

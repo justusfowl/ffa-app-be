@@ -28,6 +28,8 @@ export class AuthComponent implements OnInit {
   ngOnInit() {
     this.openDialog();
     this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
+    this.returnUrl = decodeURIComponent(this.returnUrl);
+
   }
 
 
@@ -38,7 +40,7 @@ export class AuthComponent implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      this.router.navigate([this.returnUrl]);
+      this.router.navigateByUrl(this.returnUrl);
     });
   }
 

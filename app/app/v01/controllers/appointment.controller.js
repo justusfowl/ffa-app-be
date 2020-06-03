@@ -1070,6 +1070,42 @@ function removeAdminTeleSlot(req, res){
     }
 }
 
+
+async function cleanUserDataFromAccountRemove(userId){
+
+    return new Promise((resolve, reject) => {
+        try{
+            MongoClient.connect(MongoUrl, function(err, db) {
+    
+                if (err) throw err;
+                
+                let dbo = db.db(config.mongodb.database);
+        
+                const collection = dbo.collection('appointments');
+        
+                collection.updateMany(
+                  {
+                      "userId" : userId
+                  },
+                  {
+                      $set : {
+                          "patientName" : "removed"
+                      }
+                  },
+                  function(err, result){
+                    if (err){
+                        reject(err);
+                    }else{
+                        resolve(result);
+                    }
+                  });
+              });
+        }catch(err){
+            reject(err);
+        }
+    })
+}
+
 module.exports = {
     getAvailableSlots, 
     getAvailableDocs, 
@@ -1084,5 +1120,8 @@ module.exports = {
     adminGetTeleSlots, 
     adminAddTeleSlot, 
     adminUpdateTeleSlot,
-    removeAdminTeleSlot
+    removeAdminTeleSlot, 
+
+    _getAppointmentsFromDateRange,
+    cleanUserDataFromAccountRemove
 }

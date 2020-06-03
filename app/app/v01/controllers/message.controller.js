@@ -200,9 +200,46 @@ async function getMyMessages(req, res){
     }
 }
 
+async function cleanUserDataFromAccountRemove(userId){
+
+    return new Promise((resolve, reject) => {
+        try{
+            MongoClient.connect(MongoUrl, function(err, db) {
+    
+                if (err) throw err;
+                
+                let dbo = db.db(config.mongodb.database);
+        
+                const collection = dbo.collection('messages');
+        
+                collection.updateMany(
+                  {
+                      "userId" : userId
+                  },
+                  {
+                      $set : {
+                          "userEmail" : "removed", 
+                          "userName" : "removed"
+                      }
+                  },
+                  function(err, result){
+                    if (err){
+                        reject(err);
+                    }else{
+                        resolve(result);
+                    }
+                  });
+              });
+        }catch(err){
+            reject(err);
+        }
+    })
+}
+
 
 module.exports = {
     handleGeneralMessage,
     handlePrescriptionMessage,
-    getMyMessages
+    getMyMessages,
+    cleanUserDataFromAccountRemove
 }

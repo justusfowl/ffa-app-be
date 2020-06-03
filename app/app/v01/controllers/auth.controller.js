@@ -85,6 +85,7 @@ async function registerUser ( req, res ){
     var salt = bcrypt.genSaltSync(10);
     let passPhrase = bcrypt.hashSync(pass, salt);
 
+    // all users coming here need to have accepted the basic terms, hence only the date will be stored for accepting
     let newUser = {
         "userName" : userName, 
         "passPhrase" : passPhrase, 
@@ -97,7 +98,13 @@ async function registerUser ( req, res ){
                 "acceptInfo" : req.body.acceptInfo || false, 
                 "timestamp" : new Date()
             }
-        ]
+        ],
+        "notifications" : {
+            "reminderCheckups" : req.body.acceptInfo || false, 
+            "reminderVaccination" : req.body.acceptInfo || false, 
+            "newsletter" : req.body.acceptInfo || false, 
+            "reminderAppointments" : true
+        }
     };
 
     let userObj = await getUserByName(userName);
@@ -158,7 +165,13 @@ async function adminRegisterUser(req, res){
     let newUser = {
         "userName" : userName, 
         "passPhrase" : passPhrase, 
-        "validated" : false
+        "validated" : false,
+        "notifications" : {
+            "reminderCheckups" : true, 
+            "reminderVaccination" : true, 
+            "newsletter" : true, 
+            "reminderAppointments" : true
+        }
     };
 
     let userObj = await getUserByName(userName);
@@ -210,6 +223,61 @@ async function getUserByName(userName){
                 
                 collection.findOne(
                     {"userName" : userName.toLowerCase()},
+                function(err, u){
+                    if (err){
+                        reject(err);
+                    }
+                    if (u){
+                        resolve(u);
+                    }else{
+                        resolve(false);
+                    }
+                
+                });
+                
+            });
+        }catch(err){
+            reject(err);
+        }
+    })
+
+}
+
+
+/**
+ * Function to get users with a specific scope
+ * @param {String/Array} scopes that a user needs to have, at least one of them
+ */
+function getUsersByScope(scopes){
+
+    let scopesArray = [];
+
+    if (Array.isArray(scopes)){
+        scopes.forEach(element => {
+            scopesArray.push(element.toLowerCase());
+        });
+    }else{
+        scopesArray = [String(scopes).toLowerCase()];
+    }
+
+
+    return new Promise ((resolve, reject) => {
+
+        try{
+
+            MongoClient.connect(MongoUrl, function(err, db) {
+        
+                if (err) throw err;
+                
+                let dbo = db.db(config.mongodb.database);
+
+                // Get the documents collection
+                const collection = dbo.collection('users');
+                
+                collection.find(
+                    {scopes : {"$in" : scopesArray}},
+                    {"passPhrase" : 0}
+                ).toArray(
                 function(err, u){
                     if (err){
                         reject(err);
@@ -689,5 +757,6 @@ module.exports = {
 
     getManyUsersById, 
     getUserById,
-    getUserByName
+    getUserByName, 
+    getUsersByScope
     }

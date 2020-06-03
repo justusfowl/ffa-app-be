@@ -6,6 +6,8 @@ const fs = require("fs");
 const path = require('path');
 const config = require('./app/config/config');
 
+const jobController = require('./app/v01/controllers/jobs.controller');
+
 config["baseDirectory"] = __dirname;
 
 const pubDirectory = path.join(__dirname, "pub");
@@ -70,7 +72,10 @@ app.use((req, res, next) => {
 
 sockets.init(server);
 
+jobController.init();
+
 server.listen(config.port, () => {
   console.log('Server started at port !' + config.port);
 });
+
 

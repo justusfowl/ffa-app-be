@@ -3,6 +3,9 @@ const config = require('../../config/config');
 var MongoClient = require('mongodb').MongoClient;
 var ObjectID = require('mongodb').ObjectID;
 
+var appointmentCtrl = require('./appointment.controller');
+var messageCtrl = require('./message.controller');
+
 var MongoUrl = config.getMongoUrl();
 
 /**
@@ -85,6 +88,66 @@ function updateUser(req, res){
 
 }
 
+function removeProfile(userId){
+    return new Promise (async (resolve, reject) => {
+        try{
+            MongoClient.connect(MongoUrl, function(err, db) {
+      
+                if (err) throw err;
+                
+                let dbo = db.db(config.mongodb.database);
+     
+                const collection = dbo.collection('users');
+     
+                collection.deleteOne(
+                    {
+                        "_id" : ObjectID(userId)
+                    }, 
+                    function(err, docs){
+                        if (err){
+                            reject(err);
+                        }else{
+                            resolve(docs);
+                        }
+                        
+                    }
+                );
+                    
+              });
+     
+        }catch(error){
+            console.error(error.stack);
+            res.send(403, "Something went wrong getting the users.");
+        }
+    })
+}
+
+async function deleteAccount(req, res){
+
+    let targetUserId = req.userId;
+
+    try{
+
+        await appointmentCtrl.cleanUserDataFromAccountRemove(targetUserId).catch(err => {
+            throw err;
+        });
+    
+        await messageCtrl.cleanUserDataFromAccountRemove(targetUserId).catch(err => {
+            throw err;
+        });
+
+        await removeProfile(targetUserId).catch(err => {
+            throw err;
+        });
+
+        res.json({"message" : "ok"});
+
+    }catch(err){
+        console.error(error.stack);
+        res.send(403, "Something went wrong removing the account the users.");
+    } 
+}
+
 async function asyncGetUserProfile(userId){
     return new Promise ((resolve, reject) => {
         try{
@@ -123,4 +186,4 @@ async function asyncGetUserProfile(userId){
     });
 }
 
-module.exports = { updateUser, asyncGetUserProfile }
+module.exports = { updateUser, deleteAccount, asyncGetUserProfile }

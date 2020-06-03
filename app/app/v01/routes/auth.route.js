@@ -11,8 +11,6 @@ router.route('/login')
 
 router.route('/register')
     .post(authCtrl.registerUser)
-
-
     
 router.route('/adminRegisterUser')
     .post([tokenValidator.detectToken, middlware_hasScopeAdmin], authCtrl.adminRegisterUser)

@@ -232,7 +232,7 @@ function sendTeleAppointment (contextObj) {
         contextObj.docName = "einem unserer Fachärzte*innen"
     }
 
-    let domain = config.email.smtpEmail.substring(config.email.smtpEmail.indexOf("@")+1, config.email.smtpEmail.length)
+    let domain = config.email.smtpEmail.substring(config.email.smtpEmail.indexOf("@")+1, config.email.smtpEmail.length);
 
         const cal = ical({
             domain: domain,
@@ -373,6 +373,32 @@ function testEmailOut (userName, tokenUrl) {
    
 };
 
+function sendDailyAppointmentPreview (recipientsArray, contextObj) {
+
+    return new Promise((resolve, reject) => {
+
+        let options = {
+            from : '"' + config.email.smtpEmailSenderName + '" ' + config.email.smtpEmail, 
+            to : recipientsArray, 
+            subject : "myFFA | Heutige Video-Sprechstunden" , 
+            template: 'dailyPreviewTeleAppointments',
+            context: contextObj
+        }
+
+        transporter.sendMail(options, function (err, info){
+            if (err){
+                reject(err); 
+
+            }else{
+                resolve(info);
+            }
+        })
+
+    });
+   
+};
+
+
 module.exports = {
     sendValidateAccountEmail, 
     sendGeneralAutoReply,
@@ -383,6 +409,8 @@ module.exports = {
     sendPreRegistrationEmail,
     sendTeleAppointment,
     sendAdminRemoveTeleAppointment,
+
+    sendDailyAppointmentPreview,
 
     testEmail
 }

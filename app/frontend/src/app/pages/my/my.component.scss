@@ -19,7 +19,7 @@
 }
 
 .mat-expansion-panel-header-description{
-    justify-content: space-between;
+    justify-content: flex-end;
 }
 
 .profile,
@@ -106,6 +106,44 @@
             display: none;
         }
     }
+    
+
+    .settings-row{
+        display: flex;
+        justify-content: flex-start;
+        
+
+        .title{
+            margin-right: 10px;
+        }
+    }
+}
+
+.settings-row{
+    align-items: center;
+    margin-bottom: 10px;
+
+    .title{
+        font-size: 16px;
+        font-weight: 500;
+    }
+
+
+    mat-slide-toggle{
+        height: auto; 
+    }
+
+   .mat-slide-toggle-content{
+       display:flex; 
+       flex-direction: column;
+   }
+
+   mat-hint.small{
+       font-size: 12px;
+       color: $background_nav;
+   }
+
+
 }
 
 @media (max-width: 1100px){
