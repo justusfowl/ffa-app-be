@@ -292,7 +292,12 @@
                     <tr>
                       <td>
                         <h2>Hallo {{userName}},</h2>
-                        <p>vielen Dank für Ihre Anmeldung zu einer Video-Konsultation. Ihr Termin:</p>
+
+                        {{#if reminder}}
+                          <p>Ihr Termin für eine Video-Konsultation nähert sich. Ihr Termin:</p>
+                        {{else}}
+                           <p>vielen Dank für Ihre Anmeldung zu einer Video-Konsultation. Ihr Termin:</p>
+                        {{/if}}
 
                         <h2>{{appointmentDate}}</h2>
 
@@ -330,7 +335,7 @@
                         </p>
 
                         <p>
-                          Sie können den Termin nicht wahrnehmen? Kein Problem - sagen Sie Ihn bequem hierüber oder über Ihr myFFA Konto ab:
+                          Sie können den Termin nicht wahrnehmen? Kein Problem - sagen Sie Ihn bequem hierüber oder über Ihr <a href="https://facharztpraxis-fuer-allgemeinmedizin.de/my" target="_blank">myFFA Profil</a> ab:
                         </p>
 
                       <table border="0" cellpadding="0" cellspacing="0" class="btn btn-primary">
@@ -350,6 +355,12 @@
                         </table>
 
                         <p>Ihr Praxis-Team.</p>
+
+                        {{#if reminder}}
+                          <p>Wussten Sie: Sie können Ihre Benachrichtigungen von uns an Ihre Bedürfnisse anpassen oder abbestellen. Nehmen Sie bequem Einstellungen über Ihr Profil 
+                            <a href="https://facharztpraxis-fuer-allgemeinmedizin.de/my" target="_blank">myFFA</a> vor </p>
+                        {{/if}}
+
                       </td>
                     </tr>
                   </table>

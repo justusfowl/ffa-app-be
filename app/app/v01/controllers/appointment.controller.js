@@ -600,7 +600,8 @@ async function _checkIfSlotIsFree(startDate, endDate, docUserId){
 
     })
 }
-
+// @TODO: refactor and modularize this function further, 
+// jobs.controller.js is using parts of it
  async function addTeleAppointment(req, res){
 
     try{
@@ -721,7 +722,7 @@ async function _checkIfSlotIsFree(startDate, endDate, docUserId){
     
                             await emailCtrl.sendTeleAppointment(emailContext).catch(err => {
                                 console.error(err);
-                            })
+                            });
 
                             res.json({"success" : true});
                         }
@@ -1089,7 +1090,8 @@ async function cleanUserDataFromAccountRemove(userId){
                   },
                   {
                       $set : {
-                          "patientName" : "removed"
+                          "patientName" : "removed",
+                          "inactive" : true
                       }
                   },
                   function(err, result){
@@ -1105,6 +1107,44 @@ async function cleanUserDataFromAccountRemove(userId){
         }
     })
 }
+
+/**
+ * Mark appointment objects in database as "reminder sent to patient"
+ * @param {*} appointmentIdsArray array containing the objectIds from the appointments in BSON no strings
+ */
+function markAppointmentsAsReminded(appointmentIdsArray){
+    return new Promise((resolve, reject) => {
+        try{
+            MongoClient.connect(MongoUrl, function(err, db) {
+    
+                if (err) throw err;
+                
+                let dbo = db.db(config.mongodb.database);
+        
+                const collection = dbo.collection('appointments');
+        
+                collection.updateMany(
+                  {
+                      "_id" : {$in : appointmentIdsArray}
+                  },
+                  {
+                      $set : {
+                          "reminderSent" : new Date()
+                      }
+                  },
+                  function(err, result){
+                    if (err){
+                        reject(err);
+                    }else{
+                        resolve(result);
+                    }
+                  });
+              });
+        }catch(err){
+            reject(err);
+        }
+    })
+ }
 
 module.exports = {
     getAvailableSlots, 
@@ -1123,5 +1163,6 @@ module.exports = {
     removeAdminTeleSlot, 
 
     _getAppointmentsFromDateRange,
-    cleanUserDataFromAccountRemove
+    cleanUserDataFromAccountRemove,
+    markAppointmentsAsReminded
 }

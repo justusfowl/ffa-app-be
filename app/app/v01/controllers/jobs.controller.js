@@ -1,7 +1,7 @@
 const cron = require("node-cron");
 
 const moment = require('moment-timezone');
-
+var jwt = require('jsonwebtoken'); 
 
 const appointmentCtrl = require('./appointment.controller');
 const authCtrl = require('./auth.controller');
@@ -59,20 +59,130 @@ async function getDailyAppointmentPreview() {
 
     console.log("Daily preview has run...");
 
+}
+
+async function notifyPatientUpcomingTeleAppointment() {
+
+    try{
+
+        let tomorrow = moment(moment().add(1, 'day').format("MM-DD-YYYY"), "MM-DD-YYYY");
+        let dayAfterTomorrow = moment(tomorrow.clone().add(2, 'day').format("MM-DD-YYYY"), "MM-DD-YYYY")
+          
+        let appointments = await appointmentCtrl._getAppointmentsFromDateRange(tomorrow, dayAfterTomorrow).catch(err => {
+            throw err;
+        });
+    
+        let appointmentsArray = [];
+    
+        for (var i = 0; i < appointments.length; i++) {
+            let appointmentObj = appointments[i];
+    
+            if (typeof(appointmentObj.reminderSent) == "undefined"){
+                await sendTeleAppointmentReminder(appointmentObj).catch(err => {
+                    throw err;
+                })
+        
+                appointmentsArray.push(appointmentObj._id);
+            }        
+    
+        }
+        
+        if (appointmentsArray.length > 0){
+            await appointmentCtrl.markAppointmentsAsReminded(appointmentsArray).catch(err => {
+                throw err;
+            })
+        }
+        
+    }catch(err){
+        console.error(err);
+    }
+ 
+ }
+
+  function sendTeleAppointmentReminder(appointmentObject){
+
+    return new Promise(async (resolve, reject) => {
+
+        try{
+
+            let appointmentId = appointmentObject._id.toString();
+
+            let userObj = await authCtrl.getUserById(appointmentObject.userId).catch(err => {
+                throw err;
+            });
+
+            if (typeof(userObj.notifications) == "undefined"){
+                return resolve("User has not specified notification settings");
+            }
+
+            if(!userObj.notifications.reminderAppointments){
+                return resolve("User does not wish to be notified");
+            }
+    
+            let startDate = moment(appointmentObject.appointmentObj.start);
+            let endDate = moment(appointmentObject.appointmentObj.end);
+    
+            let data = {
+                "_id" : appointmentObject["userId"], 
+                "appointmentId" : appointmentId
+            };
+    
+            let now = moment();
+    
+            var token = jwt.sign(data, config.auth.jwtsec, {
+                expiresIn: ((endDate.unix() - now.unix())*1000)
+            });
+    
+            let urlBase;
+    
+            if (config.env == "development"){
+                urlBase = config.hostProto + "://" + config.hostBase + ":" + config.hostExposedPort  + "/home?c=cancel-appointment&appointmentId="  + appointmentId  + "&token=";
+            }else{
+                urlBase = config.hostProto + "://" + config.hostBase + "/home?c=cancel-appointment&appointmentId="  + appointmentId  + "&token=";
+            }
+    
+            let tokenUrl = encodeURI(urlBase + token);
+    
+            let displayStartDate = startDate.tz(config.timeZone).locale("de");
+    
+            let emailContext = {
+                userEmail : userObj.userName,
+                userName : userObj.name || userObj.userName,
+                patientCode : appointmentObject.tele.patientCode, 
+                dialInUrlPatient : appointmentObject.tele["dialInUrlPatient"], 
+                appointmentDate : displayStartDate.format("LLL"), 
+                appointmentType : appointmentObject.appointmentType.name, 
+                docName : appointmentObject.doc.userName, 
+                startDate : startDate, 
+                endDate : endDate, 
+                tokenUrl : tokenUrl
+            }
+    
+            await emailCtrl.sendTeleAppointment(emailContext, true).catch(err => {
+                throw err;
+            });
+
+            resolve(true);
+
+        }catch(err){
+            reject(err);
+        }
+
+    })
 
 }
 
 
-
 function init(){
 
-    // function to notify patients about upcoming appointment at 4am UTC
+    // the following cron jobs are scheduled based on UTC time
+
+    // function to notify doctors in the morning about upcoming appointments at 4am UTC
     cron.schedule("0 4 * * *", getDailyAppointmentPreview);
 
-    // function to notify doctors in the morning about upcoming appointments
+    // function to notify patients about upcoming appointment at 8am UTC
 
-    // function to send up updates / newsletter to patients that accepted 
-
+    cron.schedule("0 8 * * *", notifyPatientUpcomingTeleAppointment);
 
 }
 

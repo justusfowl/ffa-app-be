@@ -226,10 +226,19 @@ function sendPreRegistrationEmail (userName, tokenUrl) {
    
 };
 
-function sendTeleAppointment (contextObj) {
+function sendTeleAppointment (contextObj, reminder=false) {
 
     if (contextObj.docName == 'Egal'){
         contextObj.docName = "einem unserer Fachärzte*innen"
+    }
+
+    contextObj["reminder"] = reminder;
+
+    let template = 'teleAppointment';
+    let subject = "myFFA | Ihre Video-Konsultation";
+
+    if (reminder){
+        subject = "myFFA | Erinnerung: Ihre Video-Konsultation steht an";
     }
 
     let domain = config.email.smtpEmail.substring(config.email.smtpEmail.indexOf("@")+1, config.email.smtpEmail.length);
@@ -258,10 +267,13 @@ function sendTeleAppointment (contextObj) {
         let options = {
             from : '"' + config.email.smtpEmailSenderName + '" ' + config.email.smtpEmail, 
             to : contextObj.userEmail, 
-            subject : "myFFA | Ihre Video-Konsultation" , 
-            template: 'teleAppointment',
-            context: contextObj, 
-            icalEvent: {
+            subject : subject , 
+            template: template,
+            context: contextObj
+        }
+
+        if (!reminder){
+            options["icalEvent"] = {
                 filename: 'tele-consult.ics',
                 method: 'request',
                 content: cal.toString()
