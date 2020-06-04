@@ -10,6 +10,8 @@ var profileCtrl = require('../controllers/profile.controller');
 
 var MongoUrl = config.getMongoUrl();
 
+const logger = require('../../../logger');
+
 
 /* #### META DATA REQUESTED FROM BACKEND SERVER ### */
 
@@ -46,7 +48,7 @@ async function _getCoachMeta(){
 (async() => {
 
   questions = await _getCoachMeta().catch(err => {
-    console.error(err);
+    logger.error(err);
   });
 
 })();
@@ -209,7 +211,7 @@ function autoCompleteSessionObj(sessionObj){
                                 }
                                 sessionObj.questions.push(generatedQuestion)
                             }else{
-                                console.log("Question should be imputed but not found: " + q.varname)
+                                logger.info("Question should be imputed but not found: " + q.varname)
                             }
 
                         });
@@ -476,48 +478,47 @@ async function storeSession(userId, inSessionObj){
  return new Promise ((resolve, reject) => {
   try{
 
-    MongoClient.connect(MongoUrl, function(err, db) {
+      MongoClient.connect(MongoUrl, function(err, db) {
 
-        if (err) throw err;
+          if (err) throw err;
 
-        
-        
-        let dbo = db.db(config.mongodb.database);
+          
+          
+          let dbo = db.db(config.mongodb.database);
 
-        const collection = dbo.collection('coach');
+          const collection = dbo.collection('coach');
 
-        var cb = function(err, docs){
-          if (err){
-           console.error(err);
-           reject(err);
+          var cb = function(err, docs){
+            if (err){
+            logger.error(err);
+            reject(err);
+            }else{
+              resolve(docs);
+            logger.info("Session stored for userId | " + userId)
+            }
+              
+          };
+
+          if (sessId){
+            collection.replaceOne(
+              {"_id" : ObjectID(sessId)},
+              sessionObj,
+                cb
+            );
           }else{
-            resolve(docs);
-           console.log("Session stored for userId | " + userId)
+            collection.insertOne(
+              sessionObj,
+                cb
+            );
           }
-            
-        };
+              
+        });
 
-        if (sessId){
-          collection.replaceOne(
-            {"_id" : ObjectID(sessId)},
-            sessionObj,
-              cb
-          );
-        }else{
-          collection.insertOne(
-            sessionObj,
-              cb
-          );
-        }
-            
-      });
+  }catch(error){
+      logger.error("Something went wrong storing the session for userId | " + userId)
+  }
 
-}catch(error){
-    console.error("Something went wrong storing the session for userId | " + userId)
-}
  })
-
-  
 
 }
 
@@ -546,7 +547,7 @@ function getSessions(req, res){
         });
 
   }catch(error){
-      console.error(error.stack);
+      logger.error(error.stack);
       res.send(403, "Something went wrong getting the sessions.");
   }
 }
@@ -577,7 +578,7 @@ function _getSessionObj(userId, sessionId){
           });
   
     }catch(error){
-        console.error(error.stack);
+        logger.error(error.stack);
         reject(error);
     }
   })
@@ -648,7 +649,7 @@ function deleteSession(req, res){
         });
 
   }catch(error){
-      console.error(error.stack);
+      logger.error(error.stack);
       res.send(403, "Something went wrong removing the session.");
   }
 

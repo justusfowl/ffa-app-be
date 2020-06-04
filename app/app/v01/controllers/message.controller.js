@@ -27,9 +27,13 @@ async function handleGeneralMessage (req, res){
             userEmail : email
         };
 
-        let isVacationObj = await timesCtrl.getIsCurrentlyVacation();
+        let isVacationObj = await timesCtrl.getIsCurrentlyVacation().catch(err => {
+            throw err;
+        });
 
-        let emailSent = await emailerCtrl.sendMessageToBackOffice(contextObject);
+        let emailSent = await emailerCtrl.sendMessageToBackOffice(contextObject).catch(err => {
+            throw err;
+        });
 
         if (isVacationObj.isVacation){
             await emailerCtrl.sendVacationAutoReply(userName, email, message, isVacationObj.vacationObj).then(result => {
@@ -46,8 +50,8 @@ async function handleGeneralMessage (req, res){
         }
 
     }catch(err){
-        console.error(err);
-        res.send(500, "An error occured sending a message: " + JSON.stringify(req.body) );
+        logger.error(err);
+        res.send(500, "An error occured sending a message." );
     }
 
 }
@@ -85,42 +89,45 @@ async function handlePrescriptionMessage(req, res){
             message += element.name + " "
         });
 
-        let userObj = await authCtrl.getUserByName(email);
+        let userObj = await authCtrl.getUserByName(email).catch(err => {
+            throw err;
+        });
 
         if (userObj._id){
             let msgObj = JSON.parse(JSON.stringify(contextObject))
             msgObj["userId"] = userObj._id.toString();
             delete msgObj.userEmail;
             storeMessage(msgObj).catch(err => {
-                console.error(err);
+                throw err;
             });
         }
 
         let isVacationObj = await timesCtrl.getIsCurrentlyVacation().catch(err => {
-            console.error(err);
-        });;
+           throw err;
+        });
 
         let emailSent = await emailerCtrl.sendMessageToBackOffice(contextObject).catch(err => {
-            console.error(err);
-        });;
+           throw err;
+        });
 
         if (isVacationObj.isVacation){
             await emailerCtrl.sendVacationAutoReply(userName, email, message, isVacationObj.vacationObj).then(result => {
                 res.json({"message" : "OK"})
             }).catch(err =>{
-                res.send(500, "An error occured sending a message: " + JSON.stringify(err) );
+                res.send(500, "An error occured sending a message" );
             });
         }else{
             await emailerCtrl.sendGeneralAutoReply(userName, email, message).then(result => {
                 res.json({"message" : "OK"})
             }).catch(err =>{
-                res.send(500, "An error occured sending a message: " + JSON.stringify(err) );
+                res.send(500, "An error occured sending a message");
+                throw err;
             });
         }
 
     }catch(err){
-        console.error(err);
-        res.send(500, "An error occured sending a message: " + JSON.stringify(req.body) );
+        logger.error(err);
+        res.send(500, "An error occured sending a message");
     }
 }
 
@@ -192,11 +199,13 @@ function getMessagesByUserId(userId){
 async function getMyMessages(req, res){
     try{
         let userId = req.userId;
-        let messages = await getMessagesByUserId(userId);
+        let messages = await getMessagesByUserId(userId).catch(err => {
+            throw err;
+        });
         res.json({"messages" : messages});
     }catch(err){
-        console.error(err);
-        res.send(500, "An error occured acquiring myMessages: " + JSON.stringify(err) );
+        logger.error(err);
+        res.send(500, "An error occured acquiring myMessages." );
     }
 }
 

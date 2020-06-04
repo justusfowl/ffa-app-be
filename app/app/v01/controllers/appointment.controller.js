@@ -13,6 +13,8 @@ var timesCtrl = require('./times.controller');
 
 const ical = require('ical-generator');
 
+const logger = require('../../../logger');
+
 // @TODO: Add those meta config data into the database 
 
 var appointmentMeta = [{
@@ -231,7 +233,7 @@ function _getSlots(userId=null){
                 }
                
             }catch(err){
-
+                logger.debug("The provided string is not a BSON Id: Argument passed in must be a single String of 12 bytes or a string of 24 hex characters");
             }
 
             MongoClient.connect(MongoUrl, function(err, db) {
@@ -342,7 +344,9 @@ async function getAvailableSlots(req, res){
 
     try{
 
-        let backendConfig = await config.getBackendConfig();
+        let backendConfig = await config.getBackendConfig().catch(err => {
+            throw err;
+        });
 
         let daysInAdvance = backendConfig.tele.daysInAdvance || 0;
         let flagIncludeWeekends = backendConfig.tele.flagIncludeWeekends || false;
@@ -508,7 +512,7 @@ async function getAvailableSlots(req, res){
         res.json(allTheoSlots);
 
     }catch(err){
-        console.error(err); 
+        logger.error(err);
         return res.send(500, "Something went wrong retrieving slots.")
     }
 
@@ -741,9 +745,13 @@ async function _checkIfSlotIsFree(startDate, endDate, docUserId){
                 throw err;
             }
             
-        })
+        }).catch(err => {
+            logger.error(err);
+        });
+
     }catch(err){
-        res.send(500, err)
+        logger.error(err);
+        res.send(500, "Something went wrong creating the tele-appointment.")
     }
 }
 
@@ -774,7 +782,8 @@ async function getMyAppointments(req, res){
     
         res.json(appointments)
     }catch(err){
-        res.send(500, err)
+        logger.error(err);
+        res.send(500, "Something went wrong getting my appointments")
     }
 }
 
@@ -804,7 +813,8 @@ async function getAppointments(req, res){
        
         res.json(appointments)
     }catch(err){
-        res.send(500, err)
+        logger.error(err);
+        res.send(500, "Something went wrong getting appointments")
     }
 }
 
@@ -884,11 +894,12 @@ async function removeAppointment(req, res){
             })
             
         }).catch(err => {
-            res.send(500, err);
+            throw err;
         })
         
     }catch(err){
-        res.sen(500, err);
+        logger.error(err);
+        res.send(500, "Something went wrong");
     }
 
 }
@@ -922,21 +933,23 @@ async function adminRemoveAppointment(req, res){
         }
 
         await teleMedCtrl.removeAppointment(appointmentObj.tele.head_id).catch(err => {
-            res.send(500, err);
+            throw err;
         })
 
         await _setAppointmentInactive(appointmentId).catch(err => {
-            res.send(500, err);
+            throw err;
         })
 
         await emailCtrl.sendAdminRemoveTeleAppointment(emailContext).then( result => {
             res.json({"success" : true})
         }).catch(err => {
-            res.json({"success" : false})
+            res.json({"success" : false});
+            throw err;
         })
         
     }catch(err){
-        res.send(500, err);
+        logger.error(err);
+        res.send(500, "Something went wrong admin-getting appointments");
     }
 }
 
@@ -947,7 +960,8 @@ async function adminGetTeleSlots(req, res){
         res.json(slots);
 
     }catch(err){
-        return res.send(500, err);
+        logger.error(err);
+        return res.send(500, "Something went wrong admin get tele slots");
     }
 }
 
@@ -981,8 +995,9 @@ function adminAddTeleSlot(req, res){
 
         });
  
-    }catch(error){
-        return res.send(500, error);
+    }catch(err){
+        logger.error(err);
+        return res.send(500, "something went wrong admin add tele slots");
     }
 }
 
@@ -1034,8 +1049,9 @@ function adminUpdateTeleSlot(req, res){
 
         });
  
-    }catch(error){
-        return res.send(500, error);
+    }catch(err){
+        logger.error(err);
+        return res.send(500, "Something went wrong updating tele slots");
     }
 }
 
@@ -1066,8 +1082,8 @@ function removeAdminTeleSlot(req, res){
           });
 
     }catch(err){
-        console.error(error)
-        res.send(500, "An error occured adding a team member: " + JSON.stringify(req.body) );
+        logger.error(err);
+        res.send(500, "An error occured adding a team member");
     }
 }
 

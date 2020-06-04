@@ -1,7 +1,3 @@
-/**
- * Created by olyjosh on 29/06/2017.
- */
-
 const config = require('../../config/config');
 const path = require('path');
 var moment = require("moment");
@@ -9,6 +5,8 @@ const ical = require('ical-generator');
 
 var nodeMailer = require("nodemailer");
 var hbs = require('nodemailer-express-handlebars');
+
+const logger = require('../../../logger');
 
 var transporter = nodeMailer.createTransport({
     host:  config.email.smtpServer,
@@ -18,7 +16,7 @@ var transporter = nodeMailer.createTransport({
       pass: config.email.smtpPass
     },
     tls: {rejectUnauthorized: false},
-    debug:true
+    debug: true
   });
 
 const handlebarOptions = {
@@ -326,7 +324,7 @@ function testEmail (req, res){
     testEmailOut(email, "Test").then(result => {
         res.json({"message" : "OK"})
     }).catch(err => {
-        console.error(err); 
+        logger.error(err); 
         return res.send(500, err);
     })
 }
@@ -354,7 +352,7 @@ function testEmailOut (userName, tokenUrl) {
         const alarm = event.createAlarm({type: 'audio', trigger: 300});
         const category = event.createCategory({name: 'APPOINTMENT'});
         
-        console.log(cal.toString())
+        logger.info(cal.toString())
 
         let options = {
             from : '"' + config.email.smtpEmailSenderName + '" ' + config.email.smtpEmail, 

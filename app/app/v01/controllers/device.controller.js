@@ -5,6 +5,8 @@ var ObjectID = require('mongodb').ObjectID;
 
 var MongoUrl = config.getMongoUrl();
 
+const logger = require('../../../logger');
+
 function addDevice(deviceObj, userId){
 
     return new Promise((resolve, reject) => {
@@ -104,7 +106,7 @@ async function getDevices(req, res){
         let devices = await loadDevices();
         res.json(devices);
     }catch(err){
-        console.error(err)
+        logger.error(err);
         return res.send(500, "An error occured requesting the devices list");
     }
 }
@@ -188,11 +190,12 @@ function updateDevice(req, res){
         updateDeviceDatabase(deviceObj).then(res => {
             res.json({"success" : true})
         }).catch(err => {
-            console.error(err);
+            logger.error(err);
             res.send(500, "The device could not have been updated.")
         });
 
     }catch(err){
+        logger.error(err);
         res.send(500, "The device could not have been updated.")
     }
 }
@@ -206,11 +209,12 @@ function removeDevice(req, res){
         removeDeviceDatabase(deviceObjId).then(res => {
             res.json({"success" : true})
         }).catch(err => {
-            console.error(err);
+            logger.error(err);
             res.send(500, "The device could not have been updated.")
         });
 
     }catch(err){
+        logger.error(err);
         res.send(500, "The device could not have been updated.")
     }
 }

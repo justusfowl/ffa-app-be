@@ -9,6 +9,8 @@ var path = require('path');
 
 var authCtrl = require('./auth.controller');
 
+const logger = require('../../../logger');
+
 async function getTeam(req, res){
 
     try{
@@ -39,7 +41,7 @@ async function getTeam(req, res){
 
  
     }catch(error){
-        console.error(error.stack);
+        logger.error(error);
         res.send(403, "Something went wrong getting the users.");
     }
 
@@ -121,8 +123,8 @@ function updateMember(req, res){
         });
     
       }catch(error){
-        console.error(error)
-        res.send(500, "An error occured updating the team member: " + JSON.stringify(req.body) );
+        logger.error(error)
+        res.send(500, "An error occured updating the team member");
       }
 }
 
@@ -154,8 +156,8 @@ function addMember(req, res){
 
     }catch(err){
         _deleteTmpFile(file.destination+file.originalname);
-        console.error(error)
-        res.send(500, "An error occured adding a team member: " + JSON.stringify(req.body) );
+        logger.error(error)
+        res.send(500, "An error occured adding a team member.");
     }
     
 }
@@ -185,8 +187,8 @@ function removeTeam(req, res){
           });
 
     }catch(err){
-        console.error(error)
-        res.send(500, "An error occured adding a team member: " + JSON.stringify(req.body) );
+        logger.error(error)
+        res.send(500, "An error occured adding a team member");
     }
 }
 
@@ -195,7 +197,7 @@ function _deleteTmpFile(path){
     try {
         fs.unlinkSync(path)      
     } catch(err) {
-        console.error(err)
+        logger.error(err)
     }
 }
 

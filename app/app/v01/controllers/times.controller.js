@@ -7,6 +7,8 @@ var MongoUrl = config.getMongoUrl();
 
 var request = require('request');
 
+const logger = require('../../../logger');
+
 async function getTimes(req, res){
 
     try{
@@ -23,7 +25,7 @@ async function getTimes(req, res){
 
  
     }catch(error){
-        console.error(error.stack);
+        logger.error(error);
         res.send(403, "Something went wrong getting the times.");
     }
 
@@ -198,8 +200,8 @@ function updateOpenDay(req, res){
         });
     
       }catch(error){
-        console.error(error)
-        res.send(500, "An error occured updating the day opening hours: " + JSON.stringify(req.body) );
+        logger.error(error)
+        res.send(500, "An error occured updating the day opening hours" );
       }
 }
 
@@ -212,7 +214,7 @@ function upsertVacation(req, res){
         if (
             typeof(vacationObj.vacationStart) == "undefined" || typeof( vacationObj.vacationStart) == "undefined"
             ){
-                return res.send(500, "Please provide correct format for vacation object" + JSON.stringify(req.body) );
+                return res.send(500, "Please provide correct format for vacation object");
             }
 
         vacationObj.vacationStart = new Date(vacationObj.vacationStart);
@@ -243,8 +245,8 @@ function upsertVacation(req, res){
         });
     
       }catch(error){
-        console.error(error)
-        res.send(500, "An error occured upserting the vacation entry: " + JSON.stringify(req.body) );
+        logger.error(error)
+        res.send(500, "An error occured upserting the vacation entry");
       }
 }
 
@@ -273,8 +275,8 @@ function removeVacation(req, res){
           });
 
     }catch(err){
-        console.error(error)
-        res.send(500, "An error occured adding a team member: " + JSON.stringify(req.body) );
+        logger.error(err)
+        res.send(500, "An error occured adding a team member");
     }
 }
 
@@ -364,13 +366,15 @@ async function insertPublicHolidays(holidayArray){
 async function syncPublicHolidays(req, res){
 
     try{
-        let backendConfig = await config.getBackendConfig();
+        let backendConfig = await config.getBackendConfig().catch(err => {
+            throw err;
+        });
+
         let stateInfo;
     
         try{
             stateInfo = backendConfig.master.state.abbreviation || "HE";
         }catch(err){
-            
            return res.send(500, "Missing master data about state");
         }
     
@@ -378,12 +382,12 @@ async function syncPublicHolidays(req, res){
         let toBeAddedHolidays = [];
     
         await removePublicHolidaysFromToday().catch(err => {
-            console.error(err);
+            throw err;
         });
     
     
         let pubHolidaysThisYear = await fetchPublicHolidays(yearStart, stateInfo).catch(err => {
-            console.error(err);
+            throw err;
         });
     
         Object.keys(pubHolidaysThisYear).forEach(key => {
@@ -398,7 +402,7 @@ async function syncPublicHolidays(req, res){
         });
     
         let pubHolidaysNextYear = await fetchPublicHolidays(yearStart+1, stateInfo).catch(err => {
-            console.error(err);
+            throw err;
         });
     
         Object.keys(pubHolidaysNextYear).forEach(key => {
@@ -413,11 +417,12 @@ async function syncPublicHolidays(req, res){
         })
         
         await insertPublicHolidays(toBeAddedHolidays).catch(err => {
-            console.error(err);
+            throw err;
         });
     
         res.json({"success" : true});
     }catch(err){
+        logger.error(err);
         res.send(500, {"success" : false, "message" : "Something went wrong syncing the public holidays."});
     }   
 

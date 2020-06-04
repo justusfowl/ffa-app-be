@@ -3,6 +3,8 @@ const cron = require("node-cron");
 const moment = require('moment-timezone');
 var jwt = require('jsonwebtoken'); 
 
+const logger = require('../../../logger');
+
 const appointmentCtrl = require('./appointment.controller');
 const authCtrl = require('./auth.controller');
 const config = require('../../config/config');
@@ -10,55 +12,62 @@ const emailCtrl = require('./emailer.controller');
 
 async function getDailyAppointmentPreview() {
 
-   let today = moment(moment().clone().format("MM-DD-YYYY"), "MM-DD-YYYY");
-   let tomorrow = moment(today.clone().add(1, 'day').format("MM-DD-YYYY"), "MM-DD-YYYY")
+    try{
+        let today = moment(moment().clone().format("MM-DD-YYYY"), "MM-DD-YYYY");
+        let tomorrow = moment(today.clone().add(1, 'day').format("MM-DD-YYYY"), "MM-DD-YYYY")
+     
+         let docUsers = await authCtrl.getUsersByScope("doc").catch(err => {
+             throw err;
+         });
 
-    let docUsers = await authCtrl.getUsersByScope("doc");
-    let recipientsArray = [];
-    docUsers.forEach(element => {
-        recipientsArray.push(element.userName);
-    });
-    
-    let appointments = await appointmentCtrl._getAppointmentsFromDateRange(today, tomorrow).catch(err => {
-        throw err;
-    });
+         let recipientsArray = [];
+         docUsers.forEach(element => {
+             recipientsArray.push(element.userName);
+         });
+         
+         let appointments = await appointmentCtrl._getAppointmentsFromDateRange(today, tomorrow).catch(err => {
+             throw err;
+         });
+     
+         let appointmentsArray = [];
+     
+         appointments.forEach(appointmentObj => {
+             let startDate = moment(appointmentObj.appointmentObj.start);
+             let displayStartDate = startDate.tz(config.timeZone).locale("de");
+     
+             let endDate = moment(appointmentObj.appointmentObj.end);
+             let displayEndTime = endDate.tz(config.timeZone).locale("de");
+     
+             let item = {
+                 "displayStartDate" : displayStartDate.format("LLL"),
+                 "displayEndTime" : displayEndTime.format("LT"),
+                 "doc" : appointmentObj.doc.userName,
+                 "type" : appointmentObj.appointmentType.name
+             }
+     
+             appointmentsArray.push(item);
+         });   
+     
+         let displayBaseDate = today.tz(config.timeZone).locale("de");
+     
+         let emailContext = {
+             "baseDate" : displayBaseDate.format('dddd MMM Do YYYY')
+         };
+     
+         if (appointmentsArray.length > 0){
+             emailContext["teleappointments"] = appointmentsArray;
+         }
+        
+         await emailCtrl.sendDailyAppointmentPreview(recipientsArray, emailContext).catch(err => {
+             throw err;
+         });
+     
+         logger.info("Daily preview has run...");
 
-    let appointmentsArray = [];
-
-    appointments.forEach(appointmentObj => {
-        let startDate = moment(appointmentObj.appointmentObj.start);
-        let displayStartDate = startDate.tz(config.timeZone).locale("de");
-
-        let endDate = moment(appointmentObj.appointmentObj.end);
-        let displayEndTime = endDate.tz(config.timeZone).locale("de");
-
-        let item = {
-            "displayStartDate" : displayStartDate.format("LLL"),
-            "displayEndTime" : displayEndTime.format("LT"),
-            "doc" : appointmentObj.doc.userName,
-            "type" : appointmentObj.appointmentType.name
-        }
-
-        appointmentsArray.push(item);
-    });   
-
-    let displayBaseDate = today.tz(config.timeZone).locale("de");
-
-    let emailContext = {
-        "baseDate" : displayBaseDate.format('dddd MMM Do YYYY')
-    };
-
-    if (appointmentsArray.length > 0){
-        emailContext["teleappointments"] = appointmentsArray;
+    }catch(err){
+        logger.error(err);
     }
-    
-
-    await emailCtrl.sendDailyAppointmentPreview(recipientsArray, emailContext).catch(err => {
-        console.error(err);
-    });
-
-    console.log("Daily preview has run...");
-
+   
 }
 
 async function notifyPatientUpcomingTeleAppointment() {
@@ -94,7 +103,7 @@ async function notifyPatientUpcomingTeleAppointment() {
         }
         
     }catch(err){
-        console.error(err);
+        logger.error(err);
     }
  
  }

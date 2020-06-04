@@ -6,6 +6,8 @@ var MongoUrl = config.getMongoUrl();
 
 var moment = require('moment-timezone');
 
+const logger = require('../../../logger');
+
 async function generateDialInCodes(id) { 
 
     return new Promise(async (resolve, reject) => {
@@ -141,7 +143,7 @@ async function removeAppointment(head_id){
     await login().then(response => {
         TELE_SESSION = response;
     }).catch(err => {
-        console.error(err);
+        logger.error(err);
     })
 
     return new Promise((resolve, reject) => {
@@ -188,7 +190,7 @@ async function insertAppointment(startDate, durationInSecs){
     await login().then(response => {
         TELE_SESSION = response;
     }).catch(err => {
-        console.error(err);
+        logger.error(err);
     })
 
     try{

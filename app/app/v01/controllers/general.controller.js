@@ -9,6 +9,8 @@ var LZString = require('lz-string');
 var base64ToImage = require('base64-to-image');
 var uuid = require("uuid");
 
+const logger = require('../../../logger');
+
 function getSettings(req, res){
 
     try{
@@ -33,7 +35,7 @@ function getSettings(req, res){
         });
  
     }catch(error){
-        console.error(error.stack);
+        logger.error(error);
         res.send(403, "Something went wrong getting the settings.");
     }
 
@@ -63,7 +65,7 @@ function getConfig(req, res){
         });
  
     }catch(error){
-        console.error(error.stack);
+        logger.error(error);
         res.send(403, "Something went wrong getting the config.");
     }
 
@@ -115,7 +117,7 @@ function storeConfig(req, res){
         });
  
     }catch(error){
-        console.error(error.stack);
+        logger.error(error);
         res.send(403, "Something went wrong writing the config object.");
     }
 
@@ -166,7 +168,7 @@ function storeSettings(req, res){
         });
  
     }catch(error){
-        console.error(error.stack);
+        logger.error(error);
         res.send(403, "Something went wrong writing the settings object.");
     }
 
@@ -229,7 +231,7 @@ function uploadFile(req, res){
         res.json(responseObj);
 
     }catch(err){
-        console.error(err);
+        logger.error(err);
         res.send(500, "Something went wrong uploading a file.")
     }
 }
@@ -259,13 +261,12 @@ async function findCities(req, res){
                 throw error;
             }
 
-            console.log(body)
             res.json(body);
 
         });
 
     }catch(err){
-        console.error(err);
+        logger.error(err);
         res.send(500, "Something went wrong finding a City.")
     }
   
@@ -301,8 +302,8 @@ async function getWeatherFromLocation(req, res){
         });
 
     }catch(err){
-        console.error(err);
-        res.send(500, "Something went wrong finding a City.")
+        logger.error(err);
+        res.send(500, "Something went wrong getWeatherFromLocation.")
     }
   
 }

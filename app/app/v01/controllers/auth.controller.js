@@ -5,6 +5,7 @@ var MongoClient = require('mongodb').MongoClient;
 var ObjectID = require('mongodb').ObjectID;
 var bcrypt = require('bcrypt');
 var emailerCtrl = require('./emailer.controller');
+const logger = require('../../../logger');
 
 var MongoUrl = config.getMongoUrl();
 
@@ -20,12 +21,12 @@ async function login(req, res){
     try{
 
          let userObj = await getUserByName(userName).catch(err => {
-            res.send(403, "Either username or password invalid"); 
+            res.status(403).send("Either username or password invalid"); 
             return; 
          });
 
          if (!userObj){
-            res.send(403, "Either username or password invalid"); 
+            res.status(403).send("Either username or password invalid"); 
             return;       
         }
 
@@ -34,7 +35,7 @@ async function login(req, res){
             let resp = userObj; 
 
             if (!userObj.validated){
-                return res.send(425, "Please verify your account first."); 
+                return res.status(425).send("Please verify your account first."); 
             }
 
             delete resp.passPhrase;
@@ -47,12 +48,12 @@ async function login(req, res){
 
             res.json({"data" : resp});
         }else{
-            res.send(403, "Either username or password invalid");            
+            res.status(403).send("Either username or password invalid");            
         }
 
     }catch(error){
-        console.error(error.stack);
-        res.send(403, "Something went wrong logging in.");
+        logger.error(err);
+        res.status(403).send("Something went wrong logging in.");
     }
 
 }
@@ -69,141 +70,157 @@ function validatePassphrase(pass){
 
 async function registerUser ( req, res ){
 
-    let userName = req.body.userName;
-    let pass = req.body.password;
-
-    if (!validateEmail(userName)){
-        res.send(406, "Please provide a valid email as a userName");
-        return;
-    }
-
-    if (!validatePassphrase(pass)){
-        res.send(406, "Please provide a strong passphrase (at least length=8 and special characters)");
-        return;
-    }
-
-    var salt = bcrypt.genSaltSync(10);
-    let passPhrase = bcrypt.hashSync(pass, salt);
-
-    // all users coming here need to have accepted the basic terms, hence only the date will be stored for accepting
-    let newUser = {
-        "userName" : userName, 
-        "passPhrase" : passPhrase, 
-        "name" : req.body.name || null,
-        "birthdate" : new Date(req.body.birthdate) || null,
-        "validated" : false, 
-        "acceptTerms" : new Date(), 
-        "acceptInfoHistory" : [
-            {
-                "acceptInfo" : req.body.acceptInfo || false, 
-                "timestamp" : new Date()
-            }
-        ],
-        "notifications" : {
-            "reminderCheckups" : req.body.acceptInfo || false, 
-            "reminderVaccination" : req.body.acceptInfo || false, 
-            "newsletter" : req.body.acceptInfo || false, 
-            "reminderAppointments" : true
+    try{
+        let userName = req.body.userName;
+        let pass = req.body.password;
+    
+        if (!validateEmail(userName)){
+            res.status(406).send("Please provide a valid email as a userName");
+            return;
         }
-    };
-
-    let userObj = await getUserByName(userName);
-
-    if (userObj){
-        res.send(409, "User cannot be created. Already exists");
-        return;
-    }
-
-    MongoClient.connect(MongoUrl, function(err, db) {
-  
-        if (err) throw err;
-        
-        let dbo = db.db(config.mongodb.database);
-
-        // Get the documents collection
-        const collection = dbo.collection('users');
-        
-        collection.insertOne(
-            newUser,
-          async function(err, u){
-
-            let resultUserObj = await getUserByName(userName);
-
-            let resp = resultUserObj; 
-
-            delete resp.passPhrase;
-
-            var token = jwt.sign(resp, config.auth.jwtsec, {
-                expiresIn: config.auth.expiresIn
-            });
-
-            resp.token = token;
-
-            res.json({"data" : resp});
-
-            _sendAccountValidationEmail(resp._id, resp.userName);
-
+    
+        if (!validatePassphrase(pass)){
+            res.status(406).send("Please provide a strong passphrase (at least length=8 and special characters)");
+            return;
+        }
+    
+        var salt = bcrypt.genSaltSync(10);
+        let passPhrase = bcrypt.hashSync(pass, salt);
+    
+        // all users coming here need to have accepted the basic terms, hence only the date will be stored for accepting
+        let newUser = {
+            "userName" : userName, 
+            "passPhrase" : passPhrase, 
+            "name" : req.body.name || null,
+            "birthdate" : new Date(req.body.birthdate) || null,
+            "validated" : false, 
+            "acceptTerms" : new Date(), 
+            "acceptInfoHistory" : [
+                {
+                    "acceptInfo" : req.body.acceptInfo || false, 
+                    "timestamp" : new Date()
+                }
+            ],
+            "notifications" : {
+                "reminderCheckups" : req.body.acceptInfo || false, 
+                "reminderVaccination" : req.body.acceptInfo || false, 
+                "newsletter" : req.body.acceptInfo || false, 
+                "reminderAppointments" : true
+            }
+        };
+    
+        let userObj = await getUserByName(userName);
+    
+        if (userObj){
+            logger.info("User cannot be created - already exists.");
+            res.status(409).send("User cannot be created. Already exists");
+            return;
+        }
+    
+        MongoClient.connect(MongoUrl, function(err, db) {
+      
+            if (err) throw err;
+            
+            let dbo = db.db(config.mongodb.database);
+    
+            // Get the documents collection
+            const collection = dbo.collection('users');
+            
+            collection.insertOne(
+                newUser,
+              async function(err, u){
+    
+                let resultUserObj = await getUserByName(userName).catch(err => {
+                    throw err;
+                });
+    
+                let resp = resultUserObj; 
+    
+                delete resp.passPhrase;
+    
+                var token = jwt.sign(resp, config.auth.jwtsec, {
+                    expiresIn: config.auth.expiresIn
+                });
+    
+                resp.token = token;
+    
+                res.json({"data" : resp});
+    
+                _sendAccountValidationEmail(resp._id, resp.userName);
+    
+              });
+            
           });
-        
-      });
-
+    }catch(err){
+        logger.error(err);
+    }
 }
 
 
 async function adminRegisterUser(req, res){
-    
-    let userName = req.body.userName;
 
-    if (!validateEmail(userName)){
-        res.send(406, "Please provide a valid email as a userName");
-        return;
-    }
+    try{
 
+        let userName = req.body.userName;
 
-    let passPhrase = "non-password-admin-preregister"; 
-
-    let newUser = {
-        "userName" : userName, 
-        "passPhrase" : passPhrase, 
-        "validated" : false,
-        "notifications" : {
-            "reminderCheckups" : true, 
-            "reminderVaccination" : true, 
-            "newsletter" : true, 
-            "reminderAppointments" : true
+        if (!validateEmail(userName)){
+            res.status(406).send("Please provide a valid email as a userName");
+            return;
         }
-    };
 
-    let userObj = await getUserByName(userName);
 
-    if (userObj){
-        res.send(409, "User cannot be created. Already exists");
-        return;
+        let passPhrase = "non-password-admin-preregister"; 
+
+        let newUser = {
+            "userName" : userName, 
+            "passPhrase" : passPhrase, 
+            "validated" : false,
+            "notifications" : {
+                "reminderCheckups" : true, 
+                "reminderVaccination" : true, 
+                "newsletter" : true, 
+                "reminderAppointments" : true
+            }
+        };
+
+        let userObj = await getUserByName(userName).catch(err=>{
+            throw err;
+        });
+
+        if (userObj){
+            res.status(409).send("User cannot be created. Already exists");
+            return;
+        }
+
+        MongoClient.connect(MongoUrl, function(err, db) {
+    
+            if (err) throw err;
+            
+            let dbo = db.db(config.mongodb.database);
+
+            // Get the documents collection
+            const collection = dbo.collection('users');
+            
+            collection.insertOne(
+                newUser,
+            async function(err, u){
+
+                res.json({"message" : "OK"});
+
+                let resultUserObj = await getUserByName(userName).catch(err=>{
+                    throw err;
+                });
+
+                let resp = resultUserObj;
+                _sendAccountPreRegistrationEmail(resp._id, resp.userName);
+
+            });
+            
+        });
+
+    }catch(err){
+        logger.error(err);
     }
-
-    MongoClient.connect(MongoUrl, function(err, db) {
-  
-        if (err) throw err;
-        
-        let dbo = db.db(config.mongodb.database);
-
-        // Get the documents collection
-        const collection = dbo.collection('users');
-        
-        collection.insertOne(
-            newUser,
-          async function(err, u){
-
-            res.json({"message" : "OK"});
-
-            let resultUserObj = await getUserByName(userName);
-
-            let resp = resultUserObj;
-            _sendAccountPreRegistrationEmail(resp._id, resp.userName);
-
-          });
-        
-      });
 
 }
 
@@ -435,103 +452,123 @@ async function validateUserScope(userId, scope){
 function _sendAccountForgotPasswordEmail (_id, userName){
     return new Promise((resolve, reject) => {
 
-        let data = {
-            "_id" : _id
-        };
+        try{
+            let data = {
+                "_id" : _id
+            };
+        
+            var token = jwt.sign(data, config.auth.jwtsec, {
+                expiresIn: 86400000
+            });
+        
+            let urlBase;
     
-        var token = jwt.sign(data, config.auth.jwtsec, {
-            expiresIn: 86400000
-        });
+            if (config.env == "development"){
+                urlBase = config.hostProto + "://" + config.hostBase + ":" + config.hostExposedPort  + "/passreset?token=";
+            }else{
+                urlBase = config.hostProto + "://" + config.hostBase + "/passreset?token=";
+            }
     
-        let urlBase;
-
-        if (config.env == "development"){
-            urlBase = config.hostProto + "://" + config.hostBase + ":" + config.hostExposedPort  + "/passreset?token=";
-        }else{
-            urlBase = config.hostProto + "://" + config.hostBase + "/passreset?token=";
+            let tokenUrl = encodeURI(urlBase + token); 
+        
+            emailerCtrl.sendForgotPasswordEmail(userName, tokenUrl).then(result => {
+                resolve(true)
+            }).catch(err =>{
+                reject(false);
+            })
+        }catch(err){
+            logger.error(err);
         }
-
-        let tokenUrl = encodeURI(urlBase + token); 
-    
-        emailerCtrl.sendForgotPasswordEmail(userName, tokenUrl).then(result => {
-            resolve(true)
-        }).catch(err =>{
-            reject(false);
-        })
+        
     })
 }
 
 function _sendPasswordWasResetEmail (userName){
     return new Promise((resolve, reject) => {
 
-        let contextObj = {
-            "userName" : userName
+        try{
+            let contextObj = {
+                "userName" : userName
+            }
+    
+            emailerCtrl.sendPasswordWasResetEmail(contextObj).then(result => {
+                resolve(true)
+            }).catch(err =>{
+                reject(false);
+            })
+        }catch(err){
+            logger.error(err);
         }
-
-        emailerCtrl.sendPasswordWasResetEmail(contextObj).then(result => {
-            resolve(true)
-        }).catch(err =>{
-            reject(false);
-        })
+       
     })
 }
 
 function _sendAccountValidationEmail (_id, userName){
     return new Promise((resolve, reject) => {
 
-        let data = {
-            "_id" : _id
-        };
+        try{
+            let data = {
+                "_id" : _id
+            };
+        
+            var token = jwt.sign(data, config.auth.jwtsec, {
+                expiresIn: 86400000
+            });
+        
+            let urlBase;
     
-        var token = jwt.sign(data, config.auth.jwtsec, {
-            expiresIn: 86400000
-        });
+            if (config.env == "development"){
+                urlBase = config.hostProto + "://" + config.hostBase + ":" + config.hostExposedPort  + "/web/validateAccount?token=";
+            }else{
+                urlBase = config.hostProto + "://" + config.hostBase + "/web/validateAccount?token=";
+            }
     
-        let urlBase;
-
-        if (config.env == "development"){
-            urlBase = config.hostProto + "://" + config.hostBase + ":" + config.hostExposedPort  + "/web/validateAccount?token=";
-        }else{
-            urlBase = config.hostProto + "://" + config.hostBase + "/web/validateAccount?token=";
+            let tokenUrl = encodeURI(urlBase + token); 
+        
+            emailerCtrl.sendValidateAccountEmail(userName, tokenUrl).then(result => {
+                resolve(true)
+            }).catch(err =>{
+                reject(false);
+            })
+        }catch(err){
+            logger.error(err);
         }
-
-        let tokenUrl = encodeURI(urlBase + token); 
-    
-        emailerCtrl.sendValidateAccountEmail(userName, tokenUrl).then(result => {
-            resolve(true)
-        }).catch(err =>{
-            reject(false);
-        })
+        
     })
 }
 
 function _sendAccountPreRegistrationEmail (_id, userName){
     return new Promise((resolve, reject) => {
 
-        let data = {
-            "_id" : _id, 
-            "flagPreRegister" : true
-        };
+        try{
+            let data = {
+                "_id" : _id, 
+                "flagPreRegister" : true
+            };
+        
+            var token = jwt.sign(data, config.auth.jwtsec, {
+                expiresIn: 86400000
+            });
+        
+            let urlBase;
     
-        var token = jwt.sign(data, config.auth.jwtsec, {
-            expiresIn: 86400000
-        });
+            if (config.env == "development"){
+                urlBase = config.hostProto + "://" + config.hostBase + ":" + config.hostExposedPort  + "/passreset?token=";
+            }else{
+                urlBase = config.hostProto + "://" + config.hostBase + "/passreset?token=";
+            }
     
-        let urlBase;
-
-        if (config.env == "development"){
-            urlBase = config.hostProto + "://" + config.hostBase + ":" + config.hostExposedPort  + "/passreset?token=";
-        }else{
-            urlBase = config.hostProto + "://" + config.hostBase + "/passreset?token=";
+            let tokenUrl = encodeURI(urlBase + token); 
+        
+            emailerCtrl.sendPreRegistrationEmail(userName, tokenUrl).then(result => {
+                resolve(true)
+            }).catch(err =>{
+                reject(false);
+            })
+        }catch(err){
+            logger.error(err);
         }
-
-        let tokenUrl = encodeURI(urlBase + token); 
-    
-        emailerCtrl.sendPreRegistrationEmail(userName, tokenUrl).then(result => {
-            resolve(true)
-        }).catch(err =>{
-            reject(false);
-        })
+       
     })
 }
 
@@ -545,7 +582,7 @@ async function userIssueAccountValidationEmail (req, res){
         _sendAccountValidationEmail(userId, userObj.userName).then (result => {
             res.json({"message" : "OK - message sent"});
         }).catch(err => {
-            console.error(err);
+            logger.error(err);
             res.send(500, "Email could not be sent.");
         })
     }else{
@@ -563,13 +600,12 @@ async function userIssueForgotPasswordEmail (req, res){
         _sendAccountForgotPasswordEmail(userId, userObj.userName).then (result => {
             res.json({"message" : "OK - message sent"});
         }).catch(err => {
-            console.error(err);
+            logger.error(err);
             res.send(500, "Email could not be sent.");
         })
     }else{
-        console.log("Reset password, user not found for: " + userName);
+        logger.info("Reset password, user not found for: " + userName);
         res.json({"message" : "OK"});
-        //res.send(404, "User not found.");
     }
 }
 
@@ -627,7 +663,7 @@ async function resetUserPassword (req, res){
         });
 
     }catch(error){
-        console.error(error.stack);
+        logger.error(error);
         res.send(403, "Something went wrong resetting the password.");
     }
 
@@ -660,7 +696,7 @@ function getUsers(req, res){
           });
  
     }catch(error){
-        console.error(error.stack);
+        logger.error(error);
         res.send(403, "Something went wrong getting the users.");
     }
 }
@@ -704,7 +740,7 @@ function updateUser(req, res){
           });
  
     }catch(error){
-        console.error(error.stack);
+        logger.error(error);
         res.send(403, "Something went wrong getting the users.");
     }
 }
@@ -734,7 +770,7 @@ function removeUser(req, res){
             });
 
     }catch(err){
-        console.error(error)
+        logger.error(error)
         res.send(500, "An error occured deleting the user: " + targetUserId );
     }
 

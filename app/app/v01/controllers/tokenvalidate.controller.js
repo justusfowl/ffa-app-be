@@ -2,14 +2,11 @@ var jwt = require('jsonwebtoken');
 var ObjectID = require('mongodb').ObjectID;
 const config = require('../../config/config');
 var authCtrl = require('./auth.controller');
+const logger = require('../../../logger');
 
 function verifyToken(req, res, next) {
 
-    // check header or url parameters or post parameters for token
-
-    let token = req.headers['x-access-token'] || req.headers['authorization']; // Express headers are auto converted to lowercase
-
-
+    let token = req.headers['x-access-token'] || req.headers['authorization'];
 
     if (token){
 
@@ -26,7 +23,6 @@ function verifyToken(req, res, next) {
                 return res.send(401, { auth: false, message: 'Failed to authenticate token.' });    
               }
         }
-            
 
         // if everything is good, save to request for use in other routes
         req.userId = decoded._id;
@@ -35,15 +31,13 @@ function verifyToken(req, res, next) {
           req.appointmentId = decoded.appointmentId;
         }
         
-
         next();
 
         });
     }else{
         res.send(403, { auth: false, message: 'No token provided.' });
     }
-   
-  
+
   }
 
 // difference: let all requests pass and decode token for the requests where token exists
@@ -127,7 +121,9 @@ function verifyToken(req, res, next) {
       if (!req.userId){
         return res.send(403, { auth: false, message: 'No token provided.' });
       }
-      let hasScope = await authCtrl.validateUserScope(req.userId, scope);
+      let hasScope = await authCtrl.validateUserScope(req.userId, scope).catch(err => {
+        logger.error(err);
+      });
       if (!hasScope){
         return res.send(401, { auth: false, message: 'No privileges to access this ressource.' });    
       }else{

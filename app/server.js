@@ -4,6 +4,11 @@ const app = express();
 const http = require('http');
 const fs = require("fs");
 const path = require('path');
+const logger = require('./logger');
+
+// const expressWinston=require('express-winston');
+
+
 const config = require('./app/config/config');
 
 const jobController = require('./app/v01/controllers/jobs.controller');
@@ -18,7 +23,7 @@ if (!fs.existsSync(pubDirectory)){
 
 var hbs = require( 'express-handlebars');
 
-console.log("Launching...")
+console.log("Launching...");
 
 app.set('view engine', 'hbs');
 app.set('views', path.resolve(__dirname, './app/v01/views/'));
@@ -54,6 +59,16 @@ var bodyParser = require('body-parser');
 app.use(bodyParser.json({limit: '50mb'}));
 app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
 
+/*
+app.use(expressWinston.logger({
+  transports: [logger],
+  meta: false,
+  msg: `{{req.ip}} - {{res.statusCode}} - {{req.method}} - {{res.responseTime}}ms - {{req.url}} - {{req.headers['user-agent']}}`,
+  expressFormat: false,
+  colorize: true
+}));
+*/
+
 app.use('/api/v' + config.APIVersion, apiRoutes);
 app.use('/web', wbRoutes);
 
@@ -75,7 +90,7 @@ sockets.init(server);
 jobController.init();
 
 server.listen(config.port, () => {
-  console.log('Server started at port !' + config.port);
+  logger.info('Server started at port !' + config.port);
 });
 
 

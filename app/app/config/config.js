@@ -17,9 +17,16 @@ else if (env == 'production'){
 
 const config = {
 
+    appName : process.env.APP_NAME,
+
     timeZone : "Europe/Berlin",
     env: env,
     port: port,
+
+    logger : {
+      papertrailHost : process.env.PAPERTRAIL_HOST,
+      papertrailPort : process.env.PAPERTRAIL_PORT,
+    },
 
     hostExposedPort : process.env.HOST_EXPOSED_PORT,
     hostBase :  process.env.HOST_BASE,

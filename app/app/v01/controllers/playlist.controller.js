@@ -5,6 +5,8 @@ var ObjectID = require('mongodb').ObjectID;
 
 var MongoUrl = config.getMongoUrl();
 
+const logger = require('../../../logger');
+
 function addPlaylist(playlistObj){
 
     return new Promise((resolve, reject) => {
@@ -72,7 +74,7 @@ async function getPlaylists(req, res){
         let playlists = await loadPlaylists();
         res.json(playlists);
     }catch(err){
-        console.error(err)
+        logger.error(err)
         return res.send(500, "An error occured requesting the playlists");
     }
 }
@@ -116,7 +118,7 @@ function updatePlaylist(req, res){
           });
  
     }catch(error){
-        console.error(error.stack);
+        logger.error(error);
         res.send(403, "Something went wrong getting the users.");
     }
 }
@@ -145,8 +147,8 @@ function removePlaylist(req, res){
           });
 
     }catch(err){
-        console.error(error)
-        res.send(500, "An error occured adding a team member: " + JSON.stringify(req.body) );
+        logger.error(err)
+        res.send(500, "An error occured adding a team member.");
     }
 }
 

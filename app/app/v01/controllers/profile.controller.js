@@ -8,6 +8,8 @@ var messageCtrl = require('./message.controller');
 
 var MongoUrl = config.getMongoUrl();
 
+const logger = require('../../../logger');
+
 /**
  * Function to update one's individual user
  * @param {*} req 
@@ -82,7 +84,7 @@ function updateUser(req, res){
          });
 
    }catch(error){
-       console.error(error.stack);
+       logger.error(error);
        res.send(403, "Something went wrong getting the users.");
    }
 
@@ -116,7 +118,7 @@ function removeProfile(userId){
               });
      
         }catch(error){
-            console.error(error.stack);
+            logger.error(error);
             res.send(403, "Something went wrong getting the users.");
         }
     })
@@ -143,7 +145,7 @@ async function deleteAccount(req, res){
         res.json({"message" : "ok"});
 
     }catch(err){
-        console.error(error.stack);
+        logger.error(error);
         res.send(403, "Something went wrong removing the account the users.");
     } 
 }

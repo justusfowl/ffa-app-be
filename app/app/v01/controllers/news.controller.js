@@ -10,6 +10,8 @@ var path = require('path');
 
 var authCtrl = require('./auth.controller');
 
+const logger = require('../../../logger');
+
 async function getNews(req, res){
 
     try{
@@ -19,7 +21,9 @@ async function getNews(req, res){
         let flagUnpublished = req.query.unpublished;
 
         if (userId){
-            flagIsAdmin = await authCtrl.validateUserScope(userId, "admin");
+            flagIsAdmin = await authCtrl.validateUserScope(userId, "admin").catch(err => {
+                throw err;
+            });
         }
 
         let newsId = req.params.newsId;
@@ -68,13 +72,11 @@ async function getNews(req, res){
           });
  
     }catch(error){
-        console.error(error.stack);
+        logger.error(error);
         res.send(403, "Something went wrong getting the users.");
     }
 
 }; 
-
-
 
 function updateNews(req, res){
     try{
@@ -128,8 +130,8 @@ function updateNews(req, res){
         });
     
       }catch(error){
-        console.error(error)
-        res.send(500, "An error occured updating the team member: " + JSON.stringify(req.body) );
+        logger.error(error);
+        res.send(500, "An error occured updating the team member." );
       }
 }
 
@@ -139,8 +141,6 @@ function newNews(req, res){
 
         var file = req.file;
         var newsObj = req.body;
-        
-
 
         try{
             newsObj["date"] = new Date(newsObj["date"]);
@@ -148,7 +148,7 @@ function newNews(req, res){
             newsObj["image"] = fqdn_file;
 
         }catch(err){
-
+            logger.error(err);
         }
 
         MongoClient.connect(MongoUrl, function(err, db) {
@@ -174,8 +174,8 @@ function newNews(req, res){
 
     }catch(err){
         _deleteTmpFile(file.destination+file.originalname);
-        console.error(error)
-        res.send(500, "An error occured adding a news article: " + JSON.stringify(req.body) );
+        logger.error(err);
+        res.send(500, "An error occured adding a news article." );
     }
     
 }
@@ -206,21 +206,18 @@ function removeNews(req, res){
           });
 
     }catch(err){
-        console.error(error)
-        res.send(500, "An error occured adding a team member: " + JSON.stringify(req.body) );
+        logger.error(err);
+        res.send(500, "An error occured adding a team member");
     }
 }
-
-
 
 function _deleteTmpFile(path){
     try {
         fs.unlinkSync(path)      
     } catch(err) {
-        console.error(err)
+        logger.error(err)
     }
 }
-
 
 module.exports = {
     getNews, 
