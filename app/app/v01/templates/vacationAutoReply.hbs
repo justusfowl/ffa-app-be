@@ -293,22 +293,32 @@
                       <td>
                         <h2>Hallo {{userName}},</h2>
                         <p>vielen Dank für Ihre Nachricht über unsere Website:</p>
-	
-						<p>
-							{{messageText}}
-						</p>
-					
-						WICHTIG: Bitte beachten Sie, dass unsere Praxis aktuell bis einschließlich den : <br/> <span class="strong">{{vacationEndDate}}</span> geschlossen ist. <br/><br/>
+            
+                            <p>
+                              {{messageText}}
+                            </p>
+                          
+                            WICHTIG: Bitte beachten Sie, dass unsere Praxis aktuell bis einschließlich den : <br/> <span class="strong">{{vacationEndDate}}</span> geschlossen ist. <br/><br/>
 
-						Folgende Kollegen*innen übernehmen währenddessen unsere Vertretung: 
+                            {{#if flagHasSubs}}
+                              <p>
+                                Folgende Kollegen*innen übernehmen währenddessen unsere Vertretung:
+                              </p>
+                              
 
-						<ul>
-							{{#each substitutes as |sub|}}
-								<li>{{sub.name}} in {{sub.address}}, Tel: {{sub.phone}}</li>
-							{{/each}}			
-						</ul>
+                              <ul>
+                                {{#each substitutes as |sub|}}
+                                  <li>{{sub.name}} in {{sub.address}}, Tel: {{sub.phone}}</li>
+                                {{/each}}			
+                              </ul>
+                            {{else}}
+                              <p>
+                                Bitte besuchen Sie unsere Website für weitere Informationen, z.B. bzgl. Vertretungen.
+                              </p>
+                            {{/if}}
 
                         <p>Ihr Praxis-Team.</p>
+                        
                       </td>
                     </tr>
                   </table>

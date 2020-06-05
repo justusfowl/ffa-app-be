@@ -62,7 +62,7 @@ async function getDailyAppointmentPreview() {
              throw err;
          });
      
-         logger.info("Daily preview has run...");
+         logger.info(`getDailyAppointmentPreview has run and has found ${appointmentsArray.length} appointments; sent to ${recipientsArray.length} doctors.`);
 
     }catch(err){
         logger.error(err);
@@ -101,6 +101,8 @@ async function notifyPatientUpcomingTeleAppointment() {
                 throw err;
             })
         }
+
+        logger.info(`notifyPatientUpcomingTeleAppointment has run and has found ${appointments.length} appointments to which ${appointmentsArray.length} notifications has been sent`);
         
     }catch(err){
         logger.error(err);

@@ -121,6 +121,12 @@ function sendVacationAutoReply (userName, email, messageText, vacationObject) {
 
     return new Promise((resolve, reject) => {
 
+        var flagHasSubs = false;
+
+        if (vacationObject.subs.length > 0){
+            flagHasSubs = true;
+        }
+
         let options = {
             from : '"' + config.email.smtpEmailSenderName + '" ' + config.email.smtpEmail, 
             to : email, 
@@ -130,6 +136,7 @@ function sendVacationAutoReply (userName, email, messageText, vacationObject) {
                 "userName": userName, 
                 "messageText" : messageText, 
                 "substitutes" : vacationObject.subs,
+                "flagHasSubs" : flagHasSubs,
                 "vacationEndDate" : new Date(vacationObject.vacationEnd).toDateString()
             }
         }
