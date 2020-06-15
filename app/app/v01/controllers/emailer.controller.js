@@ -89,18 +89,31 @@ function sendForgotPasswordEmail (userName, tokenUrl) {
    
 };
 
-function sendGeneralAutoReply (userName, email, messageText) {
+function sendGeneralAutoReply (userName, email, messageText, medicationsArray = [], 
+    flagCollectFromPractice=false, collectDrugStore="", subject="Eingang | Wir haben Ihre Nachricht erhalten") {
 
     return new Promise((resolve, reject) => {
+
+        var flagHasMedication = false;
+
+        if (Array.isArray(medicationsArray)){
+            if (medicationsArray.length > 0){
+                flagHasMedication = true;
+            }
+        }
 
         let options = {
             from : '"' + config.email.smtpEmailSenderName + '" ' + config.email.smtpEmail, 
             to : email, 
-            subject : "Eingang | Wir haben Ihre Nachricht erhalten" , 
+            subject :  subject, 
             template: 'generalAutoReply',
             context: {
                 "userName": userName, 
-                "messageText" : messageText
+                "messageText" : messageText, 
+                "flagHasMedication" : flagHasMedication, 
+                "medications" : medicationsArray, 
+                "flagCollectFromPractice" : flagCollectFromPractice,
+                "collectDrugStore" : collectDrugStore
             }
         }
 
@@ -117,11 +130,19 @@ function sendGeneralAutoReply (userName, email, messageText) {
    
 };
 
-function sendVacationAutoReply (userName, email, messageText, vacationObject) {
+function sendVacationAutoReply (userName, email, messageText, vacationObject, 
+    medicationsArray = [], flagCollectFromPractice=false, collectDrugStore="", subject="Eingang und Urlaubsnotiz | Wir haben Ihre Nachricht erhalten") {
 
     return new Promise((resolve, reject) => {
 
         var flagHasSubs = false;
+        var flagHasMedication = false;
+
+        if (Array.isArray(medicationsArray)){
+            if (medicationsArray.length > 0){
+                flagHasMedication = true;
+            }
+        }
 
         if (vacationObject.subs.length > 0){
             flagHasSubs = true;
@@ -130,14 +151,18 @@ function sendVacationAutoReply (userName, email, messageText, vacationObject) {
         let options = {
             from : '"' + config.email.smtpEmailSenderName + '" ' + config.email.smtpEmail, 
             to : email, 
-            subject : "Eingang und Urlaubsnotiz | Wir haben Ihre Nachricht erhalten" , 
+            subject : subject , 
             template: 'vacationAutoReply',
             context: {
                 "userName": userName, 
                 "messageText" : messageText, 
                 "substitutes" : vacationObject.subs,
                 "flagHasSubs" : flagHasSubs,
-                "vacationEndDate" : new Date(vacationObject.vacationEnd).toDateString()
+                "vacationEndDate" : new Date(vacationObject.vacationEnd).toDateString(), 
+                "flagHasMedication" : flagHasMedication, 
+                "medications" : medicationsArray, 
+                "flagCollectFromPractice" : flagCollectFromPractice,
+                "collectDrugStore" : collectDrugStore
             }
         }
 

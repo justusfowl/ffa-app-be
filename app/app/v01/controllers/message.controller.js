@@ -83,11 +83,7 @@ async function handlePrescriptionMessage(req, res){
             collectDrugStore : collectDrugStore
         };
 
-        let message = "Ihre Rezeptvorbestellung für: ";
-
-        medications.forEach(element => {
-            message += element.name + " "
-        });
+        let message = "Eingang | Ihre Rezeptvorbestellung";
 
         let userObj = await authCtrl.getUserByName(email).catch(err => {
             throw err;
@@ -111,14 +107,16 @@ async function handlePrescriptionMessage(req, res){
         });
 
         if (isVacationObj.isVacation){
-            await emailerCtrl.sendVacationAutoReply(userName, email, message, isVacationObj.vacationObj).then(result => {
-                res.json({"message" : "OK"})
+            let subject = "Eingang und Urlaubsnotiz | Wir haben Ihre Rezeptbestellung erhalten";
+            await emailerCtrl.sendVacationAutoReply(userName, email, "", isVacationObj.vacationObj, medications, flagCollectFromPractice, collectDrugStore, subject).then(result => {
+                res.json({"message" : "OK"});
             }).catch(err =>{
                 res.send(500, "An error occured sending a message" );
             });
         }else{
-            await emailerCtrl.sendGeneralAutoReply(userName, email, message).then(result => {
-                res.json({"message" : "OK"})
+            let subject = "Eingang | Wir haben Ihre Rezeptbestellung erhalten";
+            await emailerCtrl.sendGeneralAutoReply(userName, email, "", medications, flagCollectFromPractice, collectDrugStore, subject).then(result => {
+                res.json({"message" : "OK"});
             }).catch(err =>{
                 res.send(500, "An error occured sending a message");
                 throw err;

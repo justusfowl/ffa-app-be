@@ -297,6 +297,46 @@
                             <p>
                               {{messageText}}
                             </p>
+
+                            {{#if flagHasMedication}}
+
+                            {{#if flagCollectFromPractice}}
+                              <p>
+                                Sie können das Rezept bei uns in der Praxis abholen.
+                              </p>
+                            {{else}}
+                              <p>
+                                Sie haben gebeten das Rezept in folgender Apotheke abzuholen: [{{collectDrugStore}}]
+                              </p>
+                            {{/if}}
+
+                            Folgende Anfrage zur Rezeptvorbestellung:
+
+                            <table style="padding: 20px;">
+                              <tr>
+                                <th>Medikamentenname</th>
+                                <th>Menge</th>
+                                <th>Wirkstoff</th>
+                                <th>Dosis</th>
+                                <th>PZN</th>
+                                <th>Darreichungsform</th>
+                              </tr>
+                              {{#each medications as |med|}}
+                                
+                                <tr>
+                                  <td>{{med.name}}</td>
+                                  <td>{{med.amount}}</td>
+                                  <td>{{med.substance}}</td>
+                                  <td>{{med.dose}}</td>
+                                  <td>{{med.pzn}}</td>
+                                  <td>{{med.dosageform}}</td>
+                                
+                                </tr>
+                                
+                              {{/each}}			
+
+                            </table>
+                          {{/if}}
                           
                             WICHTIG: Bitte beachten Sie, dass unsere Praxis aktuell bis einschließlich den : <br/> <span class="strong">{{vacationEndDate}}</span> geschlossen ist. <br/><br/>
 
