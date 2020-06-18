@@ -76,15 +76,15 @@ export class LoginComponent implements OnInit {
 
     this.guestform =  new FormGroup({
       name : new FormControl('', Validators.required),
-      userEmail : new FormControl('', [Validators.required, Validators.pattern("^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$")])
+      userEmail : new FormControl('', [Validators.required, Validators.email])
     });
 
     this.forgotPasswordForm =  new FormGroup({
-      username : new FormControl('', [Validators.required, Validators.pattern("^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$")])
+      username : new FormControl('', [Validators.required, Validators.email])
     });
 
-    this.registerForm =  new FormGroup({
-      userName : new FormControl('', [Validators.required, Validators.pattern("^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$")]),
+    this.registerForm =  new FormGroup({ 
+      userName : new FormControl('', [Validators.required, Validators.email]),
       name : new FormControl('', Validators.required),
       birthdate : new FormControl('', [Validators.required, validateAge]),
       password : new FormControl('', [Validators.required, validatePassphrase]), 
@@ -93,7 +93,7 @@ export class LoginComponent implements OnInit {
     });
 
     this.loginForm = new FormGroup({
-      username : new FormControl('', [Validators.required, Validators.pattern("^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$")]),
+      username : new FormControl('', [Validators.required, Validators.email]),
       password : new FormControl('', Validators.required)
     });
 
@@ -107,14 +107,6 @@ export class LoginComponent implements OnInit {
   ngOnInit() {
     this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
   }
-
-
-  /*
-  validatePassphrase(pass){
-    var mediumRegex = new RegExp("^(((?=.*[a-z])(?=.*[A-Z]))|((?=.*[a-z])(?=.*[0-9]))|((?=.*[A-Z])(?=.*[0-9])))(?=.{6,})");
-    return mediumRegex.test(pass)
-  }
-  */
 
   get f() { return this.loginForm.controls; }
 

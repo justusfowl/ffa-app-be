@@ -665,7 +665,7 @@ async function resetUserPassword (req, res){
     }catch(error){
         logger.error(error);
         res.send(403, "Something went wrong resetting the password.");
-    }
+    }iimm
 
 
 }
