@@ -8,6 +8,8 @@ var emailerCtrl = require('./emailer.controller');
 var timesCtrl = require('./times.controller');
 var authCtrl = require('./auth.controller');
 
+const logger = require('../../../logger');
+
 async function handleGeneralMessage (req, res){
 
     try{
@@ -96,7 +98,7 @@ async function handlePrescriptionMessage(req, res){
             storeMessage(msgObj).catch(err => {
                 throw err;
             });
-        }
+        };
 
         let isVacationObj = await timesCtrl.getIsCurrentlyVacation().catch(err => {
            throw err;
@@ -111,14 +113,13 @@ async function handlePrescriptionMessage(req, res){
             await emailerCtrl.sendVacationAutoReply(userName, email, "", isVacationObj.vacationObj, medications, flagCollectFromPractice, collectDrugStore, subject).then(result => {
                 res.json({"message" : "OK"});
             }).catch(err =>{
-                res.send(500, "An error occured sending a message" );
+                throw err;
             });
         }else{
             let subject = "Eingang | Wir haben Ihre Rezeptbestellung erhalten";
             await emailerCtrl.sendGeneralAutoReply(userName, email, "", medications, flagCollectFromPractice, collectDrugStore, subject).then(result => {
                 res.json({"message" : "OK"});
             }).catch(err =>{
-                res.send(500, "An error occured sending a message");
                 throw err;
             });
         }

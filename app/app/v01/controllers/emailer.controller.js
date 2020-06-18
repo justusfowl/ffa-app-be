@@ -144,9 +144,12 @@ function sendVacationAutoReply (userName, email, messageText, vacationObject,
             }
         }
 
-        if (vacationObject.subs.length > 0){
-            flagHasSubs = true;
+        if (vacationObject.subs){
+            if (vacationObject.subs.length > 0){
+                flagHasSubs = true;
+            }
         }
+
 
         let options = {
             from : '"' + config.email.smtpEmailSenderName + '" ' + config.email.smtpEmail, 

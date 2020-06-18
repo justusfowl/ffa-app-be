@@ -257,10 +257,10 @@
                     <h2>Urlaubszeiten</h2>
 
                     <div class="vacation-closed" *ngIf="currentVacation">
-                        <p>
+                        <p >
                             Unsere Praxis ist urlaubsbedingt geschlossen. 
                         </p>
-                        <p>
+                        <p *ngIf="currentVacation.subs">
                             Bitte wenden Sie sich an folgende vertretenden Kollegen*innen:
                         </p>
 
