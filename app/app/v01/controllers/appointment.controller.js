@@ -1197,12 +1197,13 @@ async function downloadAppointments(req, res){
                 end: element.appointmentObj.end.toISOString(),
                 title: element.appointmentObj.title, 
                 doc: element.doc.userName, 
-                type : element.appointmentType.name
+                type : element.appointmentType.name, 
+                patientName : element.patientName
             })
         });
 
         // -> Convert JSON to CSV data
-        const fields = ['start', 'end', 'title', 'doc', 'type'];
+        const fields = ['start', 'end', 'title', 'doc', 'type', 'patientName'];
 
         const csvData = parse(output, {fields});
 
