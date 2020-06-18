@@ -15,6 +15,8 @@ const ical = require('ical-generator');
 
 const logger = require('../../../logger');
 
+const { parse } = require('json2csv');
+
 // @TODO: Add those meta config data into the database 
 
 var appointmentMeta = [{
@@ -1162,6 +1164,69 @@ function markAppointmentsAsReminded(appointmentIdsArray){
     })
  }
 
+async function downloadAppointments(req, res){
+    try{
+
+        let startDate, endDate, docId; 
+
+        docId = req.query.docId;
+
+        if (req.query.startDate && req.query.endDate){
+            startDate = new Date(req.query.startDate);
+            endDate = new Date(req.query.endDate);
+
+            if ((endDate.getTime() - startDate.getTime())/(1000*60*60*24) > 200 ){
+                return res.send(500, "Invalid timeframe - limit to 35 days.")
+            }
+        }else{
+            return res.send(500, "please provide start/end dates")
+        }
+
+        let appointments; 
+        if (docId){
+            appointments = await _getAppointmentsFromDateRange(startDate, endDate, null, docId);
+        }else{
+            appointments = await _getAppointmentsFromDateRange(startDate, endDate);
+        }
+
+        let output = [];
+
+        appointments.forEach(element => {
+            output.push({
+                start: element.appointmentObj.start.toISOString(),
+                end: element.appointmentObj.end.toISOString(),
+                title: element.appointmentObj.title, 
+                doc: element.doc.userName, 
+                type : element.appointmentType.name
+            })
+        });
+
+        // -> Convert JSON to CSV data
+        const fields = ['start', 'end', 'title', 'doc', 'type'];
+
+        const csvData = parse(output, {fields});
+
+        console.log(csvData);
+        /**
+            "id","address","age","name"
+            1,"Jack Smith",23,"Massachusetts"
+            2,"Adam Johnson",27,"New York"
+            3,"Katherin Carter",26,"Washington DC"
+            4,"Jack London",33,"Nevada"
+            5,"Jason Bourne",36,"California"
+        */
+      
+        // -> Send CSV File to Client
+        res.setHeader('Content-disposition', 'attachment; filename=appointments.csv');
+        res.set('Content-Type', 'text/csv');
+        res.status(200).end(csvData);
+
+    }catch(err){
+        logger.error(err);
+        res.send(500, "An error occured downloading appointments");
+    }
+}
+
 module.exports = {
     getAvailableSlots, 
     getAvailableDocs, 
@@ -1180,5 +1245,7 @@ module.exports = {
 
     _getAppointmentsFromDateRange,
     cleanUserDataFromAccountRemove,
-    markAppointmentsAsReminded
+    markAppointmentsAsReminded,
+
+    downloadAppointments
 }

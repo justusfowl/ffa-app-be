@@ -33,4 +33,7 @@ router.route('/slots')
 router.route('/slots/:slotId')
     .delete([tokenValidator.detectToken, middlware_hasScopeAdmin], appointmentCtrl.removeAdminTeleSlot)
 
+router.route('/download')
+    .get([tokenValidator.detectToken, middlware_hasScopeAdmin], appointmentCtrl.downloadAppointments)   
+
 module.exports = router;
