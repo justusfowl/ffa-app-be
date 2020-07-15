@@ -10,7 +10,7 @@
         <div class="bullets" formArrayName="bullets">
 
             <div class="bullet-header">
-                <h3>Bullet-Punkte ({{slideContentFrm.controls.bullets.controls.length}}/10)</h3>
+                <h3>Bullet-Punkte ({{slideContentFrm.value.bullets.length}}/10)</h3>
                 <button mat-icon-button (click)="addBullet()">
                     <mat-icon>
                         add
@@ -19,7 +19,7 @@
             </div>
             
 
-            <div class="bullet-itm" *ngFor="let b of slideContentFrm.controls.bullets.controls; let j=index;" [formGroupName]="j">
+            <div class="bullet-itm" *ngFor="let b of getBullets().controls; let j=index;" [formGroupName]="j">
                 <button mat-icon-button (click)="removeBullet(j)">
                     <mat-icon>
                         delete
