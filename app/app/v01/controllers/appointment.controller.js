@@ -743,6 +743,7 @@ async function _checkIfSlotIsFree(startDate, endDate, docUserId){
                 }
 
             }catch(err){
+                logger.error(`There was an error with the tele-provider ${JSON.stringify(response)}`);
                 res.send(500, "An error occured adding a tele appointment.")
                 throw err;
             }

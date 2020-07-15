@@ -13,6 +13,7 @@ import * as LZString from 'lz-string';
 import { EditquoteComponent } from 'src/app/components/tv/editquote/editquote.component';
 import { EditweatherComponent } from 'src/app/components/tv/editweather/editweather.component';
 import { EditmediaComponent } from 'src/app/components/tv/editmedia/editmedia.component';
+import { EditbulletslideComponent } from 'src/app/components/tv/editbulletslide/editbulletslide.component';
 
 @Component({
   selector: 'app-tvhome',
@@ -58,6 +59,11 @@ export class TVHomeComponent implements OnInit {
       "title" : "Wetter",
       "icon": "wb_sunny", 
       "avatar" : "/assets/images/weather.jpg"
+    },
+    {
+      "type" : "bulletslide", 
+      "title" : "Liste",
+      "icon": "view_module"
     },
     {
       "type" : "designer", 
@@ -346,6 +352,20 @@ export class TVHomeComponent implements OnInit {
       const dialogRef = this.dialog.open(EditmediaComponent, {
         data: {item : item}, 
         panelClass : "edit-media-dialog"
+      });
+
+    }else if (item.type.type == 'bulletslide'){
+
+      const dialogRef = this.dialog.open(EditbulletslideComponent, {
+        data: {item : item}, 
+        panelClass : "edit-bulletslide-dialog"
+      });
+
+      dialogRef.afterClosed().subscribe(resultItem => {
+        if (resultItem){
+          console.log(resultItem);
+         item["slide"] = resultItem;
+        }
       });
 
     }

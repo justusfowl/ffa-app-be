@@ -214,9 +214,16 @@ async function insertAppointment(startDate, durationInSecs){
                     "method": "create",
                     "VideoAppointment": {
                         "start": moment(startDate).toISOString(),
-                        "VideoAppointmentDetails": {
-                            "patientName": "nwNny3mWCV3WUo/nY4dOHiJH1k tv/G3mWajkv6Ultn5yMDbmBb3Y7X4N4BjD0rgjZo",
-                            "doctorName": "FFA",
+                        "VideoAppointmentDetails": 
+                        
+                        {
+                            "organisatorName": "ffa",
+                            "isConference": false,
+                            "participants": [
+                                {
+                                    "name": "nwNny3mWCV3WUo/nY4dOHiJH1k tv/G3mWajkv6Ultn5yMDbmBb3Y7X4N4BjD0rgjZo"
+                                }
+                            ],
                             "duration": Math.round(durationInSecs/60)
                         },
                         "doctorCode": docCode,

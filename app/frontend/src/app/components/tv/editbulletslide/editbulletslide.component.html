@@ -1,0 +1,47 @@
+<div class="edit-bulletslide-dialog">
+
+    <form id="slideContentFrm"  FormGroupDirective  [formGroup]="slideContentFrm"  data-toggle="validator" data-focus="false">
+        <mat-form-field class="form-input">
+            <mat-label>Folien-Titel</mat-label>
+            <input formControlName="title" required type="text" matInput #messageObj maxlength="300" placeholder="Folien-Titel">
+            <mat-hint class="hint" align="end">{{slideContentFrm.value.title.length}} / 300</mat-hint>
+        </mat-form-field>
+        
+        <div class="bullets" formArrayName="bullets">
+
+            <div class="bullet-header">
+                <h3>Bullet-Punkte ({{slideContentFrm.controls.bullets.controls.length}}/10)</h3>
+                <button mat-icon-button (click)="addBullet()">
+                    <mat-icon>
+                        add
+                    </mat-icon>
+                </button>
+            </div>
+            
+
+            <div class="bullet-itm" *ngFor="let b of slideContentFrm.controls.bullets.controls; let j=index;" [formGroupName]="j">
+                <button mat-icon-button (click)="removeBullet(j)">
+                    <mat-icon>
+                        delete
+                    </mat-icon>
+                </button>
+                <mat-form-field class="form-input">
+                    <input matInput placeholder="Inhalt" class="form-item" formControlName="text">
+                </mat-form-field>
+            </div>
+
+        </div>
+    </form>
+
+    <div class="buttons">
+
+        <button mat-button (click)="close()">
+            Schließen
+        </button>
+        <button mat-button (click)="save()" [disabled]="!slideContentFrm.valid">
+            Speichern
+        </button>
+
+    </div>
+
+</div>

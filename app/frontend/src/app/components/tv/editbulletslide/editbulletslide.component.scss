@@ -1,0 +1,25 @@
+.edit-bulletslide-dialog{
+    .bullets{
+        .bullet-header{
+            h3{
+                margin: 0;
+            }
+            
+            display: flex;
+            align-items: center;
+        }
+    }
+
+    .form-input{
+        min-width: 350px;
+    }
+}
+
+@media(max-width: 350px){
+    .edit-bulletslide-dialog{
+        .form-input{
+            width: 80vw;
+        }
+    }
+    
+}

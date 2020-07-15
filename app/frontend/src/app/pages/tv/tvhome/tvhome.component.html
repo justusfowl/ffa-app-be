@@ -117,6 +117,16 @@
                                         </div>
                                     </ng-container>
 
+                                    <ng-container *ngIf="item.type.type == 'bulletslide' && item.slide" >
+                                            <div class="main">
+                                                {{item.slide.title}}
+                                            </div>
+        
+                                            <div class="subtitle">
+                                                # {{item.slide.bullets.length}} Inhalte
+                                            </div>
+                                        </ng-container>
+
                                     <ng-container *ngIf="item.type.type == 'weather' && item.location" >
                                         <div class="main">
                                             {{item.location.name}} ({{item.location.sys.country}})
@@ -149,7 +159,13 @@
                             </button>
 
                             <button class="edit endbtn" mat-icon-button (click)="editItem(item)" 
-                                    *ngIf="item.type.type == 'clock' || item.type.type == 'quote' || item.type.type == 'weather' || item.type.type == 'image' || item.type.type == 'video'">
+                                    *ngIf="
+                                        item.type.type == 'clock' || 
+                                        item.type.type == 'quote' || 
+                                        item.type.type == 'weather' || 
+                                        item.type.type == 'image' || 
+                                        item.type.type == 'video' || 
+                                        item.type.type == 'bulletslide'">
                                 <mat-icon>more_vert</mat-icon>
                             </button>
 
