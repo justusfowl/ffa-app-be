@@ -26,7 +26,6 @@ export class CancelappointmentComponent implements OnInit, AfterViewInit {
   ) {
 
     if (data.token){
-      
       this.token = data.token;
       this.appointmentId = data.appointmentId;
     }else{

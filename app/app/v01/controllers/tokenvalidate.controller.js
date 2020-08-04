@@ -60,11 +60,12 @@ function verifyToken(req, res, next) {
         if (err){
           if (err.name == "TokenExpiredError"){
             return res.send(440, { auth: false, message: 'Token expired.' });    
+          }else{
+            return res.status(401).send({ auth: false, message: 'Failed to authenticate token.' });    
           }
         }else{
           req.userId = decoded._id;
         }
-          
         next();
   
       });
