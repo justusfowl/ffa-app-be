@@ -5,11 +5,12 @@ const http = require('http');
 const fs = require("fs");
 const path = require('path');
 const logger = require('./logger');
-
+var MongoClient = require('mongodb').MongoClient;
 // const expressWinston=require('express-winston');
 
 
 const config = require('./app/config/config');
+var MongoUrl = config.getMongoUrl();
 
 const jobController = require('./app/v01/controllers/jobs.controller');
 
@@ -91,6 +92,25 @@ jobController.init();
 
 server.listen(config.port, () => {
   logger.info('Server started at port !' + config.port);
+
+  MongoClient.connect(MongoUrl, {useUnifiedTopology: true}, function(err, db) {
+  
+    if (err) throw err;
+    
+    let dbo = db.db(config.mongodb.database);
+
+    const collection = dbo.collection('config');
+
+    collection.findOne({}, function(error, result){
+        if (error){
+            throw err;
+        }else{
+          logger.info("mongoDB connected successfully")
+        }
+    });
+
+});
+
 });
 
 

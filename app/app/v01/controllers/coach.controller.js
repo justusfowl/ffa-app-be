@@ -46,10 +46,12 @@ async function _getCoachMeta(){
 }
 
 (async() => {
-
+  logger.info("_getCoachMeta is deactivated.")
+  /*
   questions = await _getCoachMeta().catch(err => {
     logger.error(err);
   });
+  */
 
 })();
 

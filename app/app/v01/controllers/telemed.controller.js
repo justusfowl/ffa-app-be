@@ -210,44 +210,27 @@ async function insertAppointment(startDate, durationInSecs){
             "method": "transaction",
             "transaction": [
                 {
-                    "class": "crud",
+                    "class": "videoAppointment",
                     "method": "create",
                     "VideoAppointment": {
                         "start": moment(startDate).toISOString(),
-                        "VideoAppointmentDetails": 
-                        
-                        {
-                            "organisatorName": "ffa",
-                            "isConference": false,
-                            "participants": [
-                                {
-                                    "name": "nwNny3mWCV3WUo/nY4dOHiJH1k tv/G3mWajkv6Ultn5yMDbmBb3Y7X4N4BjD0rgjZo"
-                                }
-                            ],
-                            "duration": Math.round(durationInSecs/60)
-                        },
-                        "doctorCode": docCode,
-                        "patientCode": patientCode
+                        "VideoAppointmentDetails": [
+                            {
+                                "organisatorName": "FFA",
+                                "isConference": false,
+                                "participants": [
+                                    {
+                                        "name": "TwPCWwbXBHLBzGqZEWUzFAhrJTRRVLJHzkFcYlJEg6tqTgPhvQpXRQlTA5UBL8humRY: "
+                                    }
+                                ],
+                                "duration": Math.round(durationInSecs/60)
+                            }
+                        ]
                     },
                     "options": {
                         "user_group_id": USER_GROUP_ID
                     }
                 },
-                {
-                    "class": "crud",
-                    "method": "create",
-                    "VideoConsultationCode": [
-                        {
-                            "id": docCode
-                        },
-                        {
-                            "id": patientCode
-                        }
-                    ],
-                    "options": {
-                        "user_group_id": USER_GROUP_ID
-                    }
-                }
             ],
             "session": {
                 "session_id": TELE_SESSION.session.session_id,
