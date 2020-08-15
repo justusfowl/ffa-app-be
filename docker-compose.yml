@@ -30,6 +30,10 @@ services:
     ports:
       - "27017:27017"
    
+networks:
+  default:
+    external:
+      name: ffa-app-network
 
 volumes:
   mongodata:
