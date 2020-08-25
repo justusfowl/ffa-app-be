@@ -70,7 +70,7 @@ export class GenmessageComponent implements OnInit {
 
       this.requestForm = new FormGroup({
         name : new FormControl(name, Validators.required),
-        email : new FormControl(userEmail, [Validators.required, Validators.pattern("^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$")]),
+        email : new FormControl(userEmail, [Validators.required, Validators.email]),
         acceptTerms : new FormControl(false, Validators.requiredTrue),
         deliveryType : new FormControl(deliveryType),
         collectDrugStore : new FormControl(collectDrugStore),
@@ -88,7 +88,7 @@ export class GenmessageComponent implements OnInit {
     }else{
       this.requestForm = new FormGroup({
         name : new FormControl(name, Validators.required),
-        email : new FormControl(userEmail, [Validators.required, Validators.pattern("^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$")]),
+        email : new FormControl(userEmail, [Validators.required, Validators.email]),
         acceptTerms : new FormControl(false, Validators.requiredTrue),
         deliveryType : new FormControl(""),
         collectDrugStore : new FormControl(""),
