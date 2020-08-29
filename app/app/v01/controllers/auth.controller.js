@@ -628,8 +628,8 @@ async function resetUserPassword (req, res){
             return;
         }
 
-        let passPhrase = bcrypt.hashSync(pass);
-
+        var salt = bcrypt.genSaltSync(10);
+        let passPhrase = bcrypt.hashSync(pass, salt);
 
         MongoClient.connect(MongoUrl, function(err, db) {
     
