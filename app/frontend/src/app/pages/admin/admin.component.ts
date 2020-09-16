@@ -1011,7 +1011,6 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy{
     }).catch(err => {
       console.error(err);
     })
-
   }
 
   handleUserSearch(evt){

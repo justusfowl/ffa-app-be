@@ -244,10 +244,76 @@ async function cleanUserDataFromAccountRemove(userId){
     })
 }
 
+async function setPrescriptionInfoToRemoved(userId, meetingId){
+
+    return new Promise((resolve, reject) => {
+        try{
+            MongoClient.connect(MongoUrl, function(err, db) {
+    
+                if (err) throw err;
+                
+                let dbo = db.db(config.mongodb.database);
+        
+                const collection = dbo.collection('messages');
+        
+                collection.updateOne(
+                  {
+                      "_id" : ObjectID(meetingId.toString()), 
+                      "userId" : userId,
+                      "medications" : {
+                          "$exists" : true
+                      }
+                  },
+                  {
+                      $set : { 
+                          "removed" : true,
+                          "medications.$[].name" : "removed",
+                          "medications.$[].amount" : "removed",
+                          "medications.$[].substance" : "removed",
+                          "medications.$[].dose" : "removed",
+                          "medications.$[].pzn" : "removed",
+                          "medications.$[].dosageform" : "removed",
+                        }
+                  },
+                  function(err, result){
+                    if (err){
+                        reject(err);
+                    }else{
+                        resolve(result);
+                    }
+                  });
+              });
+        }catch(err){
+            reject(err);
+        }
+    })
+}
+
+async function handlePrescriptionMessageRemove(req, res){
+
+    try{
+
+        let messageId = req.params.messageId;
+        let userId = req.userId;
+
+        if (!messageId){
+            throw new Error("No message Id provided.")
+        }
+
+        await setPrescriptionInfoToRemoved(userId, messageId);
+        res.json({"message" : "OK"});
+
+    }catch(err){
+        logger.error(err);
+        res.send(500, "An error occured sending a message");
+    }
+
+}
 
 module.exports = {
     handleGeneralMessage,
     handlePrescriptionMessage,
     getMyMessages,
-    cleanUserDataFromAccountRemove
+    cleanUserDataFromAccountRemove, 
+    handlePrescriptionMessageRemove
 }

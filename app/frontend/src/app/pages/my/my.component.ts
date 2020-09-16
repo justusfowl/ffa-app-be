@@ -238,11 +238,41 @@ export class MyComponent implements OnInit {
 
   }
 
+  removePrescriptionRequest(prescriptionRequest){
+
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      data: {meta : {"type" : "confirm", "title" : "Anfrage-Details löschen", "messageText" : "Möchten Sie die Anfragedetails (zB Medikationen) löschen?"}}
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (!result){return;}
+      if (result.answerConfirm){
+        this.api.delete(`/message/prescription/${prescriptionRequest._id}`).then(result => {
+          this._snackBar.open("Details gelöscht", "", {
+            duration: 2000,
+          });
+          prescriptionRequest.removed = true;
+
+        }).catch(err => {
+          console.error(err);
+          this._snackBar.open("Ups - es scheint etwas schief gelaufen zu sein.", "", {
+            duration: 2000,
+          });
+        });
+      }
+    });
+  }
+
   newPrescriptionRequest(prescriptionRequest=null){
     this.openMessageDialog("prescription", prescriptionRequest);
   }
 
   getListMedis(prescriptionRequest){
+
+    if (prescriptionRequest.removed){
+      return "";
+    }
+
     if (prescriptionRequest.medications){
       let outString = "";
       prescriptionRequest.medications.forEach(element => {

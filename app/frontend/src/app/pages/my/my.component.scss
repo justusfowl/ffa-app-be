@@ -88,6 +88,10 @@
 
     .buttons{
         margin-top: 20px;
+        
+        button{
+            margin-left: 10px;
+        }
 
         .floatright{
             float: right;
@@ -171,6 +175,11 @@
             }
 
         }
+    }
+
+    .prescriptions-item.removed{
+        text-decoration: line-through;
+        opacity: 0.7;
     }
 
 }
