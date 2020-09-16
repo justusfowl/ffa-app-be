@@ -266,7 +266,9 @@ async function setPrescriptionInfoToRemoved(userId, meetingId){
                   },
                   {
                       $set : { 
+                          "removeDate" : new Date(),
                           "removed" : true,
+                          "userName" : "",
                           "medications.$[].name" : "removed",
                           "medications.$[].amount" : "removed",
                           "medications.$[].substance" : "removed",
