@@ -3,7 +3,7 @@
   <head>
     <meta name="viewport" content="width=device-width" />
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <title>Wir haben Ihre Nachricht erhalten</title>
+    <title>{{messageTitle}}</title>
     <style>
       /* -------------------------------------
           GLOBAL RESETS
@@ -282,7 +282,7 @@
           <div class="content">
 
             <!-- START CENTERED WHITE CONTAINER -->
-            <span class="preheader">Wir haben Ihre Nachricht erhalten.</span>
+            <span class="preheader">{{preheader}}</span>
             <table class="main">
 
               <!-- START MAIN CONTENT AREA -->
@@ -292,67 +292,25 @@
                     <tr>
                       <td>
                         <h2>Hallo {{userName}},</h2>
-                        <p>vielen Dank für Ihre Nachricht über unsere Website</p>
-
+                        
                         <p>
                           {{messageText}}
                         </p>
 
-                        {{#if flagHasMedication}}
-
-                            {{#if flagCollectFromPractice}}
-                              <p>
-                                Sie möchten das Rezept bei uns in der Praxis abholen.
-                              </p>
-                            {{else}}
-                              <p>
-                                Sie haben gebeten das Rezept in folgender Apotheke abzuholen: [{{collectDrugStore}}]
-                              </p>
-                            {{/if}}
-
-                            {{#if messageUrl}}
-                              <p>
-                                Sie können <a href="{{messageUrl}}">hierüber</a> auf Ihre Anfrage zugreifen und den Status einsehen. Wir benachrichtigen Sie per eMail, wenn sich der Status Ihrer Anfrage geändert hat.
-                              </p>
-                            {{else}}
-                              <p>
-                                Wir benachrichtigen Sie per eMail, wenn sich der Status Ihrer Anfrage geändert hat.
-                              </p>
-                            {{/if}}
-
-
-                            <!--
-                            Folgende Anfrage zur Rezeptvorbestellung:
-
-                            <table style="padding: 20px;">
-                              <tr>
-                                <th>Medikamentenname</th>
-                                <th>Menge</th>
-                                <th>Wirkstoff</th>
-                                <th>Dosis</th>
-                                <th>PZN</th>
-                                <th>Darreichungsform</th>
-                              </tr>
-                              {{#each medications as |med|}}
-                                
-                                <tr>
-                                  <td>{{med.name}}</td>
-                                  <td>{{med.amount}}</td>
-                                  <td>{{med.substance}}</td>
-                                  <td>{{med.dose}}</td>
-                                  <td>{{med.pzn}}</td>
-                                  <td>{{med.dosageform}}</td>
-                                
-                                </tr>
-                                
-                              {{/each}}			
-
-                            </table>
-
-                            -->
+                         {{#if flagHasAccount}}
+                              <p> 
+                              Sie können <a href="{{messageUrl}}">hierüber</a> auf Ihre Anfrage zugreifen.
+                            </p>
+                          {{else}}
+                            <p> 
+                              Wir werden Sie über den Bearbeitungsstand informieren. 
+                              
+                            </p>
+                            <p>
+                              Wussten Sie schon: Erstellen Sie einen Account auf unserer Website und nutzen Sie
+                              bequem Anfragen wieder und sehen Sie stets den Bearbeitungszustand ein.
+                            </p>
                           {{/if}}
-                      
-                        Wir werden uns zeitnah bei Ihnen diesbezüglich zurückmelden.
 
                         <p>Ihr Praxis-Team.</p>
                         

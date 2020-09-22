@@ -11,6 +11,8 @@ services:
       - .:/app
       - /app/node_modules
       - appdata:/usr/app/pub
+    environment:
+      APP_ENC_KEY: ${APP_ENC_KEY}
     links:
       - mongo
   

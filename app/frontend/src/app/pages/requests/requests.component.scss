@@ -1,0 +1,98 @@
+
+
+.requests-container{
+    .prescriptions{
+        .content-header{
+            padding: 10px;  
+        }
+
+        .status-row{
+            padding: 20px;
+            font-weight: 600;
+        }
+    }
+}
+
+
+.prescriptions{
+    .no-data{
+        width: 100%;
+        text-align: center;
+        margin-top: 30px;
+        margin-bottom: 30px;
+    }    
+
+    .medication-table{
+        width: 100%; 
+    }
+
+    .buttons{
+        margin-top: 20px;
+        
+        button{
+            margin-left: 10px;
+        }
+
+        .floatright{
+            float: right;
+        }
+    }
+}
+
+@media(min-width: 1101px){
+    .prescriptions-item{
+
+        .medication-table{
+            display: table;
+        }
+
+        .medications-table-mobile{
+            display: none;
+        }
+    }
+    
+
+    .settings-row{
+        display: flex;
+        justify-content: flex-start;
+        
+
+        .title{
+            margin-right: 10px;
+        }
+    }
+}
+
+@media (max-width: 1100px){
+    .prescriptions-item{
+        .prescription-time{
+            display: none;
+        }
+        .medis-list{
+            display: none;
+        }
+
+        .medication-table{
+            display: none;
+        }
+
+        .medications-table-mobile{
+            display: block;
+            margin-bottom: 10px;
+            .name{
+                font-size: 18px;
+            }
+
+            .details{
+                color: gray;
+            }
+
+        }
+    }
+
+    .prescriptions-item.removed{
+        text-decoration: line-through;
+        opacity: 0.7;
+    }
+
+}

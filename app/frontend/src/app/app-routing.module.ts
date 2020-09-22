@@ -13,6 +13,7 @@ import { AuthGuard } from './services/authguard';
 import { ImprintComponent } from './pages/imprint/imprint.component';
 import { NotfoundComponent } from './pages/notfound/notfound.component';
 import { TVHomeComponent } from './pages/tv/tvhome/tvhome.component';
+import { RequestsComponent } from './pages/requests/requests.component';
 
 
 const routes: Routes = [
@@ -24,6 +25,7 @@ const routes: Routes = [
   { path: 'passreset', component: PassresetComponent},
   { path: 'my', component: MyComponent, canActivate: [AuthGuard]},
   { path: 'admin', component: AdminComponent, canActivate: [AuthGuard]},
+  { path: 'requests', component: RequestsComponent, canActivate: [AuthGuard]},
   { path: 'appointments', component: AppointmentsComponent, canActivate: [AuthGuard]},
   { path: 'tv', component: TVHomeComponent, canActivate: [AuthGuard]},
 

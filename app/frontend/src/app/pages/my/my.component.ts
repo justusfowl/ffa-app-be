@@ -31,6 +31,7 @@ export class MyComponent implements OnInit {
     "rezeptanfragen"
   ]
   selectedIndex : number = 1;
+  messageId : string = "";
 
   constructor(
     private auth : AuthenticationService, 
@@ -42,10 +43,12 @@ export class MyComponent implements OnInit {
     private location : Location
   ) {
     this.route.queryParams.subscribe(params => {
-      this.tab = params['tab'] || ""; 
-      let idx = this.tabs.findIndex(x => x.toLowerCase() == this.tab.toLowerCase()); 
-      this.selectedIndex = idx;
-  });
+        this.tab = params['tab'] || ""; 
+        let idx = this.tabs.findIndex(x => x.toLowerCase() == this.tab.toLowerCase()); 
+        this.selectedIndex = idx;
+
+        this.messageId = params['messageId'] || null; 
+    });
    }
 
   ngOnInit() {
@@ -248,6 +251,7 @@ export class MyComponent implements OnInit {
       if (!result){return;}
       if (result.answerConfirm){
         this.api.delete(`/message/prescription/${prescriptionRequest._id}`).then(result => {
+
           this._snackBar.open("Details gelöscht", "", {
             duration: 2000,
           });

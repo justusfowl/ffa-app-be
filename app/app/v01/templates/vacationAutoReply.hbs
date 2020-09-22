@@ -302,14 +302,25 @@
 
                             {{#if flagCollectFromPractice}}
                               <p>
-                                Sie können das Rezept bei uns in der Praxis abholen.
+                                Sie möchten das Rezept bei uns in der Praxis abholen. Wir benachrichtigen Sie, sobald das Rezept abholbereit ist.
                               </p>
                             {{else}}
                               <p>
-                                Sie haben gebeten das Rezept in folgender Apotheke abzuholen: [{{collectDrugStore}}]
+                                Sie haben gebeten das Rezept in folgender Apotheke abzuholen: [{{collectDrugStore}}]. Wir benachrichtigen, wenn wir Ihre Anfrage bearbeitet haben.
                               </p>
                             {{/if}}
 
+                             {{#if messageUrl}}
+                              <p>
+                                Sie können <a href="{{messageUrl}}">hierüber</a> auf Ihre Anfrage zugreifen und den Status einsehen. Wir benachrichtigen Sie per eMail, wenn sich der Status Ihrer Anfrage geändert hat.
+                              </p>
+                            {{else}}
+                              <p>
+                                Wir benachrichtigen Sie per eMail, wenn sich der Status Ihrer Anfrage geändert hat.
+                              </p>
+                            {{/if}}
+
+                            <!--
                             Folgende Anfrage zur Rezeptvorbestellung:
 
                             <table style="padding: 20px;">
@@ -336,6 +347,8 @@
                               {{/each}}			
 
                             </table>
+
+                            -->
                           {{/if}}
                           
                             WICHTIG: Bitte beachten Sie, dass unsere Praxis aktuell bis einschließlich den : <br/> <span class="strong">{{vacationEndDate}}</span> geschlossen ist. <br/><br/>

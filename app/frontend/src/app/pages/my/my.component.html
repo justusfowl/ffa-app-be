@@ -261,10 +261,19 @@
                     <div class="content prescriptions" *ngIf="myPrescriptionRequests.length > 0">
     
                         <mat-accordion>
-                            <mat-expansion-panel *ngFor="let preq of myPrescriptionRequests; let i=index;" class="prescriptions-item" [class.removed]="preq.removed">
+                            <mat-expansion-panel *ngFor="let preq of myPrescriptionRequests; let i=index;" 
+                                    class="prescriptions-item" 
+                                    [class.removed]="preq.removed"
+                                    [expanded]="preq._id == messageId">
                                 <mat-expansion-panel-header>
                                     <mat-panel-title>
-                                        {{preq.sendDate  | date:'longDate':'de'}} <span class="prescription-time">{{preq.sendDate | date:'shortTime':'de'}}</span>
+                                        <ng-container *ngIf="!preq.removed">
+                                                <mat-icon  matTooltip="Wir haben Ihre Anfrage erhalten " *ngIf="preq.status == 0">sync</mat-icon>
+                                                <mat-icon color="warn" matTooltip="Wir benötigen noch ein paar Informationen von Ihnen, bitte melden Sie sich bei uns telefonisch." *ngIf="preq.status == 50">perm_phone_msg</mat-icon>
+                                                <mat-icon class="success" matTooltip="Ihre Anfrage ist abgeschlossen. " *ngIf="preq.status == 100">check</mat-icon>
+                                        </ng-container>
+
+                                        {{preq.sendDate  | date:'longDate':'de'}} <span class="prescription-time"> {{preq.sendDate | date:'shortTime':'de'}}</span>
                                     </mat-panel-title>
                                     <mat-panel-description>
 
@@ -291,6 +300,12 @@
                                             <input required matInput type="text" placeholder="Apotheken-Abholung" class="form-control" [ngModel]="preq.collectDrugStore" readonly>
                                         </mat-form-field>
                                     </div>
+
+                                    <ng-container *ngIf="preq.removed">
+                                        <p>
+                                            ## gelöscht ##
+                                        </p>
+                                    </ng-container>
                                     
                                     <ng-container *ngIf="!preq.removed">
                                         <div class="medications-table-mobile" *ngFor="let m of preq.medications; let i=index;" >
@@ -341,7 +356,28 @@
                                         
 
                                     <div class="buttons">
-
+                                        <ng-container *ngIf="!preq.removed">
+                                            <button class="saveBtn floatleft"  
+                                                mat-button  mat-stroked-button 
+                                                *ngIf="preq.status == 0"
+                                                >
+                                                <mat-icon>sync</mat-icon>
+                                                Anfrage erhalten
+                                            </button>
+                                            <button class="saveBtn floatleft success"  
+                                                mat-button  mat-stroked-button *ngIf="preq.status == 100"
+                                                >
+                                                <mat-icon>check</mat-icon>
+                                                Bearbeitung abgeschlossen
+                                            </button>
+                                            <button class="saveBtn floatleft"  color="warn" 
+                                                mat-button  mat-stroked-button *ngIf="preq.status == 50"
+                                                >
+                                                <mat-icon>perm_phone_msg</mat-icon>
+                                                Bitte melden Sie sich bei uns telefonisch
+                                            </button>
+                                        </ng-container>
+                                        
                                         <button class="saveBtn floatright" color="warn"  
                                             mat-button matSuffix mat-stroked-button 
                                             (click)="removePrescriptionRequest(preq)"

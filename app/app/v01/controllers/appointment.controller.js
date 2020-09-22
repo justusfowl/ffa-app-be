@@ -215,6 +215,13 @@ function _getAppointmentsFromDateRange(startDate, endDate, userId=null, docId=nu
                             if (appointmentObj.patientName){
                                 appointmentObj.patientName = cryptoSrv.decrypt(appointmentObj.patientName);
                             }
+                            if (appointmentObj.patientEmail){
+                                appointmentObj.patientEmail = cryptoSrv.decrypt(appointmentObj.patientEmail);
+                            }
+                        
+                            if (appointmentObj.patientMobilePhone){
+                                appointmentObj.patientMobilePhone = cryptoSrv.decrypt(appointmentObj.patientMobilePhone);
+                            }
                         });
 
                         resolve(result);
@@ -542,6 +549,14 @@ async function _insertTeleAppointment(appointmentObj){
 
     if (appointmentObj.patientName){
         appointmentObj.patientName = cryptoSrv.encrypt(appointmentObj.patientName);
+    }
+
+    if (appointmentObj.patientEmail){
+        appointmentObj.patientEmail = cryptoSrv.encrypt(appointmentObj.patientEmail);
+    }
+
+    if (appointmentObj.patientMobilePhone){
+        appointmentObj.patientMobilePhone = cryptoSrv.encrypt(appointmentObj.patientMobilePhone);
     }
 
     return new Promise((resolve, reject) => {

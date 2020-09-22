@@ -88,6 +88,14 @@ app.use((req, res, next) => {
   }
 });
 
+if (config.appSecret.encryptionKey){
+  logger.info("APP_ENC_KEY defined")
+}else{
+  logger.error("no APP_ENC_KEY defined")
+  throw new Error("No APP_ENC_KEY was defined.");
+  process.exit(1)
+}
+
 sockets.init(server);
 
 jobController.init();
@@ -110,6 +118,7 @@ server.listen(config.port, () => {
 
           logger.info("mongoDB connected successfully");
           
+
           deployment.run();
 
         }

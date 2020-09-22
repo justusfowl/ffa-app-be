@@ -55,6 +55,7 @@ import { EditquoteComponent } from './components/tv/editquote/editquote.componen
 import { EditweatherComponent } from './components/tv/editweather/editweather.component';
 import { EditmediaComponent } from './components/tv/editmedia/editmedia.component';
 import { EditbulletslideComponent } from './components/tv/editbulletslide/editbulletslide.component';
+import { RequestsComponent } from './pages/requests/requests.component';
 
 const cookieConfig:NgcCookieConsentConfig = {
   cookie: {
@@ -110,7 +111,7 @@ const config: SocketIoConfig = { url: environment.apiProtocol + '://' + environm
     EditclockComponent, 
     EditquoteComponent, 
     EditweatherComponent, 
-    EditmediaComponent, EditbulletslideComponent
+    EditmediaComponent, EditbulletslideComponent, RequestsComponent
   ],
   imports: [
     HttpClientModule,

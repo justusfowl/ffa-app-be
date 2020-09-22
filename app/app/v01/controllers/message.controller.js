@@ -104,55 +104,56 @@ async function handlePrescriptionMessage(req, res){
 
         let contextObject = {
             userName : userName, 
-            medications : medications, 
+            medications : medications,
             sendDate : new Date(),
             userEmail : email, 
             flagCollectFromPractice : flagCollectFromPractice, 
             collectDrugStore : collectDrugStore
         };
 
-        let message = "Eingang | Ihre Rezeptvorbestellung";
+        let userObj = await authCtrl.getUserByName(email);
 
-        let userObj = await authCtrl.getUserByName(email).catch(err => {
-            throw err;
-        });
+        let flagHasAccount = false;
 
         if (userObj._id){
-
-            let msgObj = JSON.parse(JSON.stringify(contextObject))
-            msgObj["userId"] = userObj._id.toString();
-            delete msgObj.userEmail;
-
-            for (var i=0;i<msgObj.medications.length;i++){
-                msgObj.medications[i] = encryptMedication(msgObj.medications[i])
-            }
-
-            storeMessage(msgObj).catch(err => {
-                throw err;
-            });
+            contextObject["userId"] = userObj._id.toString();
+            flagHasAccount = true;
         };
 
-        let isVacationObj = await timesCtrl.getIsCurrentlyVacation().catch(err => {
-           throw err;
-        });
+        for (var i=0;i<contextObject.medications.length;i++){
+            contextObject.medications[i] = encryptMedication(contextObject.medications[i])
+        }
 
-        let emailSent = await emailerCtrl.sendMessageToBackOffice(contextObject).catch(err => {
-           throw err;
-        });
+        let msgObjResult = await storeMessage(contextObject);
+        contextObject["_id"] = msgObjResult._id.toString();
+
+        let messageId = msgObjResult._id.toString();
+
+        let isVacationObj = await timesCtrl.getIsCurrentlyVacation();
+
+        let adminMessageUrl;
+
+        if (config.env == "development"){
+            adminMessageUrl = config.hostProto + "://" + config.hostBase + ":" + config.hostExposedPort  + `/requests?tab=rezeptanfragen&messageId=${messageId}`;
+        }else{
+            adminMessageUrl = config.hostProto + "://" + config.hostBase + `/requests?tab=rezeptanfragen&messageId=${messageId}`;
+        }
+
+        adminMessageUrl = encodeURI(adminMessageUrl); 
+
+        contextObject["messageUrl"] = adminMessageUrl;
+
+        let emailSent = await emailerCtrl.sendMessageToBackOffice(contextObject);
 
         if (isVacationObj.isVacation){
             let subject = "Eingang und Urlaubsnotiz | Wir haben Ihre Rezeptbestellung erhalten";
-            await emailerCtrl.sendVacationAutoReply(userName, email, "", isVacationObj.vacationObj, medications, flagCollectFromPractice, collectDrugStore, subject).then(result => {
+            await emailerCtrl.sendVacationAutoReply(userName, email, "", isVacationObj.vacationObj, flagCollectFromPractice, collectDrugStore, subject, true, messageId, flagHasAccount).then(result => {
                 res.json({"message" : "OK"});
-            }).catch(err =>{
-                throw err;
             });
         }else{
             let subject = "Eingang | Wir haben Ihre Rezeptbestellung erhalten";
-            await emailerCtrl.sendGeneralAutoReply(userName, email, "", medications, flagCollectFromPractice, collectDrugStore, subject).then(result => {
+            await emailerCtrl.sendGeneralAutoReply(userName, email, "", true, flagCollectFromPractice, collectDrugStore, subject, messageId, flagHasAccount).then(result => {
                 res.json({"message" : "OK"});
-            }).catch(err =>{
-                throw err;
             });
         }
 
@@ -166,12 +167,16 @@ function storeMessage(messageObject){
     return new Promise((resolve, reject) => {
         try{
 
-            if (messageObject.sendDate){
-                messageObject.sendDate = new Date(messageObject.sendDate);
+            let newMessageObj = JSON.parse(JSON.stringify(messageObject));
+
+            newMessageObj["status"] = 0;
+
+            if (newMessageObj.sendDate){
+                newMessageObj.sendDate = new Date(newMessageObj.sendDate);
             }
 
-            if (messageObject.userName){
-                messageObject.userName = cryptoSrv.encrypt(messageObject.userName);
+            if (newMessageObj.userName){
+                newMessageObj.userName = cryptoSrv.encrypt(newMessageObj.userName);
             }
 
             MongoClient.connect(MongoUrl, function(err, db) {
@@ -183,14 +188,85 @@ function storeMessage(messageObject){
                 const collection = dbo.collection('messages');
         
                 collection.insertOne(
-                    messageObject,
+                    newMessageObj,
                   function(err, result){
                     if (err){
                         reject(err);
                     }else{
-                        resolve(true);
+                        messageObject["_id"] = result.insertedId.toString();
+                        resolve(messageObject);
                     }
-                    
+                  });
+              });
+    
+        }catch(err){
+            reject(err);
+        }
+    })
+}
+
+
+/**
+ * Function to retrieve messages, including the option to filter by workflow status
+ * for status see function updateMessageStatus
+ * @param {*} options 
+ */
+function getMessages(options){
+    return new Promise((resolve, reject) => {
+        try{
+
+            let filterIndividualMessage = false;
+
+            let filterObj = {"medications" : {$exists : true}, "removed" : {$exists : false}};
+
+            let sortObj = { sendDate: 1 };
+
+            if (options.status){
+                filterObj["status"] = parseInt(options.status);
+                sortObj = { sendDate: 1 };
+            }else if (!options.flagIncludeCompleted){
+                filterObj["status"] = {$lt : 100};
+                sortObj = { sendDate: -1 };
+            }
+
+            if (options.messageId){
+                filterObj = {"_id" : ObjectID(options.messageId.toString())};
+                filterIndividualMessage = true;
+            }
+
+            MongoClient.connect(MongoUrl, function(err, db) {
+        
+                if (err) throw err;
+                
+                let dbo = db.db(config.mongodb.database);
+        
+                const collection = dbo.collection('messages');
+        
+                collection.find(filterObj).sort( sortObj ).toArray(function(err, result){
+                    if (err){
+                        reject(err);
+                    }else{
+
+                        result.forEach(msgObj => {
+                            
+                            if (msgObj.medications){
+                                for (var i=0;i<msgObj.medications.length;i++){
+                                    msgObj.medications[i] = decryptMedication(msgObj.medications[i])
+                                }
+                            }
+
+                            if (msgObj.userName){
+                                msgObj.userName = cryptoSrv.decrypt(msgObj.userName);
+                            }
+
+                        });
+
+                        if (result.length > 0 && filterIndividualMessage){
+                            result = result[0];
+                        }
+
+                        resolve(result);
+                    }                    
                   });
               });
     
@@ -362,6 +438,104 @@ async function handlePrescriptionMessageRemove(req, res){
 
 }
 
+async function adminHandleGetRequests(req, res){
+    try{
+        let userId = req.userId;
+        let flagIncludeCompleted = req.query.flagincludecompleted;
+
+        let messages = await getMessages({flagIncludeCompleted});
+
+        res.json({"messages" : messages});
+
+
+    }catch(err){
+        logger.error(err);
+        res.send(500, "An error occured acquiring myMessages." );
+    }
+}
+
+/**
+ * Function to update a workflow status of a message
+ * [0]=created, [100]=completed, [50]=waiting on patient
+ * @param {*} messageId 
+ * @param {*} status 
+ */
+function updateMessageStatus(messageId, status){
+    return new Promise ((resolve, reject) => {
+        try{
+
+            status = parseInt(status);
+
+            MongoClient.connect(MongoUrl, function(err, db) {
+      
+                if (err) throw err;
+                
+                let dbo = db.db(config.mongodb.database);
+     
+                const collection = dbo.collection('messages');
+     
+                collection.updateOne(
+                    {
+                        "_id" : ObjectID(messageId)
+                    }, 
+                    {
+                        $set: {
+                            "status" : status
+                        }
+                    },
+                    function(err, docs){
+                        if (err) throw err;
+                        resolve(true);
+                    }
+                );
+                    
+              });
+     
+        }catch(error){
+            reject(err);
+        }
+
+    })
+}
+
+async function handleMessageStatusUpdate(req, res){
+    try{
+        
+        let messageId = req.params.messageId;
+        let status = req.body.status;
+
+        if (!messageId || !status){
+            throw new Error("messageId or status undefined")
+        }
+
+        status = parseInt(status);
+
+        await updateMessageStatus(messageId, status);
+
+        let messageObj = await getMessages({messageId});
+
+        let userEmail = messageObj.userEmail;
+        let userName = messageObj.userName;
+        let userId = messageObj.userId || false;
+
+        if (!userEmail){
+            throw new Error(`userEmail undefined for sending general msgnotification for message: ${messageId}`)
+        }
+
+        if (!userName){
+            userName = userEmail;
+        }
+
+        await emailerCtrl.sendGeneralMsgNotification(userEmail, userName, userId, {status, messageId});
+
+        res.json({"key" : "SUCCESS"});
+
+    }catch(err){
+        logger.error(err);
+        res.send(500, "An error occured updating via handleMessageStatusUpdate." );
+    }
+} 
+
 module.exports = {
     handleGeneralMessage,
     handlePrescriptionMessage,
@@ -370,5 +544,9 @@ module.exports = {
     handlePrescriptionMessageRemove, 
 
     decryptMedication, 
-    encryptMedication
+    encryptMedication, 
+
+    adminHandleGetRequests, 
+
+    handleMessageStatusUpdate
 }

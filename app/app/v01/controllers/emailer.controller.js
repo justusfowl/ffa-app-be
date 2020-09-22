@@ -89,31 +89,40 @@ function sendForgotPasswordEmail (userName, tokenUrl) {
    
 };
 
-function sendGeneralAutoReply (userName, email, messageText, medicationsArray = [], 
-    flagCollectFromPractice=false, collectDrugStore="", subject="Eingang | Wir haben Ihre Nachricht erhalten") {
+function sendGeneralAutoReply (userName, email, messageText, flagHasMedication=false, 
+    flagCollectFromPractice=false, collectDrugStore="", subject="Eingang | Wir haben Ihre Nachricht erhalten", messageId=null, flagHasAccount=false) {
 
     return new Promise((resolve, reject) => {
 
-        var flagHasMedication = false;
+        let urlBase, messageUrl
 
-        if (Array.isArray(medicationsArray)){
-            if (medicationsArray.length > 0){
-                flagHasMedication = true;
+        if (flagHasMedication){
+            if (config.env == "development"){
+                urlBase = config.hostProto + "://" + config.hostBase + ":" + config.hostExposedPort  + `/my?tab=rezeptanfragen&messageId=${messageId}`;
+            }else{
+                urlBase = config.hostProto + "://" + config.hostBase + `/my?tab=rezeptanfragen&messageId=${messageId}`;
             }
+    
+            messageUrl = encodeURI(urlBase); 
         }
 
+        if (!flagHasAccount){
+            messageUrl = false;
+        }
+    
         let options = {
             from : '"' + config.email.smtpEmailSenderName + '" ' + config.email.smtpEmail, 
-            to : email, 
-            subject :  subject, 
+            to : email,
+            subject :  subject,
             template: 'generalAutoReply',
             context: {
                 "userName": userName, 
                 "messageText" : messageText, 
                 "flagHasMedication" : flagHasMedication, 
-                "medications" : medicationsArray, 
                 "flagCollectFromPractice" : flagCollectFromPractice,
-                "collectDrugStore" : collectDrugStore
+                "collectDrugStore" : collectDrugStore, 
+                "messageUrl" : messageUrl, 
+                "flagHasAccount" : flagHasAccount
             }
         }
 
@@ -131,17 +140,26 @@ function sendGeneralAutoReply (userName, email, messageText, medicationsArray = 
 };
 
 function sendVacationAutoReply (userName, email, messageText, vacationObject, 
-    medicationsArray = [], flagCollectFromPractice=false, collectDrugStore="", subject="Eingang und Urlaubsnotiz | Wir haben Ihre Nachricht erhalten") {
+     flagCollectFromPractice=false, collectDrugStore="", subject="Eingang und Urlaubsnotiz | Wir haben Ihre Nachricht erhalten", flagHasMedication=false, flagHasAccount=false) {
 
     return new Promise((resolve, reject) => {
 
         var flagHasSubs = false;
-        var flagHasMedication = false;
 
-        if (Array.isArray(medicationsArray)){
-            if (medicationsArray.length > 0){
-                flagHasMedication = true;
+        let urlBase, messageUrl
+
+        if (flagHasMedication){
+            if (config.env == "development"){
+                urlBase = config.hostProto + "://" + config.hostBase + ":" + config.hostExposedPort  + `/my?tab=rezeptanfragen&messageId=${messageId}`;
+            }else{
+                urlBase = config.hostProto + "://" + config.hostBase + `/my?tab=rezeptanfragen&messageId=${messageId}`;
             }
+    
+            messageUrl = encodeURI(urlBase); 
+        }
+
+        if (!flagHasAccount){
+            messageUrl = false;
         }
 
         if (vacationObject.subs){
@@ -149,7 +167,6 @@ function sendVacationAutoReply (userName, email, messageText, vacationObject,
                 flagHasSubs = true;
             }
         }
-
 
         let options = {
             from : '"' + config.email.smtpEmailSenderName + '" ' + config.email.smtpEmail, 
@@ -165,7 +182,9 @@ function sendVacationAutoReply (userName, email, messageText, vacationObject,
                 "flagHasMedication" : flagHasMedication, 
                 "medications" : medicationsArray, 
                 "flagCollectFromPractice" : flagCollectFromPractice,
-                "collectDrugStore" : collectDrugStore
+                "collectDrugStore" : collectDrugStore, 
+                "messageUrl" : messageUrl, 
+                "flagHasAccount" : flagHasAccount
             }
         }
 
@@ -444,6 +463,78 @@ function sendDailyAppointmentPreview (recipientsArray, contextObj) {
 };
 
 
+function sendGeneralMsgNotification (userEmail, userName, userId, messageOptions=null) {
+
+    return new Promise((resolve, reject) => {
+
+        try{    
+
+            let options = {};
+            let flagHasAccount = userId ? true : false;
+
+            if (messageOptions){
+                options = messageOptions;
+            }
+
+            if (!options.messageId || !options.status){
+                throw new Error("missing information, messageId or status in sending general notification")
+            }
+
+            let subject = options.subject || "myFFA | Wir haben eine Nachricht für Sie";  
+            let messageTitle = "Eine Nachricht für Sie";
+            let status = parseInt(options.status);
+
+            let preheader, messageText, messageUrl;
+
+            if (status === 50){
+                preheader = 'Wir benötigen mehr Informationen zu Ihrer Anfrage.';
+                messageText = "Vielen Dank für Ihre Anfrage. Zur weiteren Bearbeitung benötigen wir jedoch noch ein paar weitere Informationen. Wir bitten Sie daher uns unter der 06123 / 90 29 10 telefonisch bei uns zu melden, um dies zu besprechen."
+            }else if (status === 100){
+                preheader = 'Ihre Anfrage wurde bearbeitet und abgeschlossen.';
+                messageText = 'Ihre Anfrage wurde bearbeitet und abgeschlossen. Sie können den Status über den folgenden Link einsehen.';
+            }
+
+            if (config.env == "development"){
+                messageUrl = config.hostProto + "://" + config.hostBase + ":" + config.hostExposedPort  + `/my?tab=rezeptanfragen&messageId=${options.messageId}`;
+            }else{
+                messageUrl = config.hostProto + "://" + config.hostBase + `/my?tab=rezeptanfragen&messageId=${options.messageId}`;
+            }
+    
+            messageUrl = encodeURI(messageUrl); 
+    
+            let sendOptions = {
+                from : '"' + config.email.smtpEmailSenderName + '" ' + config.email.smtpEmail, 
+                to : userEmail, 
+                subject : subject , 
+                template: 'generalMessageNotification',
+                context: {
+                    "userName": userName, 
+                    "userEmail" : userEmail,
+                    "messageTitle" : messageTitle, 
+                    "preheader" : preheader, 
+                    "messageText" : messageText, 
+                    "messageUrl" : messageUrl, 
+                    "flagHasAccount" : flagHasAccount
+                }
+            }
+    
+            transporter.sendMail(sendOptions, function (err, info){
+                if (err){
+                    reject(err); 
+                }else{
+                    resolve(info);
+                }
+            })
+
+        }catch(err){
+            reject(err);
+        }
+       
+
+    });
+   
+};
+
 module.exports = {
     sendValidateAccountEmail, 
     sendGeneralAutoReply,
@@ -457,5 +548,7 @@ module.exports = {
 
     sendDailyAppointmentPreview,
 
-    testEmail
+    testEmail, 
+
+    sendGeneralMsgNotification
 }

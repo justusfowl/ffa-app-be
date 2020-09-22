@@ -3,6 +3,7 @@
 const config = require('../../config/config');
 var CryptoJS = require('crypto-js');
 var AES = require("crypto-js/aes");
+var logger = require('../../../logger');
 
 function encrypt (val){
 
@@ -14,8 +15,13 @@ function encrypt (val){
 }
 
 function decrypt (val){
+    try{
+        return AES.decrypt(val, config.appSecret.encryptionKey.toString()).toString(CryptoJS.enc.Utf8);
+    }catch(err){
+        logger.error(err);
+        return "";
+    }
     
-    return AES.decrypt(val, config.appSecret.encryptionKey.toString()).toString(CryptoJS.enc.Utf8);
 }
 
 module.exports = {
