@@ -10,6 +10,8 @@ var authCtrl = require('./auth.controller');
 
 const logger = require('../../../logger');
 
+const cryptoSrv = require('../crypto/crypto');
+
 async function handleGeneralMessage (req, res){
 
     try{
@@ -58,6 +60,30 @@ async function handleGeneralMessage (req, res){
 
 }
 
+function encryptMedication(medicationObject){
+
+    medicationObject.name = cryptoSrv.encrypt(medicationObject.name);
+    medicationObject.amount = cryptoSrv.encrypt(medicationObject.amount);
+    medicationObject.substance = cryptoSrv.encrypt(medicationObject.substance);
+    medicationObject.dose = cryptoSrv.encrypt(medicationObject.dose);
+    medicationObject.pzn = cryptoSrv.encrypt(medicationObject.pzn);
+    medicationObject.dosageform = cryptoSrv.encrypt(medicationObject.dosageform);
+
+    return medicationObject;
+}
+
+function decryptMedication(medicationObject){
+    
+    medicationObject.name = cryptoSrv.decrypt(medicationObject.name);
+    medicationObject.amount = cryptoSrv.decrypt(medicationObject.amount);
+    medicationObject.substance = cryptoSrv.decrypt(medicationObject.substance);
+    medicationObject.dose = cryptoSrv.decrypt(medicationObject.dose);
+    medicationObject.pzn = cryptoSrv.decrypt(medicationObject.pzn);
+    medicationObject.dosageform = cryptoSrv.decrypt(medicationObject.dosageform);
+
+    return medicationObject;
+}
+
 async function handlePrescriptionMessage(req, res){
     try{
         let messageObj = req.body; 
@@ -92,9 +118,15 @@ async function handlePrescriptionMessage(req, res){
         });
 
         if (userObj._id){
+
             let msgObj = JSON.parse(JSON.stringify(contextObject))
             msgObj["userId"] = userObj._id.toString();
             delete msgObj.userEmail;
+
+            for (var i=0;i<msgObj.medications.length;i++){
+                msgObj.medications[i] = encryptMedication(msgObj.medications[i])
+            }
+
             storeMessage(msgObj).catch(err => {
                 throw err;
             });
@@ -136,6 +168,10 @@ function storeMessage(messageObject){
 
             if (messageObject.sendDate){
                 messageObject.sendDate = new Date(messageObject.sendDate);
+            }
+
+            if (messageObject.userName){
+                messageObject.userName = cryptoSrv.encrypt(messageObject.userName);
             }
 
             MongoClient.connect(MongoUrl, function(err, db) {
@@ -184,6 +220,21 @@ function getMessagesByUserId(userId){
                     if (err){
                         reject(err);
                     }else{
+
+                        result.forEach(msgObj => {
+                            
+                            if (msgObj.medications){
+                                for (var i=0;i<msgObj.medications.length;i++){
+                                    msgObj.medications[i] = decryptMedication(msgObj.medications[i])
+                                }
+                            }
+
+                            if (msgObj.userName){
+                                msgObj.userName = cryptoSrv.decrypt(msgObj.userName);
+                            }
+
+                        });
+
                         resolve(result);
                     }                    
                   });
@@ -198,9 +249,8 @@ function getMessagesByUserId(userId){
 async function getMyMessages(req, res){
     try{
         let userId = req.userId;
-        let messages = await getMessagesByUserId(userId).catch(err => {
-            throw err;
-        });
+        let messages = await getMessagesByUserId(userId);
+
         res.json({"messages" : messages});
     }catch(err){
         logger.error(err);
@@ -317,5 +367,8 @@ module.exports = {
     handlePrescriptionMessage,
     getMyMessages,
     cleanUserDataFromAccountRemove, 
-    handlePrescriptionMessageRemove
+    handlePrescriptionMessageRemove, 
+
+    decryptMedication, 
+    encryptMedication
 }

@@ -17,6 +17,8 @@ const logger = require('../../../logger');
 
 const { parse } = require('json2csv');
 
+const cryptoSrv = require('../crypto/crypto');
+
 // @TODO: Add those meta config data into the database 
 
 var appointmentMeta = [{
@@ -206,6 +208,15 @@ function _getAppointmentsFromDateRange(startDate, endDate, userId=null, docId=nu
                     if (error){
                         reject(error);
                     }else{
+
+                        // decrypt sensitive fields 
+
+                        result.forEach(appointmentObj => {
+                            if (appointmentObj.patientName){
+                                appointmentObj.patientName = cryptoSrv.decrypt(appointmentObj.patientName);
+                            }
+                        });
+
                         resolve(result);
                     }
     
@@ -526,6 +537,12 @@ async function _insertTeleAppointment(appointmentObj){
     // these must be of type DATE for proper usage within mongodb
     appointmentObj.appointmentObj.start = new Date(moment(appointmentObj.appointmentObj.start).format());
     appointmentObj.appointmentObj.end = new Date(moment(appointmentObj.appointmentObj.end).format());
+
+    // encrypt sensitive fields
+
+    if (appointmentObj.patientName){
+        appointmentObj.patientName = cryptoSrv.encrypt(appointmentObj.patientName);
+    }
 
     return new Promise((resolve, reject) => {
         try{
@@ -1208,7 +1225,6 @@ async function downloadAppointments(req, res){
 
         const csvData = parse(output, {fields});
 
-        console.log(csvData);
         /**
             "id","address","age","name"
             1,"Jack Smith",23,"Massachusetts"

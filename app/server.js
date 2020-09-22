@@ -6,6 +6,8 @@ const fs = require("fs");
 const path = require('path');
 const logger = require('./logger');
 var MongoClient = require('mongodb').MongoClient;
+
+var deployment = require('./app/deploy');
 // const expressWinston=require('express-winston');
 
 
@@ -105,7 +107,11 @@ server.listen(config.port, () => {
         if (error){
             throw err;
         }else{
-          logger.info("mongoDB connected successfully")
+
+          logger.info("mongoDB connected successfully");
+          
+          deployment.run();
+
         }
     });
 
