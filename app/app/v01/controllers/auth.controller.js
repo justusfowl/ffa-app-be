@@ -56,7 +56,8 @@ async function login(req, res){
         }
 
     }catch(error){
-        logger.error(err);
+        logger.error(`Something went wrong logging in: ${userName}`)
+        logger.error(error);
         res.status(403).send("Something went wrong logging in.");
     }
 
