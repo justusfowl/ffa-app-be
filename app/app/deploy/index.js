@@ -75,48 +75,61 @@ function updateVersion(version){
 
 
 function run(){
-    const directoryPath = path.join(__dirname);
-    //passsing directoryPath and callback function
-    
-    fs.readdir(directoryPath, async function (err, files) {
-        //handling error
-        if (err) {
-            return console.log('Unable to scan directory: ' + err);
-        } 
+
+    try{
+        const directoryPath = path.join(__dirname);
+        //passsing directoryPath and callback function
         
-        let idx = files.indexOf("index.js");
-        files.splice(idx, 1);
+        fs.readdir(directoryPath, async function (err, files) {
+            //handling error
+            if (err) {
+                return logger.error('Unable to scan directory: ' + err);
+            } 
+            
+            let idx = files.indexOf("index.js");
+            files.splice(idx, 1);
 
-        let applicationSettings = await getCurrentVersion();
+            let applicationSettings = await getCurrentVersion();
 
-        let currentApplicationVersion = applicationSettings.version || -1;
+            let currentApplicationVersion;
 
-        for (var i=0;i<files.length;i++){
-            let file = files[i];
+            if (applicationSettings){
+                currentApplicationVersion = applicationSettings.version || -1;
+            }else{
+                currentApplicationVersion = -1;
+            }
 
-            if (file.indexOf(".js") > -1){
-                let versionNumber = parseInt(file.substring(0, file.indexOf(".js")));
+            for (var i=0;i<files.length;i++){
+                let file = files[i];
 
-                if (versionNumber > currentApplicationVersion){
+                if (file.indexOf(".js") > -1){
+                    let versionNumber = parseInt(file.substring(0, file.indexOf(".js")));
 
-                    console.log(`Starting deploying for version ${versionNumber}`); 
+                    if (versionNumber > currentApplicationVersion){
 
-                    let {init} = require("./" + file);
+                        logger.info(`Starting deploying for version ${versionNumber}`); 
+
+                        let {init} = require("./" + file);
         
                     await init();
 
                     await updateVersion(versionNumber);
 
-                    console.log(`Deploying completed for version ${versionNumber}`); 
+                    logger.info(`Deploying completed for version ${versionNumber}`); 
             
                     
                 }else{
-                    console.log(`Skipped: Version ${versionNumber}`); 
+                    logger.info(`Skipped: Version ${versionNumber}`); 
                 }
             }
         }
         
     });
+}catch(err){
+    logger.error(err);
+}
+
+   
 }
 
 
