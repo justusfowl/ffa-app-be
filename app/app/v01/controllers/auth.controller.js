@@ -21,11 +21,13 @@ async function login(req, res){
     try{
 
          let userObj = await getUserByName(userName).catch(err => {
+            logger.warning(`"Either username or password invalid" ${userName}`)
             res.status(403).send("Either username or password invalid"); 
             return; 
          });
 
          if (!userObj){
+            logger.warning(`"Either username or password invalid" ${userName}`)
             res.status(403).send("Either username or password invalid"); 
             return;       
         }
@@ -35,6 +37,7 @@ async function login(req, res){
             let resp = userObj; 
 
             if (!userObj.validated){
+                logger.warning(`Please verify your account first. ${userName}`)
                 return res.status(425).send("Please verify your account first."); 
             }
 
@@ -48,6 +51,7 @@ async function login(req, res){
 
             res.json({"data" : resp});
         }else{
+            logger.warning(`Either username or password invalid. ${userName}`)
             res.status(403).send("Either username or password invalid");            
         }
 
