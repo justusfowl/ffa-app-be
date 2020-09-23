@@ -514,9 +514,17 @@ async function handleMessageStatusUpdate(req, res){
 
         let messageObj = await getMessages({messageId});
 
+        let userId = messageObj.userId || false;
+
         let userEmail = messageObj.userEmail;
         let userName = messageObj.userName;
-        let userId = messageObj.userId || false;
+
+        if (userId){
+            let userObj = await authCtrl.getUserById(userId);
+
+            userEmail = userObj.userName;
+            userName = userObj.name;
+        }
 
         if (!userEmail){
             throw new Error(`userEmail undefined for sending general msgnotification for message: ${messageId}`)

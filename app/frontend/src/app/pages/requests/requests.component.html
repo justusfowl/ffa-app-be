@@ -58,19 +58,25 @@
                         </mat-expansion-panel-header>
 
                     <div class="prescriptions-content">
-                                                                        
-                            <div class="form-group" *ngIf="!preq.flagCollectFromPractice">
-                                <mat-form-field >
-                                    <input required matInput type="text" placeholder="Apotheken-Abholung" class="form-control" [ngModel]="preq.collectDrugStore" readonly>
-                                </mat-form-field>
-                            </div>
 
                             <div class="status-row">
 
                                 Der Vorgang steht im Status: {{getStatusDescription(preq)}}
 
                             </div>
-                            
+
+                            <div class="form-group" >
+                                <mat-form-field *ngIf="!preq.flagCollectFromPractice">
+                                    <input required matInput type="text" placeholder="Apotheken-Abholung" class="form-control" [ngModel]="preq.collectDrugStore" readonly>
+                                </mat-form-field>
+                                <mat-form-field >
+                                    <input required matInput type="text" placeholder="Name" class="form-control" [ngModel]="preq.userName" readonly>
+                                </mat-form-field>
+                                <mat-form-field >
+                                    <input required matInput type="text" placeholder="Email" class="form-control" [ngModel]="preq.userEmail" readonly>
+                                </mat-form-field>
+                            </div>
+
                             <ng-container *ngIf="!preq.removed">
                                 <div class="medications-table-mobile" *ngFor="let m of preq.medications; let i=index;" >
                                     <div class="name">
