@@ -29,6 +29,7 @@ services:
       - mongodata:/data/db
       - ./init:/docker-entrypoint-initdb.d
       - ./init/mongod.conf:/etc/mongod.conf:ro
+      - ./mongodump:/mongodump
     ports:
       - "27017:27017"
    
