@@ -18,16 +18,20 @@ async function login(req, res){
         return res.status(403).send({ auth: false, message: 'Please provide both user-ID and password.' });
     }
 
+    userName = userName.toString().toLowerCase();
+
+    let logUserName = userName.substring(0,userName.indexOf("@")) + "@*******.XX";
+
     try{
 
          let userObj = await getUserByName(userName).catch(err => {
-            logger.warning(`"Either username or password invalid" ${userName}`)
+            logger.warn(`"Either username or password invalid" ${logUserName}`)
             res.status(403).send("Either username or password invalid"); 
             return; 
          });
 
          if (!userObj){
-            logger.warning(`"Either username or password invalid" ${userName}`)
+            logger.warn(`"Either username or password invalid" ${logUserName}`)
             res.status(403).send("Either username or password invalid"); 
             return;       
         }
@@ -37,7 +41,7 @@ async function login(req, res){
             let resp = userObj; 
 
             if (!userObj.validated){
-                logger.warning(`Please verify your account first. ${userName}`)
+                logger.warn(`Please verify your account first. ${logUserName}`)
                 return res.status(425).send("Please verify your account first."); 
             }
 
@@ -51,12 +55,12 @@ async function login(req, res){
 
             res.json({"data" : resp});
         }else{
-            logger.warning(`Either username or password invalid. ${userName}`)
+            logger.warn(`Either username or password invalid. ${logUserName}`)
             res.status(403).send("Either username or password invalid");            
         }
 
     }catch(error){
-        logger.error(`Something went wrong logging in: ${userName}`)
+        logger.error(`Something went wrong logging in: ${logUserName}`)
         logger.error(error);
         res.status(403).send("Something went wrong logging in.");
     }
@@ -78,8 +82,10 @@ async function registerUser ( req, res ){
     try{
         let userName = req.body.userName;
         let pass = req.body.password;
+        let logUserName = userName.substring(0,userName.indexOf("@")) + "@*******.XX";
     
         if (!validateEmail(userName)){
+            logger.warn(`Please provide a valid email as a userName ${logUserName}`)
             res.status(406).send("Please provide a valid email as a userName");
             return;
         }
@@ -88,6 +94,8 @@ async function registerUser ( req, res ){
             res.status(406).send("Please provide a strong passphrase (at least length=8 and special characters)");
             return;
         }
+
+        userName = userName.toString().toLowerCase();
     
         var salt = bcrypt.genSaltSync(10);
         let passPhrase = bcrypt.hashSync(pass, salt);
@@ -117,7 +125,7 @@ async function registerUser ( req, res ){
         let userObj = await getUserByName(userName);
     
         if (userObj){
-            logger.info("User cannot be created - already exists.");
+            logger.info(`User cannot be created - already exists for user: ${logUserName}`);
             res.status(409).send("User cannot be created. Already exists");
             return;
         }
@@ -135,19 +143,11 @@ async function registerUser ( req, res ){
                 newUser,
               async function(err, u){
     
-                let resultUserObj = await getUserByName(userName).catch(err => {
-                    throw err;
-                });
+                let resultUserObj = await getUserByName(userName);
     
                 let resp = resultUserObj; 
     
                 delete resp.passPhrase;
-    
-                var token = jwt.sign(resp, config.auth.jwtsec, {
-                    expiresIn: config.auth.expiresIn
-                });
-    
-                resp.token = token;
     
                 res.json({"data" : resp});
     

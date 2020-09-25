@@ -6,6 +6,7 @@ import {MatSnackBar } from '@angular/material';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Router, ActivatedRoute } from '@angular/router';
 import { GoogleAnalyticsService } from 'src/app/services/google-analytics.service';
+import { LoaderService } from 'src/app/services/loader.service';
 
 
 
@@ -71,7 +72,8 @@ export class LoginComponent implements OnInit {
     private snackBar : MatSnackBar, 
     private router : Router, 
     private route : ActivatedRoute, 
-    private googleAnalytics : GoogleAnalyticsService
+    private googleAnalytics : GoogleAnalyticsService, 
+    private loaderSrv : LoaderService
   ) {
 
     this.guestform =  new FormGroup({
@@ -113,6 +115,7 @@ export class LoginComponent implements OnInit {
   get forgot() {return this.forgotPasswordForm.controls;}
 
   login() {
+
       // reset alerts on submit
       // this.alertService.clear();
 
@@ -121,10 +124,15 @@ export class LoginComponent implements OnInit {
           return;
       }
 
+      this.loaderSrv.setMsgLoading(true, "einen Moment bitte...");
+
       this.authenticationService.login(this.f.username.value, this.f.password.value)
           .pipe(first())
           .subscribe(
               userData => {
+
+                this.loaderSrv.setMsgLoading(false)
+
                   this.snackBar.open(`Willkommen ${userData.userName}`, null, {
                       duration: 1500,
                     });
@@ -139,7 +147,7 @@ export class LoginComponent implements OnInit {
                   
               },
               error => {
-                console.log(error);
+                this.loaderSrv.setMsgLoading(false);
                 if (error.status == 425){
                   this.snackBar.open("Bitte verifizieren Sie Ihr Konto, bevor Sie Ihr Konto verwenden können. Prüfen Sie Ihr Email-Postfach.", "OK", {
                     duration : 10000
@@ -172,10 +180,13 @@ export class LoginComponent implements OnInit {
         return;
     }
 
+    this.loaderSrv.setMsgLoading(true, "einen Moment bitte...")
+
     this.authenticationService.forgotPassword(this.forgot.username.value)
     .pipe(first())
     .subscribe(
         userData => {
+          this.loaderSrv.setMsgLoading(false);
             this.snackBar.open(`Danke für Ihre Anfrage. Wir haben Ihnen soeben eine Email geschickt.`, null, {
                 duration: 1500,
               });
@@ -188,10 +199,18 @@ export class LoginComponent implements OnInit {
               });
         },
         error => {
-
-            this.snackBar.open("Das hat leider nicht geklappt, bitte erneut versuchen.", "OK", {
+          this.loaderSrv.setMsgLoading(false);
+          if (error.status == 425){
+            
+            this.snackBar.open("Es ist ein Fehler aufgetreten, ggf. ist für diese eMail schon ein Konto angelegt worden.", "OK", {
               duration : 3000
             });
+          }else{
+            this.snackBar.open("Es ist ein Fehler aufgetreten, ggf. ist für diese eMail schon ein Konto angelegt worden.", "OK", {
+              duration : 3000
+            });
+          }
+          
         });
     
   }
@@ -210,11 +229,18 @@ export class LoginComponent implements OnInit {
 
   registerNewUser(){
 
+    if (this.registerForm.invalid){
+      return;
+    }
+
+    this.loaderSrv.setMsgLoading(true, "einen Moment bitte...")
+
     this.authenticationService.register(this.registerForm.value)
     .pipe(first())
     .subscribe(
         userData => {
-          console.log(userData);
+          
+          this.loaderSrv.setMsgLoading(false);
 
             this.setState("newuser")
 
@@ -232,6 +258,8 @@ export class LoginComponent implements OnInit {
             // this.router.navigate([this.returnUrl]);
         },
         error => {
+
+          this.loaderSrv.setMsgLoading(false);
 
           if (error.status == 412){
             this.snackBar.open("Es scheint, als wäre diese eMail bereits registriert. Eventuell hilft das Zurücksetzen des Passworts.", "OK", {
