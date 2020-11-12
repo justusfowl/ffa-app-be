@@ -37,7 +37,16 @@ export class GoogleAnalyticsService {
   }
 
   setStatus(status){
+    console.log(status);
     this.active = status;
+    if (!status){
+      let gCookies = document.cookie.split(";").map(x => {return x.split("=")[0]}).filter(x => x.indexOf('_g')>-1);
+      gCookies.forEach(gC => {
+        document.cookie = gC + '=; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+      });
+      document.cookie = "cookieconsent_status=deny;"
+      
+    }
   }
 
   initGA(){
@@ -45,7 +54,6 @@ export class GoogleAnalyticsService {
       return;
     }
     gtag('js', new Date());
-    console.log("Initiatilizing GA with...#" + this.gaId);
     gtag('config', this.gaId);
 
     this.active = true;

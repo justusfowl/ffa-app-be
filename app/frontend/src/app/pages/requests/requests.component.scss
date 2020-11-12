@@ -6,6 +6,10 @@
             padding: 10px;  
         }
 
+        .formfield{
+            margin: 0 10px;
+        }
+
         .status-row{
             padding: 20px;
             font-weight: 600;
@@ -24,6 +28,10 @@
 
     .medication-table{
         width: 100%; 
+
+        td.mat-cell{
+            text-align: left;
+        }
     }
 
     .buttons{

@@ -89,6 +89,8 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
         if (event.status == "allow"){ 
           this.googleAnalytics.setStatus(true);
           this.googleAnalytics.initGA()
+        }else{
+          this.googleAnalytics.setStatus(false);
         }
       });
 

@@ -488,7 +488,7 @@ function sendGeneralMsgNotification (userEmail, userName, userId, messageOptions
 
             if (status === 50){
                 preheader = 'Wir benötigen mehr Informationen zu Ihrer Anfrage.';
-                messageText = "Vielen Dank für Ihre Anfrage. Zur weiteren Bearbeitung benötigen wir jedoch noch ein paar weitere Informationen. Wir bitten Sie daher uns unter der 06123 / 90 29 10 telefonisch bei uns zu melden, um dies zu besprechen."
+                messageText = "Vielen Dank für Ihre Anfrage. Zur weiteren Bearbeitung benötigen wir jedoch noch ein paar weitere Informationen. Wir bitten Sie daher, sich telefonisch bei uns unter der Rufnummer 06123 / 90 29 10 zu melden, um dies zu besprechen."
             }else if (status === 100){
                 preheader = 'Ihre Anfrage wurde bearbeitet und abgeschlossen.';
                 messageText = 'Ihre Anfrage wurde bearbeitet und abgeschlossen. Sie können den Status über den folgenden Link einsehen.';

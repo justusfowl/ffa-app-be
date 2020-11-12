@@ -30,7 +30,6 @@ export class ApiService {
 
     this.apiURL= this.apiURL + environment.apiEnd;
 
-    console.log(environment.production);
   }
 
   setLoading(targetState){

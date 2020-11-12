@@ -1,22 +1,51 @@
 version: "3.6"
 services:
 
+  nginx-proxy:
+    image: jwilder/nginx-proxy:latest
+    restart: unless-stopped
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - /etc/nginx/certs:/etc/nginx/certs
+      - ./nginx/conf:/etc/nginx/conf.d
+      - ./nginx/vhost.d:/etc/nginx/vhost.d
+      - /usr/share/nginx/html:/usr/share/nginx/html
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+    labels:
+      com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy: "true"
+
+  nginx-proxy-letsencrypt:
+    image: jrcs/letsencrypt-nginx-proxy-companion:latest
+    restart: unless-stopped
+    volumes:
+      - /etc/nginx/certs:/etc/nginx/certs
+      - ./nginx/vhost.d:/etc/nginx/vhost.d
+      - /usr/share/nginx/html:/usr/share/nginx/html
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      DEFAULT_EMAIL: it@facharztpraxis-fuer-allgemeinmedizin.de
+    depends_on:
+      - nginx-proxy
+
   app:
     restart: always
-    build: ./app
+    image: myffa/ffa:latest
     env_file: .env
-    ports:
-      - "8000:8000"
     volumes:
       - .:/app
       - /app/node_modules
       - appdata:/usr/app/pub
     environment:
-      APP_ENC_KEY: ${APP_ENC_KEY}
+      - APP_ENC_KEY=${APP_ENC_KEY}
+      - VIRTUAL_HOST=facharztpraxis-fuer-allgemeinmedizin.de,www.facharztpraxis-fuer-allgemeinmedizin.de
+      - VIRTUAL_PORT=8000
+      - LETSENCRYPT_HOST=facharztpraxis-fuer-allgemeinmedizin.de
+      - LETSENCRYPT_EMAIL=it@facharztpraxis-fuer-allgemeinmedizin.de
     links:
       - mongo
   
-
   mongo:
     image: mongo
     container_name: mongo
@@ -29,9 +58,6 @@ services:
       - mongodata:/data/db
       - ./init:/docker-entrypoint-initdb.d
       - ./init/mongod.conf:/etc/mongod.conf:ro
-      - ./mongodump:/mongodump
-    ports:
-      - "27017:27017"
    
 networks:
   default:

@@ -72,10 +72,10 @@ const cookieConfig:NgcCookieConsentConfig = {
   theme: 'edgeless',
   type: 'opt-in',
   content : {
-    "message": "Wir möchten Ihnen das bestmögliche Nutzererlebnis bei unseren digitalen Gesundheitsdiensten bieten und nutzen dafür Cookies.",
+    "message": "Neben für die Funktionalität der Website notwendigen Cookies möchten wir Ihnen das bestmögliche Nutzererlebnis bei unseren digitalen Gesundheitsdiensten bieten und nutzen dafür Cookies.",
     "dismiss": "OK!",
-    "allow": "OK - ich bin einverstanden!",
-    "deny": "Lieber nicht.",
+    "allow": "alle bestätigen",
+    "deny": "nur notwendige",
     "link": "mehr Infos",
     "href": "/privacy",
     "policy": "Datenschutz"
